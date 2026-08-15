@@ -40,45 +40,46 @@
 
       <div class="px-4 pt-3 pb-1 text-[11px] font-bold text-blue-200/70 uppercase">Модулі системи</div>
       
-      <button id="nav-housing" onclick="navigate('housing')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover">
+      <!-- Неактивні модулі (відкриватимуться по черзі) -->
+      <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-hotel w-4"></i> ПОСЕЛЕННЯ</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-70"></i>
-      </button>
+        <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
+      </div>
 
-      <button id="nav-attendance" onclick="navigate('attendance')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover">
+      <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-calendar-check w-4"></i> ВІДВІДУВАНІСТЬ</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-70"></i>
-      </button>
+        <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
+      </div>
 
-      <button id="nav-academic" onclick="navigate('academic')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover">
+      <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-chart-line w-4"></i> УСПІШНІСТЬ І БОРГИ</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-70"></i>
-      </button>
+        <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
+      </div>
 
-      <button id="nav-rating" onclick="navigate('rating')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover">
+      <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-award w-4"></i> СТИПЕНДІЯ / РЕЙТИНГ</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-70"></i>
-      </button>
+        <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
+      </div>
 
-      <button id="nav-military" onclick="navigate('military')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover">
+      <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-shield-halved w-4"></i> ВІЙСЬКОВИЙ ОБЛІК</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-70"></i>
-      </button>
+        <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
+      </div>
 
-      <button id="nav-social" onclick="navigate('social')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover">
+      <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-hand-holding-heart w-4"></i> СОЦІАЛЬНИЙ ЗАХИСТ</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-70"></i>
-      </button>
+        <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
+      </div>
 
-      <button id="nav-safety" onclick="navigate('safety')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover">
+      <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-compass w-4"></i> АДАПТАЦІЯ ТА БЕЗПЕКА</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-70"></i>
-      </button>
+        <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
+      </div>
 
-      <button id="nav-reports" onclick="navigate('reports')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover">
+      <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-file-lines w-4"></i> ЗВІТНІСТЬ КУРАТОРА</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-70"></i>
-      </button>
+        <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
+      </div>
     </nav>
 
     <!-- Інфо групи внизу сайдбара -->
@@ -110,7 +111,7 @@
 
     <!-- Робоча зона -->
     <main id="main-content" class="flex-1 overflow-y-auto p-6">
-      <!-- Контент генерується функцією renderCurrentView() -->
+      <!-- Контент генерується динамічно -->
     </main>
   </div>
 
@@ -231,37 +232,11 @@
         <button onclick="closeModal('modal-card')" class="text-slate-600 hover:text-black text-base font-bold">✕</button>
       </div>
 
-      <div id="card-content" class="p-6 overflow-y-auto flex-1 text-xs">
-        <!-- Заповнюється скриптом viewStudentCard() -->
-      </div>
+      <div id="card-content" class="p-6 overflow-y-auto flex-1 text-xs"></div>
 
       <div class="p-3 bg-slate-100 border-t border-slate-300 flex justify-end">
         <button onclick="closeModal('modal-card')" class="px-4 py-1 border border-slate-400 bg-white hover:bg-slate-50 text-slate-800 rounded-sm text-xs">
           Закрити картку
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Модальне вікно: Повідомлення про наповнення модуля -->
-  <div id="modal-under-construction" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
-    <div class="bg-white border border-slate-400 rounded-sm shadow-xl w-full max-w-md">
-      <div class="sute-blue text-white px-4 py-2 flex items-center justify-between font-bold text-xs">
-        <span class="flex items-center gap-2"><i class="fa-solid fa-circle-info"></i> Повідомлення системи</span>
-        <button onclick="closeModal('modal-under-construction')" class="text-white hover:text-red-200 text-sm">✕</button>
-      </div>
-      <div class="p-5 text-center space-y-3">
-        <div class="w-12 h-12 rounded-full bg-blue-50 text-[#2b569a] flex items-center justify-center mx-auto text-xl border border-blue-200">
-          <i class="fa-solid fa-bars-progress"></i>
-        </div>
-        <div>
-          <h3 id="uc-module-title" class="font-bold text-slate-800 text-sm">Модуль у розробці</h3>
-          <p class="text-xs text-slate-500 mt-1">Цей сервіс системи «єКуратор» перебуває на етапі наповнення та налаштування бізнес-логіки згідно з технічним регламентом[cite: 1].</p>
-        </div>
-      </div>
-      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-center">
-        <button onclick="closeModal('modal-under-construction')" class="px-5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white font-semibold rounded-sm text-xs">
-          Зрозуміло
         </button>
       </div>
     </div>
@@ -276,20 +251,22 @@
     let studentsList = [];
     let searchQuery = '';
 
-    const moduleNamesMap = {
-      housing: '1. Поселення та студмістечко',
-      attendance: '2. Відвідуваність та навчальна дисципліна',
-      academic: '3. Контроль успішності та сесія',
-      rating: '4. Стипендіальний рейтинг та портфоліо',
-      military: '5. Військовий облік та ТЦК',
-      social: '6. Соціальний супровід та пільги',
-      safety: '7. Адаптація, самоврядування та безпека',
-      reports: '8. Звітність та аналітика куратора'
-    };
-
     window.addEventListener('DOMContentLoaded', () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash === 'students' || hash === 'dashboard') {
+        currentTab = hash;
+      }
+      
       fetchStudentsFromCloud();
+      renderNavigationUI();
       renderCurrentView();
+    });
+
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash.replace('#', '') || 'dashboard';
+      if ((hash === 'students' || hash === 'dashboard') && hash !== currentTab) {
+        navigate(hash, false);
+      }
     });
 
     async function fetchStudentsFromCloud() {
@@ -319,30 +296,27 @@
       if (countEl) countEl.innerText = studentsList.length;
     }
 
-    function navigate(tabKey) {
+    function navigate(tabKey, updateHash = true) {
       currentTab = tabKey;
-      
-      const allButtons = document.querySelectorAll('aside nav button');
-      allButtons.forEach(btn => {
-        btn.className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover";
-      });
-      
-      const activeBtn = document.getElementById(`nav-${tabKey}`);
-      if (activeBtn) {
-        activeBtn.className = "w-full flex items-center justify-between px-4 py-2.5 bg-blue-800 font-bold border-l-4 border-amber-400 text-white";
+      if (updateHash) {
+        window.location.hash = tabKey;
       }
 
+      renderNavigationUI();
       renderCurrentView();
-
-      // Якщо це один із модулів у розробці — показуємо спливаюче повідомлення
-      if (moduleNamesMap[tabKey]) {
-        showUnderConstructionModal(moduleNamesMap[tabKey]);
-      }
     }
 
-    function showUnderConstructionModal(name) {
-      document.getElementById('uc-module-title').innerText = name;
-      openModal('modal-under-construction');
+    function renderNavigationUI() {
+      const btnDashboard = document.getElementById('nav-dashboard');
+      const btnStudents = document.getElementById('nav-students');
+      
+      if (currentTab === 'dashboard') {
+        btnDashboard.className = "w-full flex items-center justify-between px-4 py-2.5 bg-blue-800 font-bold border-l-4 border-amber-400 text-white";
+        btnStudents.className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover";
+      } else if (currentTab === 'students') {
+        btnStudents.className = "w-full flex items-center justify-between px-4 py-2.5 bg-blue-800 font-bold border-l-4 border-amber-400 text-white";
+        btnDashboard.className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover";
+      }
     }
 
     function renderCurrentView() {
@@ -409,22 +383,6 @@
           </div>
         `;
         renderStudentsTable();
-      } else {
-        const title = moduleNamesMap[currentTab] || 'Модуль системи';
-        main.innerHTML = `
-          <div class="bg-white border border-slate-300 p-8 text-center rounded-sm">
-            <div class="w-12 h-12 rounded-full bg-blue-50 text-[#2b569a] flex items-center justify-center mx-auto text-xl border border-blue-200 mb-3">
-              <i class="fa-solid fa-screwdriver-wrench"></i>
-            </div>
-            <div class="font-bold text-slate-800 text-base">${title}</div>
-            <div class="text-xs text-slate-500 mt-1.5 max-w-md mx-auto">
-              Розділ активовано в системі. Наразі триває наповнення функціональними блоками та інтеграція з базою групи ФТМ 1-5[cite: 1].
-            </div>
-            <button onclick="navigate('students')" class="mt-4 px-4 py-1.5 bg-[#2b569a] text-white rounded-sm text-xs font-semibold hover:bg-[#1f4277]">
-              Повернутися до Списку групи
-            </button>
-          </div>
-        `;
       }
     }
 
