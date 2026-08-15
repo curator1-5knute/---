@@ -16,6 +16,36 @@
     .sute-link { color: #1e5bb8; text-decoration: underline; }
     .sute-link:hover { color: #0d3875; }
     .table-header { background-color: #e9ecef; }
+    
+    /* Автентичне біле випадне меню у стилі МІА */
+    .mia-submenu {
+      background-color: #ffffff;
+      border-radius: 4px;
+      margin: 4px 8px 8px 8px;
+      padding: 6px 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    }
+    .mia-submenu-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 6px 14px;
+      font-size: 12px;
+      color: #334155;
+      transition: all 0.15s;
+    }
+    .mia-submenu-item:hover {
+      background-color: #f1f5f9;
+      color: #1e5bb8;
+      font-weight: 600;
+    }
+    .mia-submenu-item.active {
+      color: #1e5bb8;
+      font-weight: 700;
+      background-color: #e0e7ff;
+      border-left: 3px solid #2b569a;
+    }
+
     @media print {
       body * { visibility: hidden; }
       #printable-area, #printable-area * { visibility: visible; }
@@ -32,9 +62,11 @@
       <span class="font-bold text-xs uppercase tracking-wider">ДТЕУ • єКуратор</span>
     </div>
 
+    <!-- Список навігації -->
     <nav class="flex-1 overflow-y-auto py-2 text-[13px]">
+      
       <div class="px-4 pb-1 text-[11px] font-bold text-blue-200/70 uppercase">Основне</div>
-      <button id="nav-dashboard" onclick="navigate('dashboard')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover">
+      <button id="nav-dashboard" onclick="navigate('dashboard')" class="w-full flex items-center justify-between px-4 py-2.5 text-blue-100 sute-nav-hover">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-house w-4"></i> ГОЛОВНА СТОРІНКА</span>
       </button>
 
@@ -43,47 +75,109 @@
         <span id="sidebar-count" class="text-[11px] bg-blue-950/60 px-1.5 py-0.5 rounded font-mono">0</span>
       </button>
 
-      <div class="px-4 pt-3 pb-1 text-[11px] font-bold text-blue-200/70 uppercase">Модулі системи</div>
+      <div class="px-4 pt-3 pb-1 text-[11px] font-bold text-blue-200/70 uppercase">Сервіси супроводу</div>
       
-      <!-- Активний Модуль 1 «ПОСЕЛЕННЯ» -->
-      <button id="nav-housing" onclick="navigate('housing')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover">
-        <span class="flex items-center gap-2.5"><i class="fa-solid fa-hotel w-4 text-amber-300"></i> ПОСЕЛЕННЯ</span>
-        <span id="sidebar-housing-count" class="text-[10px] bg-amber-500/30 text-amber-200 px-1.5 py-0.5 rounded font-mono">0</span>
-      </button>
+      <!-- Модуль 1 «ПОСЕЛЕННЯ» (Випадаючий блок у стилі МІА) -->
+      <div>
+        <button id="btn-group-housing" onclick="toggleMenu('housing')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition">
+          <span class="flex items-center gap-2.5 font-bold"><i class="fa-solid fa-hotel w-4"></i> ПОСЕЛЕННЯ</span>
+          <i id="arrow-housing" class="fa-solid fa-chevron-right text-[11px] transition-transform duration-200"></i>
+        </button>
 
+        <!-- Підсторінки (МIA-стиль) -->
+        <div id="sub-housing" class="mia-submenu hidden">
+          <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-1">
+            SUTE-Housing v1.0
+          </div>
+          <button onclick="navigate('housing-dashboard')" id="subnav-housing-dashboard" class="mia-submenu-item">
+            0. Дашборд поселення
+          </button>
+          
+          <div class="px-3 pt-2 pb-0.5 text-[9px] font-bold text-blue-900/60 uppercase">Етап I: Допоселенський аудит</div>
+          <button onclick="navigate('housing-stage1-import')" id="subnav-housing-stage1-import" class="mia-submenu-item">
+            1.1. Реєстр та імпорт наказу
+          </button>
+          <button onclick="navigate('housing-stage1-screening')" id="subnav-housing-stage1-screening" class="mia-submenu-item">
+            1.2. Соціальний скринінг
+          </button>
+          <button onclick="navigate('housing-stage1-verification')" id="subnav-housing-stage1-verification" class="mia-submenu-item">
+            1.3. Верифікація пільг
+          </button>
+          <button onclick="navigate('housing-stage1-list')" id="subnav-housing-stage1-list" class="mia-submenu-item">
+            1.4. Проєкт списку на поселення
+          </button>
+
+          <div class="px-3 pt-2 pb-0.5 text-[9px] font-bold text-blue-900/60 uppercase">Етап II: Інструктажі</div>
+          <button onclick="navigate('housing-stage2-slots')" id="subnav-housing-stage2-slots" class="mia-submenu-item">
+            2.1. Планувальник тайм-слотів
+          </button>
+          <button onclick="navigate('housing-stage2-checklist')" id="subnav-housing-stage2-checklist" class="mia-submenu-item">
+            2.2. Чек-лист документів
+          </button>
+          <button onclick="navigate('housing-stage2-briefings')" id="subnav-housing-stage2-briefings" class="mia-submenu-item">
+            2.3. Журнал інструктажів
+          </button>
+
+          <div class="px-3 pt-2 pb-0.5 text-[9px] font-bold text-blue-900/60 uppercase">Етап III: Очний день</div>
+          <button onclick="navigate('housing-stage3-terminal')" id="subnav-housing-stage3-terminal" class="mia-submenu-item">
+            3.1. Маршрут поселення (5 кроків)
+          </button>
+          <button onclick="navigate('housing-stage3-defects')" id="subnav-housing-stage3-defects" class="mia-submenu-item">
+            3.2. Реєстр дефектів кімнат
+          </button>
+
+          <div class="px-3 pt-2 pb-0.5 text-[9px] font-bold text-blue-900/60 uppercase">Етап IV: Підсумки</div>
+          <button onclick="navigate('housing-stage4-elections')" id="subnav-housing-stage4-elections" class="mia-submenu-item">
+            4.1. Збори та вибори старости
+          </button>
+          <button onclick="navigate('housing-stage4-handbook')" id="subnav-housing-stage4-handbook" class="mia-submenu-item">
+            4.2. Вручення довідників
+          </button>
+          <button onclick="navigate('housing-stage4-report')" id="subnav-housing-stage4-report" class="mia-submenu-item">
+            4.3. Фінальний звіт куратора
+          </button>
+
+          <div class="px-3 pt-2 pb-0.5 text-[9px] font-bold text-blue-900/60 uppercase">Налаштування</div>
+          <button onclick="navigate('housing-settings')" id="subnav-housing-settings" class="mia-submenu-item">
+            5.1. Квоти, тарифи та гуртожитки
+          </button>
+        </div>
+      </div>
+
+      <!-- Інші неактивні модулі -->
       <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-calendar-check w-4"></i> ВІДВІДУВАНІСТЬ</span>
-        <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
+        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
       </div>
 
       <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-chart-line w-4"></i> УСПІШНІСТЬ І БОРГИ</span>
-        <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
+        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
       </div>
 
       <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-award w-4"></i> СТИПЕНДІЯ / РЕЙТИНГ</span>
-        <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
+        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
       </div>
 
       <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-shield-halved w-4"></i> ВІЙСЬКОВИЙ ОБЛІК</span>
-        <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
+        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
       </div>
 
       <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-hand-holding-heart w-4"></i> СОЦІАЛЬНИЙ ЗАХИСТ</span>
-        <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
+        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
       </div>
 
       <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-compass w-4"></i> АДАПТАЦІЯ ТА БЕЗПЕКА</span>
-        <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
+        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
       </div>
 
       <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-file-lines w-4"></i> ЗВІТНІСТЬ КУРАТОРА</span>
-        <i class="fa-solid fa-lock text-[10px] opacity-40"></i>
+        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
       </div>
     </nav>
 
@@ -116,7 +210,7 @@
 
     <!-- Робоча зона -->
     <main id="main-content" class="flex-1 overflow-y-auto p-6">
-      <!-- Контент сторінки -->
+      <!-- Контент генерується динамічно функцією renderCurrentView() -->
     </main>
   </div>
 
@@ -236,134 +330,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА: Редагування потреби та пільги поселення (Етап I) -->
-  <div id="modal-housing-edit" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
-    <div class="bg-white border border-slate-400 rounded-sm shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-      <div class="sute-blue text-white px-4 py-2.5 flex items-center justify-between font-bold text-xs">
-        <span><i class="fa-solid fa-hotel mr-2"></i>Параметри поселення та верифікація пільги студента</span>
-        <button onclick="closeModal('modal-housing-edit')" class="text-white hover:text-red-200 text-base">✕</button>
-      </div>
-
-      <form id="housing-edit-form" onsubmit="saveHousingData(event)" class="p-5 overflow-y-auto space-y-4 text-xs">
-        <input type="hidden" id="h-student-id">
-
-        <div class="bg-slate-100 p-2.5 rounded border border-slate-300">
-          <div class="text-[11px] text-slate-500 font-medium">Студент:</div>
-          <div id="h-student-name" class="font-bold text-slate-900 text-sm">...</div>
-          <div id="h-student-meta" class="text-[11px] text-slate-600 mt-0.5">...</div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold mb-1 text-slate-700">Потреба в гуртожитку *</label>
-            <select id="h-need" onchange="toggleRefusalBlock(this.value)" class="w-full border border-slate-300 p-2 rounded-sm bg-white font-semibold">
-              <option value="true">Так (Потребує поселення)</option>
-              <option value="false">Ні (Відмова від гуртожитку)</option>
-            </select>
-          </div>
-
-          <div id="block-refusal" class="hidden">
-            <label class="block font-semibold mb-1 text-slate-700">Причина відмови *</label>
-            <select id="h-refusal-reason" class="w-full border border-slate-300 p-2 rounded-sm bg-white">
-              <option value="Проживає вдома (Київ/область)">Проживає вдома (Київ/область)</option>
-              <option value="Оренда квартири">Оренда квартири</option>
-              <option value="Проживання у родичів">Проживання у родичів</option>
-              <option value="Інше">Інше</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="block-housing-details" class="space-y-3 pt-2 border-t border-slate-200">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label class="block font-semibold mb-1 text-slate-700">Соціальна пільгова категорія *</label>
-              <select id="h-benefit" class="w-full border border-slate-300 p-2 rounded-sm bg-white">
-                <option value="Без пільг">Без пільг (Загальний конкурс)</option>
-                <option value="Дитина загиблого Захисника">Дитина загиблого Захисника України (100% пільга)</option>
-                <option value="Сирота / Позбавлені піклування">Сирота / Позбавлені піклування</option>
-                <option value="УБД / Дитина УБД">УБД / Дитина УБД</option>
-                <option value="ВПО">ВПО (Внутрішньо переміщена особа)</option>
-                <option value="Особа з інвалідністю">Особа з інвалідністю</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block font-semibold mb-1 text-slate-700">Статус перевірки документів пільги *</label>
-              <select id="h-benefit-status" class="w-full border border-slate-300 p-2 rounded-sm bg-white">
-                <option value="Не подано">Не подано</option>
-                <option value="На перевірці">На перевірці куратором</option>
-                <option value="Підтверджено">Підтверджено (Верифіковано)</option>
-                <option value="Відхилено">Відхилено (Неповний пакет)</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label class="block font-semibold mb-1 text-slate-700">Рекомендований гуртожиток ДТЕУ</label>
-              <select id="h-dorm" class="w-full border border-slate-300 p-2 rounded-sm bg-white">
-                <option value="Гуртожиток №1">Гуртожиток №1</option>
-                <option value="Гуртожиток №2">Гуртожиток №2</option>
-                <option value="Гуртожиток №3">Гуртожиток №3</option>
-                <option value="Гуртожиток №4">Гуртожиток №4</option>
-                <option value="Гуртожиток №5">Гуртожиток №5</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-semibold mb-1 text-slate-700">Рекомендована кімната / блок</label>
-              <input type="text" id="h-room" placeholder="напр. 412/1" class="w-full border border-slate-300 p-2 rounded-sm bg-white font-mono">
-            </div>
-          </div>
-        </div>
-
-        <div class="flex justify-end gap-2 pt-3 border-t border-slate-300">
-          <button type="button" onclick="closeModal('modal-housing-edit')" class="px-4 py-1.5 border border-slate-300 rounded-sm text-slate-700 bg-slate-100 hover:bg-slate-200">
-            Скасувати
-          </button>
-          <button type="submit" class="px-5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white font-bold rounded-sm shadow-sm">
-            <i class="fa-solid fa-check mr-1"></i> Зберегти дані поселення
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- МОДАЛКА: Додати дефект кімнати (RoomDefect) -->
-  <div id="modal-defect-add" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
-    <div class="bg-white border border-slate-400 rounded-sm shadow-xl w-full max-w-md">
-      <div class="sute-blue text-white px-4 py-2 flex items-center justify-between font-bold text-xs">
-        <span><i class="fa-solid fa-screwdriver-wrench mr-2"></i>Фіксація дефекту в кімнаті гуртожитку</span>
-        <button onclick="closeModal('modal-defect-add')" class="text-white hover:text-red-200 text-base">✕</button>
-      </div>
-
-      <form id="defect-form" onsubmit="saveDefect(event)" class="p-4 space-y-3 text-xs">
-        <div>
-          <label class="block font-semibold mb-1 text-slate-700">Номер кімнати / блоку *</label>
-          <input type="text" id="def-room" required placeholder="напр. 315/2" class="w-full border border-slate-300 p-2 rounded-sm bg-white font-mono">
-        </div>
-        <div>
-          <label class="block font-semibold mb-1 text-slate-700">Тип виявленого дефекту *</label>
-          <select id="def-type" class="w-full border border-slate-300 p-2 rounded-sm bg-white">
-            <option value="Меблі">Меблі (ліжко, шафа, стіл, стілець)</option>
-            <option value="Сантехніка">Сантехніка (кран, душ, умивальник, туалет)</option>
-            <option value="Електрика">Електрика (розетка, освітлення, вимикач)</option>
-            <option value="Вікна / Двері">Вікна / Двері / Замок</option>
-            <option value="Інше">Інше побутове питання</option>
-          </select>
-        </div>
-        <div>
-          <label class="block font-semibold mb-1 text-slate-700">Детальний опис дефекту *</label>
-          <textarea id="def-desc" required rows="3" placeholder="Опишіть проблему для передачі коменданту..." class="w-full border border-slate-300 p-2 rounded-sm bg-white"></textarea>
-        </div>
-        <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
-          <button type="button" onclick="closeModal('modal-defect-add')" class="px-3 py-1.5 border border-slate-300 rounded text-slate-700 bg-slate-100">Скасувати</button>
-          <button type="submit" class="px-4 py-1.5 bg-[#2b569a] text-white font-bold rounded">Зафіксувати дефект</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ДРУКОВАНА ОБЛАСТЬ: Проєкт списку / Звіт -->
+  <!-- ДРУКОВАНА ОБЛАСТЬ -->
   <div id="printable-area" class="hidden p-8 text-black text-xs font-serif"></div>
 
   <script>
@@ -372,19 +339,22 @@
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentTab = 'dashboard';
-    let housingSubTab = 'etap1'; // etap1, etap2, etap3, etap4
+    let isHousingMenuOpen = false;
     let studentsList = [];
-    let housingData = {}; // student_id -> { need, refusal_reason, benefit, benefit_status, dorm, room, slot, step1, step2, step3, step4, step5 }
+    let housingData = {};
     let roomDefects = [];
     let searchQuery = '';
 
     window.addEventListener('DOMContentLoaded', () => {
       loadSavedHousingData();
-      const hash = window.location.hash.replace('#', '');
-      if (hash === 'students' || hash === 'dashboard' || hash === 'housing') {
-        currentTab = hash;
-      }
+      const hash = window.location.hash.replace('#', '') || 'dashboard';
+      currentTab = hash;
       
+      // Якщо перейшли за прямим посиланням у підсторінку поселення — відкриваємо меню
+      if (currentTab.startsWith('housing-')) {
+        isHousingMenuOpen = true;
+      }
+
       fetchStudentsFromCloud();
       renderNavigationUI();
       renderCurrentView();
@@ -393,7 +363,10 @@
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '') || 'dashboard';
       if (hash !== currentTab) {
-        navigate(hash, false);
+        currentTab = hash;
+        if (currentTab.startsWith('housing-')) isHousingMenuOpen = true;
+        renderNavigationUI();
+        renderCurrentView();
       }
     });
 
@@ -431,7 +404,7 @@
       initHousingRecordsForStudents();
       updateCounters();
       if (currentTab === 'students') renderStudentsTable();
-      if (currentTab === 'housing') renderHousingSubView();
+      if (currentTab.startsWith('housing-')) renderCurrentView();
     }
 
     function initHousingRecordsForStudents() {
@@ -445,11 +418,13 @@
             dorm: 'Гуртожиток №1',
             room: '—',
             slot: '26 серпня (09:00 - 10:00)',
+            briefing: false,
             step1: false,
             step2: false,
             step3: false,
             step4: false,
-            step5: false
+            step5: false,
+            handbook: false
           };
         }
       });
@@ -459,42 +434,60 @@
     function updateCounters() {
       const countEl = document.getElementById('sidebar-count');
       if (countEl) countEl.innerText = studentsList.length;
+    }
 
-      const hCountEl = document.getElementById('sidebar-housing-count');
-      if (hCountEl) {
-        const needCount = studentsList.filter(s => housingData[s.id] && housingData[s.id].need === true).length;
-        hCountEl.innerText = needCount;
+    // Відкриття / закриття випадаючого списку (Accordion)
+    function toggleMenu(menuKey) {
+      if (menuKey === 'housing') {
+        isHousingMenuOpen = !isHousingMenuOpen;
+        renderNavigationUI();
       }
     }
 
     function navigate(tabKey, updateHash = true) {
       currentTab = tabKey;
       if (updateHash) window.location.hash = tabKey;
+      if (currentTab.startsWith('housing-')) isHousingMenuOpen = true;
       renderNavigationUI();
       renderCurrentView();
     }
 
-    function switchHousingSubTab(subKey) {
-      housingSubTab = subKey;
-      renderHousingSubView();
-    }
-
     function renderNavigationUI() {
-      const btnDashboard = document.getElementById('nav-dashboard');
-      const btnStudents = document.getElementById('nav-students');
-      const btnHousing = document.getElementById('nav-housing');
+      const subMenu = document.getElementById('sub-housing');
+      const arrow = document.getElementById('arrow-housing');
+      const btnGroup = document.getElementById('btn-group-housing');
 
-      const all = [btnDashboard, btnStudents, btnHousing];
-      all.forEach(btn => {
-        if (btn) btn.className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover";
-      });
+      // Відображення випадаючого меню
+      if (isHousingMenuOpen) {
+        subMenu.classList.remove('hidden');
+        arrow.className = "fa-solid fa-chevron-down text-[11px] transition-transform duration-200";
+        btnGroup.className = "w-full flex items-center justify-between px-4 py-2 text-white bg-blue-800/80 font-bold transition";
+      } else {
+        subMenu.classList.add('hidden');
+        arrow.className = "fa-solid fa-chevron-right text-[11px] transition-transform duration-200";
+        btnGroup.className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition";
+      }
 
-      const activeBtn = document.getElementById(`nav-${currentTab}`);
-      if (activeBtn) {
-        activeBtn.className = "w-full flex items-center justify-between px-4 py-2.5 bg-blue-800 font-bold border-l-4 border-amber-400 text-white";
+      // Скидання підсвічування всіх кнопок
+      document.getElementById('nav-dashboard').className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover";
+      document.getElementById('nav-students').className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover";
+
+      // Скидання підсторінок
+      document.querySelectorAll('.mia-submenu-item').forEach(el => el.classList.remove('active'));
+
+      if (currentTab === 'dashboard') {
+        document.getElementById('nav-dashboard').className = "w-full flex items-center justify-between px-4 py-2.5 bg-blue-800 font-bold border-l-4 border-amber-400 text-white";
+      } else if (currentTab === 'students') {
+        document.getElementById('nav-students').className = "w-full flex items-center justify-between px-4 py-2.5 bg-blue-800 font-bold border-l-4 border-amber-400 text-white";
+      } else if (currentTab.startsWith('housing-')) {
+        const activeSub = document.getElementById(`subnav-${currentTab}`);
+        if (activeSub) activeSub.classList.add('active');
       }
     }
 
+    // ==========================================
+    // ГОЛОВНИЙ РОУТЕР ЕКРАНІВ
+    // ==========================================
     function renderCurrentView() {
       const main = document.getElementById('main-content');
       
@@ -510,8 +503,34 @@
         `;
       } else if (currentTab === 'students') {
         renderStudentsView(main);
-      } else if (currentTab === 'housing') {
-        renderHousingView(main);
+      } else if (currentTab === 'housing-dashboard') {
+        renderHousingDashboard(main);
+      } else if (currentTab === 'housing-stage1-import') {
+        renderHousingStage1Import(main);
+      } else if (currentTab === 'housing-stage1-screening') {
+        renderHousingStage1Screening(main);
+      } else if (currentTab === 'housing-stage1-verification') {
+        renderHousingStage1Verification(main);
+      } else if (currentTab === 'housing-stage1-list') {
+        renderHousingStage1List(main);
+      } else if (currentTab === 'housing-stage2-slots') {
+        renderHousingStage2Slots(main);
+      } else if (currentTab === 'housing-stage2-checklist') {
+        renderHousingStage2Checklist(main);
+      } else if (currentTab === 'housing-stage2-briefings') {
+        renderHousingStage2Briefings(main);
+      } else if (currentTab === 'housing-stage3-terminal') {
+        renderHousingStage3Terminal(main);
+      } else if (currentTab === 'housing-stage3-defects') {
+        renderHousingStage3Defects(main);
+      } else if (currentTab === 'housing-stage4-elections') {
+        renderHousingStage4Elections(main);
+      } else if (currentTab === 'housing-stage4-handbook') {
+        renderHousingStage4Handbook(main);
+      } else if (currentTab === 'housing-stage4-report') {
+        renderHousingStage4Report(main);
+      } else if (currentTab === 'housing-settings') {
+        renderHousingSettings(main);
       }
     }
 
@@ -629,158 +648,160 @@
       `).join('');
     }
 
-    // ==========================================
-    // МОДУЛЬ 1: ПОСЕЛЕННЯ ТА СТУДМІСТЕЧКО (4 ЕТАПИ)
-    // ==========================================
-    function renderHousingView(main) {
-      main.innerHTML = `
-        <div class="space-y-4">
-          <!-- Шапка модуля -->
-          <div class="bg-white border border-slate-300 p-4 rounded-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-sm">
-            <div>
-              <h1 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                <i class="fa-solid fa-hotel text-amber-600"></i>
-                Модуль: Поселення та студентське містечко (SUTE-Housing)
-              </h1>
-              <div class="text-xs text-slate-500 mt-0.5">
-                Автоматизований супровід 4 етапів поселення групи ФТМ 1-5
-              </div>
-            </div>
-            
-            <div class="flex items-center gap-2">
-              <button onclick="printHousingDraftList()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-xs font-semibold text-slate-700 flex items-center gap-1.5">
-                <i class="fa-solid fa-print"></i> Друк Проєкту списку (Етап I)[cite: 1]
-              </button>
-              <button onclick="generateHousingFinalReport()" class="px-3 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white rounded text-xs font-bold flex items-center gap-1.5">
-                <i class="fa-solid fa-file-pdf"></i> Фінальний звіт (Етап IV)[cite: 1]
-              </button>
-            </div>
-          </div>
+    // =========================================================================
+    // ПІДСТОРІНКИ МОДУЛЯ 1: ПОСЕЛЕННЯ (ЗА РЕГЛАМЕНТОМ)
+    // =========================================================================
 
-          <!-- Вкладки підрозділів (4 Етапи регламенту) -->
-          <div class="flex border-b border-slate-300 bg-white px-2 pt-2 text-xs font-semibold overflow-x-auto">
-            <button onclick="switchHousingSubTab('etap1')" id="htab-etap1" class="px-4 py-2.5 border-b-2 ${housingSubTab === 'etap1' ? 'border-[#2b569a] text-[#2b569a] font-bold bg-slate-50' : 'border-transparent text-slate-600 hover:text-slate-900'}">
-              1. Аудит, потреба та пільги (15–22 серп.)[cite: 1]
-            </button>
-            <button onclick="switchHousingSubTab('etap2')" id="htab-etap2" class="px-4 py-2.5 border-b-2 ${housingSubTab === 'etap2' ? 'border-[#2b569a] text-[#2b569a] font-bold bg-slate-50' : 'border-transparent text-slate-600 hover:text-slate-900'}">
-              2. Тайм-слоти та чек-лист (23–25 серп.)[cite: 1]
-            </button>
-            <button onclick="switchHousingSubTab('etap3')" id="htab-etap3" class="px-4 py-2.5 border-b-2 ${housingSubTab === 'etap3' ? 'border-[#2b569a] text-[#2b569a] font-bold bg-slate-50' : 'border-transparent text-slate-600 hover:text-slate-900'}">
-              3. Маршрут очного дня (26–31 серп.)[cite: 1]
-            </button>
-            <button onclick="switchHousingSubTab('etap4')" id="htab-etap4" class="px-4 py-2.5 border-b-2 ${housingSubTab === 'etap4' ? 'border-[#2b569a] text-[#2b569a] font-bold bg-slate-50' : 'border-transparent text-slate-600 hover:text-slate-900'}">
-              4. Дефекти кімнат та підсумки (1–3 вер.)[cite: 1]
-            </button>
-          </div>
-
-          <!-- Вміст підрозділу -->
-          <div id="housing-sub-content"></div>
-        </div>
-      `;
-      renderHousingSubView();
-    }
-
-    function renderHousingSubView() {
-      const container = document.getElementById('housing-sub-content');
-      if (!container) return;
-
-      if (studentsList.length === 0) {
-        container.innerHTML = `
-          <div class="bg-white border border-slate-300 p-8 text-center rounded-sm">
-            <i class="fa-solid fa-users-slash text-3xl text-slate-400 mb-2"></i>
-            <div class="font-bold text-slate-700">У групі ще немає зареєстрованих студентів</div>
-            <div class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-              Щоб розподіляти кімнати, верифікувати пільги та проводити заселення, спочатку зареєструйте студентів у розділі «СПИСОК ГРУПИ»[cite: 1].
-            </div>
-            <button onclick="navigate('students')" class="mt-4 px-4 py-1.5 bg-[#2b569a] text-white rounded text-xs font-semibold">
-              Перейти до Списку групи
-            </button>
-          </div>
-        `;
-        return;
-      }
-
-      if (housingSubTab === 'etap1') {
-        renderHousingEtap1(container);
-      } else if (housingSubTab === 'etap2') {
-        renderHousingEtap2(container);
-      } else if (housingSubTab === 'etap3') {
-        renderHousingEtap3(container);
-      } else if (housingSubTab === 'etap4') {
-        renderHousingEtap4(container);
-      }
-    }
-
-    // --- ЕТАП 1: АУДИТ ТА ПІЛЬГИ ---
-    function renderHousingEtap1(container) {
+    // 0. Дашборд модуля «Поселення»
+    function renderHousingDashboard(main) {
       const needCount = studentsList.filter(s => housingData[s.id]?.need).length;
+      const settledCount = studentsList.filter(s => {
+        const h = housingData[s.id];
+        return h && h.need && h.step1 && h.step2 && h.step3 && h.step4 && h.step5;
+      }).length;
       const benefitCount = studentsList.filter(s => housingData[s.id]?.need && housingData[s.id]?.benefit !== 'Без пільг').length;
 
-      container.innerHTML = `
+      main.innerHTML = `
         <div class="space-y-4">
-          <!-- Статистика Етапу 1 -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div class="bg-white border border-slate-300 p-3 rounded-sm">
-              <div class="text-[11px] text-slate-500 font-semibold uppercase">Потребують гуртожитку</div>
-              <div class="text-xl font-bold text-blue-800 mt-1">${needCount} із ${studentsList.length} осіб</div>
+          <div class="bg-white border border-slate-300 p-4 rounded-sm flex items-center justify-between">
+            <div>
+              <h1 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-[#2b569a]"></i>
+                0. Дашборд кампанії з поселення (SUTE-Housing)
+              </h1>
+              <div class="text-xs text-slate-500 mt-0.5">Оперативне зведення по академічній групі ФТМ 1-5</div>
             </div>
-            <div class="bg-white border border-slate-300 p-3 rounded-sm">
-              <div class="text-[11px] text-slate-500 font-semibold uppercase">Пільговики на поселення</div>
-              <div class="text-xl font-bold text-pink-700 mt-1">${benefitCount} осіб</div>
+            <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded">
+              Кампанія активна (2026/2027)
+            </span>
+          </div>
+
+          <!-- Лічильники -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div class="bg-white border border-slate-300 p-3.5 rounded-sm">
+              <div class="text-[11px] text-slate-500 font-bold uppercase">Всього в групі</div>
+              <div class="text-2xl font-bold text-slate-800 mt-1">${studentsList.length}</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">Зараховані студенти</div>
             </div>
-            <div class="bg-white border border-slate-300 p-3 rounded-sm">
-              <div class="text-[11px] text-slate-500 font-semibold uppercase">Відмовились від житла</div>
-              <div class="text-xl font-bold text-slate-600 mt-1">${studentsList.length - needCount} осіб</div>
+            <div class="bg-white border border-slate-300 p-3.5 rounded-sm">
+              <div class="text-[11px] text-slate-500 font-bold uppercase">Потребують житла</div>
+              <div class="text-2xl font-bold text-blue-800 mt-1">${needCount}</div>
+              <div class="text-[11px] text-blue-600 mt-0.5">Заявки в обробці[cite: 1, 2]</div>
+            </div>
+            <div class="bg-white border border-slate-300 p-3.5 rounded-sm">
+              <div class="text-[11px] text-slate-500 font-bold uppercase">Заселено повністю</div>
+              <div class="text-2xl font-bold text-emerald-700 mt-1">${settledCount}</div>
+              <div class="text-[11px] text-emerald-600 mt-0.5">Пройшли 5 кроків[cite: 1, 2]</div>
+            </div>
+            <div class="bg-white border border-slate-300 p-3.5 rounded-sm">
+              <div class="text-[11px] text-slate-500 font-bold uppercase">Пільгові категорії</div>
+              <div class="text-2xl font-bold text-pink-700 mt-1">${benefitCount}</div>
+              <div class="text-[11px] text-pink-600 mt-0.5">Першочергові[cite: 1, 2]</div>
             </div>
           </div>
 
-          <!-- Таблиця Етапу 1 -->
-          <div class="bg-white border border-slate-300 rounded-sm overflow-x-auto shadow-sm">
-            <table class="w-full text-left border-collapse text-xs">
+          <!-- Календарний статус етапів регламенту -->
+          <div class="bg-white border border-slate-300 p-4 rounded-sm">
+            <div class="font-bold text-slate-800 text-sm mb-3">Календарний стан етапів регламенту:</div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-xs">
+              <div class="p-3 bg-blue-50 border border-blue-200 rounded">
+                <div class="font-bold text-blue-900">Етап I (15–22 серп.)[cite: 1, 2]</div>
+                <div class="text-[11px] text-slate-600 mt-1">Аудит, соціальний скринінг та проєкт списку[cite: 1, 2].</div>
+              </div>
+              <div class="p-3 bg-slate-50 border border-slate-200 rounded">
+                <div class="font-bold text-slate-700">Етап II (23–25 серп.)[cite: 1, 2]</div>
+                <div class="text-[11px] text-slate-600 mt-1">Тайм-слоти прибуття та чек-лист документів[cite: 1, 2].</div>
+              </div>
+              <div class="p-3 bg-slate-50 border border-slate-200 rounded">
+                <div class="font-bold text-slate-700">Етап III (26–31 серп.)[cite: 1, 2]</div>
+                <div class="text-[11px] text-slate-600 mt-1">Очний 5-кроковий маршрут заселення[cite: 1, 2].</div>
+              </div>
+              <div class="p-3 bg-slate-50 border border-slate-200 rounded">
+                <div class="font-bold text-slate-700">Етап IV (1–3 вер.)[cite: 1, 2]</div>
+                <div class="text-[11px] text-slate-600 mt-1">Збори, вибори старости та фінальний звіт[cite: 1, 2].</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 1.1. Імпорт наказу та реєстр
+    function renderHousingStage1Import(main) {
+      main.innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm flex items-center justify-between">
+            <div>
+              <h1 class="font-bold text-slate-800 text-sm">1.1. Імпорт наказу та первинний реєстр групи</h1>
+              <div class="text-xs text-slate-500 mt-0.5">Звірка зарахованих студентів ФТМ 1-5 з наказами деканату[cite: 2]</div>
+            </div>
+            <button onclick="navigate('students')" class="px-3 py-1.5 bg-[#2b569a] text-white rounded text-xs font-semibold">
+              + Додати студента вручну[cite: 2]
+            </button>
+          </div>
+
+          <div class="bg-white border border-slate-300 rounded overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="table-header border-b border-slate-300 text-slate-700 font-bold">
+                  <th class="p-2.5 border-r border-slate-300 w-10 text-center">№</th>
+                  <th class="p-2.5 border-r border-slate-300">ПІБ</th>
+                  <th class="p-2.5 border-r border-slate-300">Фінансування</th>
+                  <th class="p-2.5 border-r border-slate-300">Студентський квиток</th>
+                  <th class="p-2.5 border-r border-slate-300">Статус у базі</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                ${studentsList.map((s, idx) => `
+                  <tr class="hover:bg-slate-50">
+                    <td class="p-2 text-center text-slate-500">${idx + 1}</td>
+                    <td class="p-2 font-bold">${s.full_name}</td>
+                    <td class="p-2">${s.payment_type}</td>
+                    <td class="p-2 font-mono text-blue-900">${s.student_card_id}</td>
+                    <td class="p-2"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">В наказі</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    // 1.2. Результати соціального скринінгу
+    function renderHousingStage1Screening(main) {
+      main.innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm">
+            <h1 class="font-bold text-slate-800 text-sm">1.2. Результати соціального скринінгу потреби в житлі[cite: 2]</h1>
+            <div class="text-xs text-slate-500 mt-0.5">Опитування першокурсників щодо надання ліжко-місця та причин відмови[cite: 1, 2]</div>
+          </div>
+
+          <div class="bg-white border border-slate-300 rounded overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
               <thead>
                 <tr class="table-header border-b border-slate-300 text-slate-700 font-bold">
                   <th class="p-2.5 border-r border-slate-300 w-10 text-center">№</th>
                   <th class="p-2.5 border-r border-slate-300">ПІБ студента</th>
-                  <th class="p-2.5 border-r border-slate-300">Потреба</th>
-                  <th class="p-2.5 border-r border-slate-300">Пільгова категорія</th>
-                  <th class="p-2.5 border-r border-slate-300">Верифікація пільги</th>
-                  <th class="p-2.5 border-r border-slate-300">Гуртожиток / Кімната</th>
-                  <th class="p-2.5 text-center w-28">Дія</th>
+                  <th class="p-2.5 border-r border-slate-300">Потреба в гуртожитку</th>
+                  <th class="p-2.5 border-r border-slate-300">Причина відмови (якщо ні)</th>
+                  <th class="p-2.5 text-center w-28">Змінити</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-200">
                 ${studentsList.map((s, idx) => {
                   const h = housingData[s.id] || {};
                   return `
-                    <tr class="hover:bg-slate-50 transition">
-                      <td class="p-2.5 border-r border-slate-300 text-center font-mono text-slate-500">${idx + 1}</td>
-                      <td class="p-2.5 border-r border-slate-300 font-bold text-slate-800">
-                        ${s.full_name}
-                        <div class="text-[10px] text-slate-400 font-normal font-mono">${s.student_card_id}</div>
+                    <tr class="hover:bg-slate-50">
+                      <td class="p-2 text-center text-slate-500">${idx + 1}</td>
+                      <td class="p-2 font-bold">${s.full_name}</td>
+                      <td class="p-2">
+                        ${h.need ? '<span class="text-emerald-700 font-bold">● Потребує поселення</span>' : '<span class="text-rose-700 font-bold">● Відмова</span>'}
                       </td>
-                      <td class="p-2.5 border-r border-slate-300">
-                        ${h.need ? '<span class="text-emerald-700 font-semibold"><i class="fa-solid fa-check text-xs mr-1"></i>Потребує</span>' : `<span class="text-rose-700 font-semibold"><i class="fa-solid fa-xmark text-xs mr-1"></i>Відмова</span><div class="text-[10px] text-slate-500">${h.refusal_reason || 'Власне житло'}</div>`}
-                      </td>
-                      <td class="p-2.5 border-r border-slate-300">
-                        <span class="px-2 py-0.5 rounded text-[11px] font-medium ${h.benefit !== 'Без пільг' ? 'bg-pink-100 text-pink-800 font-bold' : 'bg-slate-100 text-slate-700'}">
-                          ${h.benefit || 'Без пільг'}
-                        </span>
-                      </td>
-                      <td class="p-2.5 border-r border-slate-300">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
-                          h.benefit_status === 'Підтверджено' ? 'bg-emerald-100 text-emerald-800' :
-                          h.benefit_status === 'На перевірці' ? 'bg-amber-100 text-amber-800' :
-                          h.benefit_status === 'Відхилено' ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-500'
-                        }">
-                          ${h.benefit_status || 'Не подано'}
-                        </span>
-                      </td>
-                      <td class="p-2.5 border-r border-slate-300 font-medium text-slate-700">
-                        ${h.need ? `<div>${h.dorm}</div><div class="text-[11px] text-blue-800 font-bold">Кімната: ${h.room || 'Не призначено'}</div>` : '<span class="text-slate-400">—</span>'}
-                      </td>
-                      <td class="p-2.5 text-center">
-                        <button onclick="openHousingEditModal('${s.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-slate-800 text-[11px] font-semibold">
-                          <i class="fa-solid fa-pen-to-square mr-1"></i> Змінити
+                      <td class="p-2 text-slate-600">${h.need ? '—' : (h.refusal_reason || 'Проживає вдома (Київ/область)')}</td>
+                      <td class="p-2 text-center">
+                        <button onclick="toggleNeedStatus('${s.id}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 border rounded text-[11px]">
+                          Перемкнути
                         </button>
                       </td>
                     </tr>
@@ -793,26 +814,33 @@
       `;
     }
 
-    // --- ЕТАП 2: ТАЙМ-СЛОТИ ТА ЧЕК-ЛИСТ ДОКУМЕНТІВ ---
-    function renderHousingEtap2(container) {
-      container.innerHTML = `
+    function toggleNeedStatus(studentId) {
+      if (housingData[studentId]) {
+        housingData[studentId].need = !housingData[studentId].need;
+        if (!housingData[studentId].need) housingData[studentId].refusal_reason = 'Проживає вдома (Київ/область)';
+        saveHousingToStorage();
+        renderHousingStage1Screening(document.getElementById('main-content'));
+      }
+    }
+
+    // 1.3. Верифікація пільг
+    function renderHousingStage1Verification(main) {
+      main.innerHTML = `
         <div class="space-y-4">
-          <div class="bg-blue-50 border border-blue-200 p-3 rounded text-xs text-blue-900 flex items-start gap-2">
-            <i class="fa-solid fa-circle-info text-blue-600 mt-0.5"></i>
-            <div>
-              <b>Інформаційно-інструктажний блок:</b> Розподіл студентів по часових слотах (26–31 серпня) для уникнення черг та контроль наявності пакета документів[cite: 1].
-            </div>
+          <div class="bg-white border border-slate-300 p-4 rounded-sm">
+            <h1 class="font-bold text-slate-800 text-sm">1.3. Верифікація пільгових документів та квот[cite: 2]</h1>
+            <div class="text-xs text-slate-500 mt-0.5">Перевірка права на першочергове поселення та пільгову оплату ДТЕУ[cite: 1, 2]</div>
           </div>
 
-          <div class="bg-white border border-slate-300 rounded-sm overflow-x-auto shadow-sm">
-            <table class="w-full text-left border-collapse text-xs">
+          <div class="bg-white border border-slate-300 rounded overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
               <thead>
                 <tr class="table-header border-b border-slate-300 text-slate-700 font-bold">
                   <th class="p-2.5 border-r border-slate-300 w-10 text-center">№</th>
                   <th class="p-2.5 border-r border-slate-300">ПІБ студента</th>
-                  <th class="p-2.5 border-r border-slate-300">Призначений слот прибуття (26–31 серпня)</th>
-                  <th class="p-2.5 border-r border-slate-300">Обов'язковий пакет документів</th>
-                  <th class="p-2.5 text-center w-36">Зміна слоту</th>
+                  <th class="p-2.5 border-r border-slate-300">Пільгова категорія</th>
+                  <th class="p-2.5 border-r border-slate-300">Статус перевірки</th>
+                  <th class="p-2.5 text-center w-36">Дія куратора</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-200">
@@ -820,24 +848,193 @@
                   const h = housingData[s.id];
                   return `
                     <tr class="hover:bg-slate-50">
-                      <td class="p-2.5 border-r border-slate-300 text-center font-mono text-slate-500">${idx + 1}</td>
-                      <td class="p-2.5 border-r border-slate-300 font-bold text-slate-800">${s.full_name}</td>
-                      <td class="p-2.5 border-r border-slate-300 font-semibold text-blue-900">
-                        <i class="fa-regular fa-clock mr-1 text-slate-400"></i> ${h.slot || '26 серпня (09:00 - 10:00)'}
+                      <td class="p-2 text-center text-slate-500">${idx + 1}</td>
+                      <td class="p-2 font-bold">${s.full_name}</td>
+                      <td class="p-2">
+                        <select onchange="updateBenefitCat('${s.id}', this.value)" class="border p-1 rounded bg-white text-xs">
+                          <option value="Без пільг" ${h.benefit === 'Без пільг' ? 'selected' : ''}>Без пільг</option>
+                          <option value="Дитина загиблого Захисника" ${h.benefit === 'Дитина загиблого Захисника' ? 'selected' : ''}>Дитина загиблого Захисника</option>
+                          <option value="Сирота / Позбавлені піклування" ${h.benefit === 'Сирота / Позбавлені піклування' ? 'selected' : ''}>Сирота</option>
+                          <option value="УБД / Дитина УБД" ${h.benefit === 'УБД / Дитина УБД' ? 'selected' : ''}>УБД / Дитина УБД</option>
+                          <option value="ВПО" ${h.benefit === 'ВПО' ? 'selected' : ''}>ВПО</option>
+                          <option value="Особа з інвалідністю" ${h.benefit === 'Особа з інвалідністю' ? 'selected' : ''}>Інвалідність</option>
+                        </select>
                       </td>
-                      <td class="p-2.5 border-r border-slate-300 text-[11px] text-slate-600">
-                        <span class="inline-block bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 mr-1 mb-1">Паспорт + 2 копії[cite: 1]</span>
-                        <span class="inline-block bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 mr-1 mb-1">Флюорографія / 086-о[cite: 1]</span>
-                        <span class="inline-block bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 mr-1 mb-1">Фото 3х4 (4 шт)[cite: 1]</span>
-                        <span class="inline-block bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 mr-1 mb-1">ВОД / ТЦК[cite: 1]</span>
+                      <td class="p-2">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                          h.benefit_status === 'Підтверджено' ? 'bg-emerald-100 text-emerald-800' :
+                          h.benefit_status === 'На перевірці' ? 'bg-amber-100 text-amber-800' :
+                          h.benefit_status === 'Відхилено' ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-500'
+                        }">
+                          ${h.benefit_status || 'Не подано'}
+                        </span>
                       </td>
-                      <td class="p-2.5 text-center">
-                        <select onchange="changeStudentSlot('${s.id}', this.value)" class="border border-slate-300 p-1 rounded text-[11px] bg-white font-medium">
+                      <td class="p-2 text-center">
+                        <button onclick="setBenefitStatus('${s.id}', 'Підтверджено')" class="px-2 py-1 bg-emerald-600 text-white rounded text-[10px] mr-1" title="Підтвердити пільгу">✓</button>
+                        <button onclick="setBenefitStatus('${s.id}', 'Відхилено')" class="px-2 py-1 bg-rose-600 text-white rounded text-[10px]" title="Відхилити">✕</button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateBenefitCat(id, val) {
+      if (housingData[id]) {
+        housingData[id].benefit = val;
+        saveHousingToStorage();
+      }
+    }
+
+    function setBenefitStatus(id, st) {
+      if (housingData[id]) {
+        housingData[id].benefit_status = st;
+        saveHousingToStorage();
+        renderHousingStage1Verification(document.getElementById('main-content'));
+      }
+    }
+
+    // 1.4. Проєкт списку на поселення
+    function renderHousingStage1List(main) {
+      main.innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm flex items-center justify-between">
+            <div>
+              <h1 class="font-bold text-slate-800 text-sm">1.4. Проєкт списку на поселення для деканату[cite: 2]</h1>
+              <div class="text-xs text-slate-500 mt-0.5">Офіційний розподіл ліжко-місць за формою ДТЕУ[cite: 1, 2]</div>
+            </div>
+            <button onclick="printOfficialList()" class="px-3 py-1.5 bg-[#2b569a] text-white rounded text-xs font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-print"></i> Друк проєкту списку
+            </button>
+          </div>
+
+          <div class="bg-white border border-slate-300 rounded overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="table-header border-b border-slate-300 text-slate-700 font-bold">
+                  <th class="p-2.5 border-r border-slate-300 w-10 text-center">№</th>
+                  <th class="p-2.5 border-r border-slate-300">ПІБ</th>
+                  <th class="p-2.5 border-r border-slate-300">Фінансування</th>
+                  <th class="p-2.5 border-r border-slate-300">Пільга</th>
+                  <th class="p-2.5 border-r border-slate-300">Гуртожиток</th>
+                  <th class="p-2.5 border-r border-slate-300">Кімната</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                ${studentsList.filter(s => housingData[s.id]?.need).map((s, idx) => {
+                  const h = housingData[s.id];
+                  return `
+                    <tr class="hover:bg-slate-50">
+                      <td class="p-2 text-center text-slate-500">${idx + 1}</td>
+                      <td class="p-2 font-bold">${s.full_name}</td>
+                      <td class="p-2">${s.payment_type}</td>
+                      <td class="p-2">${h.benefit}</td>
+                      <td class="p-2 font-semibold text-blue-900">${h.dorm}</td>
+                      <td class="p-2">
+                        <input type="text" value="${h.room !== '—' ? h.room : ''}" onchange="updateStudentRoom('${s.id}', this.value)" placeholder="напр. 412/1" class="border p-1 rounded w-24 text-xs font-mono font-bold">
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateStudentRoom(id, val) {
+      if (housingData[id]) {
+        housingData[id].room = val.trim() || '—';
+        saveHousingToStorage();
+      }
+    }
+
+    function printOfficialList() {
+      const area = document.getElementById('printable-area');
+      const needStudents = studentsList.filter(s => housingData[s.id]?.need);
+
+      area.innerHTML = `
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="font-size: 16px; font-weight: bold; margin: 0;">ДЕРЖАВНИЙ ТОРГОВЕЛЬНО-ЕКОНОМІЧНИЙ УНІВЕРСИТЕТ</h2>
+          <h3 style="font-size: 14px; margin: 5px 0;">ПРОЄКТ РОЗПОДІЛУ ЛІЖКО-МІСЦЬ У ГУРТОЖИТКАХ (2026/2027 н.р.)</h3>
+          <p style="font-size: 12px; margin: 0;">Факультет торгівлі та маркетингу • Група ФТМ 1-5</p>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; font-size: 11px;" border="1">
+          <thead>
+            <tr style="background-color: #f2f2f2;">
+              <th style="padding: 4px;">№</th>
+              <th style="padding: 4px;">ПІБ Студента</th>
+              <th style="padding: 4px;">Фінансування</th>
+              <th style="padding: 4px;">Пільгова категорія</th>
+              <th style="padding: 4px;">Гуртожиток</th>
+              <th style="padding: 4px;">Кімната</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${needStudents.map((s, idx) => {
+              const h = housingData[s.id];
+              return `
+                <tr>
+                  <td style="padding: 4px; text-align: center;">${idx + 1}</td>
+                  <td style="padding: 4px; font-weight: bold;">${s.full_name}</td>
+                  <td style="padding: 4px;">${s.payment_type}</td>
+                  <td style="padding: 4px;">${h.benefit}</td>
+                  <td style="padding: 4px;">${h.dorm}</td>
+                  <td style="padding: 4px; font-weight: bold;">${h.room}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+
+        <div style="margin-top: 30px; display: flex; justify-content: space-between;">
+          <div>Куратор групи ФТМ 1-5: ____________ (Ісіков Я. А.)</div>
+          <div>Заступник декана ФТМ: ____________</div>
+        </div>
+      `;
+
+      window.print();
+    }
+
+    // 2.1. Тайм-слоти
+    function renderHousingStage2Slots(main) {
+      main.innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm">
+            <h1 class="font-bold text-slate-800 text-sm">2.1. Планувальник індивідуальних тайм-слотів прибуття[cite: 2]</h1>
+            <div class="text-xs text-slate-500 mt-0.5">Розподіл часу прибуття на 26–31 серпня для запобігання чергам біля гуртожитків[cite: 1, 2]</div>
+          </div>
+
+          <div class="bg-white border border-slate-300 rounded overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="table-header border-b border-slate-300 text-slate-700 font-bold">
+                  <th class="p-2.5 border-r border-slate-300 w-10 text-center">№</th>
+                  <th class="p-2.5 border-r border-slate-300">ПІБ студента</th>
+                  <th class="p-2.5 border-r border-slate-300">Призначений слот</th>
+                  <th class="p-2.5 text-center w-36">Змінити слот</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                ${studentsList.filter(s => housingData[s.id]?.need).map((s, idx) => {
+                  const h = housingData[s.id];
+                  return `
+                    <tr class="hover:bg-slate-50">
+                      <td class="p-2 text-center text-slate-500">${idx + 1}</td>
+                      <td class="p-2 font-bold">${s.full_name}</td>
+                      <td class="p-2 font-semibold text-blue-900"><i class="fa-regular fa-clock mr-1 text-slate-400"></i>${h.slot}</td>
+                      <td class="p-2 text-center">
+                        <select onchange="updateStudentSlot('${s.id}', this.value)" class="border p-1 rounded bg-white text-xs">
                           <option value="26 серпня (09:00 - 10:00)" ${h.slot === '26 серпня (09:00 - 10:00)' ? 'selected' : ''}>26 серп. 09:00</option>
                           <option value="26 серпня (11:00 - 12:00)" ${h.slot === '26 серпня (11:00 - 12:00)' ? 'selected' : ''}>26 серп. 11:00</option>
                           <option value="27 серпня (09:00 - 10:00)" ${h.slot === '27 серпня (09:00 - 10:00)' ? 'selected' : ''}>27 серп. 09:00</option>
                           <option value="28 серпня (10:00 - 11:00)" ${h.slot === '28 серпня (10:00 - 11:00)' ? 'selected' : ''}>28 серп. 10:00</option>
-                          <option value="30 серпня (09:00 - 10:00)" ${h.slot === '30 серпня (09:00 - 10:00)' ? 'selected' : ''}>30 серп. 09:00</option>
                         </select>
                       </td>
                     </tr>
@@ -850,22 +1047,113 @@
       `;
     }
 
-    function changeStudentSlot(studentId, newSlot) {
-      if (housingData[studentId]) {
-        housingData[studentId].slot = newSlot;
+    function updateStudentSlot(id, val) {
+      if (housingData[id]) {
+        housingData[id].slot = val;
         saveHousingToStorage();
       }
     }
 
-    // --- ЕТАП 3: 5-КРОКОВИЙ МАРШРУТ ОЧНОГО ДНЯ ---
-    function renderHousingEtap3(container) {
-      container.innerHTML = `
+    // 2.2. Чек-лист документів
+    function renderHousingStage2Checklist(main) {
+      main.innerHTML = `
         <div class="space-y-4">
-          <div class="bg-amber-50 border border-amber-200 p-3 rounded text-xs text-amber-900 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <i class="fa-solid fa-clipboard-check text-amber-700 text-sm"></i>
-              <span><b>Робоче місце чергового куратора на локації (26–31 серпня):</b> Відмічайте проходження кожного з 5 пунктів маршруту в реальному часі[cite: 1].</span>
-            </div>
+          <div class="bg-white border border-slate-300 p-4 rounded-sm">
+            <h1 class="font-bold text-slate-800 text-sm">2.2. Чек-лист обов'язкового пакета документів на поселення[cite: 2]</h1>
+            <div class="text-xs text-slate-500 mt-0.5">Паспорт, фото 3х4, флюорографія / форма 086-о, ВОД з відміткою ТЦК, квитанція про оплату[cite: 1, 2]</div>
+          </div>
+
+          <div class="bg-white border border-slate-300 rounded overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="table-header border-b border-slate-300 text-slate-700 font-bold">
+                  <th class="p-2.5 border-r border-slate-300 w-10 text-center">№</th>
+                  <th class="p-2.5 border-r border-slate-300">ПІБ студента</th>
+                  <th class="p-2.5 border-r border-slate-300">Паспорт + 2 копії</th>
+                  <th class="p-2.5 border-r border-slate-300">Флюорографія</th>
+                  <th class="p-2.5 border-r border-slate-300">Фото 3х4 (4 шт)</th>
+                  <th class="p-2.5 border-r border-slate-300">ВОД (ТЦК)</th>
+                  <th class="p-2.5">Квитанція / Пільга</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                ${studentsList.filter(s => housingData[s.id]?.need).map((s, idx) => `
+                  <tr class="hover:bg-slate-50">
+                    <td class="p-2 text-center text-slate-500">${idx + 1}</td>
+                    <td class="p-2 font-bold">${s.full_name}</td>
+                    <td class="p-2 text-emerald-700 font-bold">✓ Наявний</td>
+                    <td class="p-2 text-emerald-700 font-bold">✓ Форма 086-о</td>
+                    <td class="p-2 text-emerald-700 font-bold">✓ 4 шт.</td>
+                    <td class="p-2 text-blue-700 font-semibold">Приписне</td>
+                    <td class="p-2 text-emerald-700 font-bold">✓ Готово</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    // 2.3. Журнал інструктажів
+    function renderHousingStage2Briefings(main) {
+      main.innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm">
+            <h1 class="font-bold text-slate-800 text-sm">2.3. Журнал проведення попередніх інструктажів[cite: 2]</h1>
+            <div class="text-xs text-slate-500 mt-0.5">Ознайомлення з правилами внутрішнього розпорядку та пропускного режиму ДТЕУ[cite: 1, 2]</div>
+          </div>
+
+          <div class="bg-white border border-slate-300 rounded overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="table-header border-b border-slate-300 text-slate-700 font-bold">
+                  <th class="p-2.5 border-r border-slate-300 w-10 text-center">№</th>
+                  <th class="p-2.5 border-r border-slate-300">ПІБ студента</th>
+                  <th class="p-2.5 border-r border-slate-300">Статус інструктажу</th>
+                  <th class="p-2.5 text-center w-36">Відмітка куратора</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                ${studentsList.filter(s => housingData[s.id]?.need).map((s, idx) => {
+                  const h = housingData[s.id];
+                  return `
+                    <tr class="hover:bg-slate-50">
+                      <td class="p-2 text-center text-slate-500">${idx + 1}</td>
+                      <td class="p-2 font-bold">${s.full_name}</td>
+                      <td class="p-2">
+                        ${h.briefing ? '<span class="text-emerald-700 font-bold">✓ Ознайомлений</span>' : '<span class="text-amber-700 font-bold">○ Очікує підтвердження</span>'}
+                      </td>
+                      <td class="p-2 text-center">
+                        <button onclick="toggleBriefing('${s.id}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 border rounded text-[11px]">
+                          ${h.briefing ? 'Скасувати' : 'Підтвердити'}
+                        </button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleBriefing(id) {
+      if (housingData[id]) {
+        housingData[id].briefing = !housingData[id].briefing;
+        saveHousingToStorage();
+        renderHousingStage2Briefings(document.getElementById('main-content'));
+      }
+    }
+
+    // 3.1. Маршрут поселення (5 кроків)
+    function renderHousingStage3Terminal(main) {
+      main.innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm">
+            <h1 class="font-bold text-slate-800 text-sm">3.1. Очний маршрут поселення — Робоче місце на локації[cite: 2]</h1>
+            <div class="text-xs text-slate-500 mt-0.5">Фіксація 5 кроків проходження маршруту в реальному часі (26–31 серпня)[cite: 1, 2]</div>
           </div>
 
           <div class="space-y-3">
@@ -876,43 +1164,36 @@
 
               return `
                 <div class="bg-white border border-slate-300 p-4 rounded shadow-sm space-y-3">
-                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-2">
+                  <div class="flex items-center justify-between border-b border-slate-200 pb-2">
                     <div>
                       <span class="font-bold text-slate-800 text-sm">${idx + 1}. ${s.full_name}</span>
-                      <span class="text-xs text-slate-500 ml-2">(${h.dorm}, кімн. ${h.room || '—'})</span>
+                      <span class="text-xs text-slate-500 ml-2">(${h.dorm}, кімн. ${h.room})</span>
                     </div>
-                    <div>
-                      <span class="px-2.5 py-1 rounded text-xs font-bold ${isSettled ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">
-                        ${isSettled ? '✓ ПОВНІСТЮ ЗАСЕЛЕНО' : `Пройдено кроків: ${stepsDone} / 5`}
-                      </span>
-                    </div>
+                    <span class="px-2.5 py-0.5 rounded text-xs font-bold ${isSettled ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">
+                      ${isSettled ? '✓ ПОВНІСТЮ ЗАСЕЛЕНО' : `Кроків: ${stepsDone} / 5`}
+                    </span>
                   </div>
 
-                  <!-- 5 інтерактивних кроків маршруту -->
                   <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 text-xs">
-                    <button onclick="toggleRouteStep('${s.id}', 'step1')" class="p-2 rounded border text-left flex flex-col justify-between transition ${h.step1 ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-slate-50 border-slate-300 text-slate-600 hover:bg-slate-100'}">
-                      <span class="font-bold">1. Ордер / Штаб[cite: 1]</span>
-                      <span class="text-[11px] mt-1">${h.step1 ? '✓ Завізовано' : '○ Очікує'}</span>
+                    <button onclick="toggleStep('${s.id}', 'step1')" class="p-2 rounded border text-left transition ${h.step1 ? 'bg-emerald-50 border-emerald-400 text-emerald-900 font-bold' : 'bg-slate-50 text-slate-600'}">
+                      <div>1. Ордер / Штаб[cite: 1, 2]</div>
+                      <div class="text-[10px] mt-1">${h.step1 ? '✓ Завізовано' : '○ Очікує'}</div>
                     </button>
-
-                    <button onclick="toggleRouteStep('${s.id}', 'step2')" class="p-2 rounded border text-left flex flex-col justify-between transition ${h.step2 ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-slate-50 border-slate-300 text-slate-600 hover:bg-slate-100'}">
-                      <span class="font-bold">2. Медпункт[cite: 1]</span>
-                      <span class="text-[11px] mt-1">${h.step2 ? '✓ Допуск лікаря' : '○ Огляд'}</span>
+                    <button onclick="toggleStep('${s.id}', 'step2')" class="p-2 rounded border text-left transition ${h.step2 ? 'bg-emerald-50 border-emerald-400 text-emerald-900 font-bold' : 'bg-slate-50 text-slate-600'}">
+                      <div>2. Медпункт[cite: 1, 2]</div>
+                      <div class="text-[10px] mt-1">${h.step2 ? '✓ Допуск лікаря' : '○ Огляд'}</div>
                     </button>
-
-                    <button onclick="toggleRouteStep('${s.id}', 'step3')" class="p-2 rounded border text-left flex flex-col justify-between transition ${h.step3 ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-slate-50 border-slate-300 text-slate-600 hover:bg-slate-100'}">
-                      <span class="font-bold">3. Оплата / Банк[cite: 1]</span>
-                      <span class="text-[11px] mt-1">${h.step3 ? '✓ Сплачено/Пільга' : '○ Квитанція'}</span>
+                    <button onclick="toggleStep('${s.id}', 'step3')" class="p-2 rounded border text-left transition ${h.step3 ? 'bg-emerald-50 border-emerald-400 text-emerald-900 font-bold' : 'bg-slate-50 text-slate-600'}">
+                      <div>3. Оплата / Банк[cite: 1, 2]</div>
+                      <div class="text-[10px] mt-1">${h.step3 ? '✓ Сплачено' : '○ Квитанція'}</div>
                     </button>
-
-                    <button onclick="toggleRouteStep('${s.id}', 'step4')" class="p-2 rounded border text-left flex flex-col justify-between transition ${h.step4 ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-slate-50 border-slate-300 text-slate-600 hover:bg-slate-100'}">
-                      <span class="font-bold">4. Комендант[cite: 1]</span>
-                      <span class="text-[11px] mt-1">${h.step4 ? '✓ Договір / Перепустка' : '○ Договір/Укриття'}</span>
+                    <button onclick="toggleStep('${s.id}', 'step4')" class="p-2 rounded border text-left transition ${h.step4 ? 'bg-emerald-50 border-emerald-400 text-emerald-900 font-bold' : 'bg-slate-50 text-slate-600'}">
+                      <div>4. Комендант[cite: 1, 2]</div>
+                      <div class="text-[10px] mt-1">${h.step4 ? '✓ Договір / Перепустка' : '○ Договір/Укриття'}</div>
                     </button>
-
-                    <button onclick="toggleRouteStep('${s.id}', 'step5')" class="p-2 rounded border text-left flex flex-col justify-between transition ${h.step5 ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-slate-50 border-slate-300 text-slate-600 hover:bg-slate-100'}">
-                      <span class="font-bold">5. Кімната / Ключі[cite: 1]</span>
-                      <span class="text-[11px] mt-1">${h.step5 ? '✓ Заселено' : '○ Акт майна'}</span>
+                    <button onclick="toggleStep('${s.id}', 'step5')" class="p-2 rounded border text-left transition ${h.step5 ? 'bg-emerald-50 border-emerald-400 text-emerald-900 font-bold' : 'bg-slate-50 text-slate-600'}">
+                      <div>5. Кімната / Завгосп[cite: 1, 2]</div>
+                      <div class="text-[10px] mt-1">${h.step5 ? '✓ Заселено' : '○ Акт майна'}</div>
                     </button>
                   </div>
                 </div>
@@ -923,57 +1204,57 @@
       `;
     }
 
-    function toggleRouteStep(studentId, stepKey) {
-      if (housingData[studentId]) {
-        housingData[studentId][stepKey] = !housingData[studentId][stepKey];
+    function toggleStep(id, stepKey) {
+      if (housingData[id]) {
+        housingData[id][stepKey] = !housingData[id][stepKey];
         saveHousingToStorage();
-        renderHousingEtap3(document.getElementById('housing-sub-content'));
+        renderHousingStage3Terminal(document.getElementById('main-content'));
       }
     }
 
-    // --- ЕТАП 4: ДЕФЕКТНА ВІДОМІСТЬ ТА ПІДСУМКИ ---
-    function renderHousingEtap4(container) {
-      container.innerHTML = `
+    // 3.2. Реєстр дефектів кімнат
+    function renderHousingStage3Defects(main) {
+      main.innerHTML = `
         <div class="space-y-4">
-          <div class="bg-white border border-slate-300 p-4 rounded shadow-sm flex items-center justify-between">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm flex items-center justify-between">
             <div>
-              <h3 class="font-bold text-slate-800 text-sm">Дефектна відомість кімнат (RoomDefect)</h3>
-              <p class="text-xs text-slate-500 mt-0.5">Фіксація побутових дефектів кімнат та передача коменданту для ремонту[cite: 1].</p>
+              <h1 class="font-bold text-slate-800 text-sm">3.2. Реєстр дефектів кімнат (RoomDefect)[cite: 2]</h1>
+              <div class="text-xs text-slate-500 mt-0.5">Фіксація несправностей майна для передачі коменданту[cite: 1, 2]</div>
             </div>
-            <button onclick="openModal('modal-defect-add')" class="px-3 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white rounded font-bold text-xs">
-              <i class="fa-solid fa-plus mr-1"></i> Додати дефект
+            <button onclick="addDefectPrompt()" class="px-3 py-1.5 bg-[#2b569a] text-white rounded text-xs font-bold">
+              + Зафіксувати дефект
             </button>
           </div>
 
-          <div class="bg-white border border-slate-300 rounded overflow-x-auto shadow-sm">
-            <table class="w-full text-left border-collapse text-xs">
+          <div class="bg-white border border-slate-300 rounded overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
               <thead>
                 <tr class="table-header border-b border-slate-300 text-slate-700 font-bold">
                   <th class="p-2.5 border-r border-slate-300 w-10 text-center">№</th>
                   <th class="p-2.5 border-r border-slate-300">Кімната</th>
-                  <th class="p-2.5 border-r border-slate-300">Тип несправності</th>
+                  <th class="p-2.5 border-r border-slate-300">Тип дефекту</th>
                   <th class="p-2.5 border-r border-slate-300">Опис проблеми</th>
-                  <th class="p-2.5 border-r border-slate-300">Статус ліквідації</th>
+                  <th class="p-2.5 border-r border-slate-300">Статус</th>
                   <th class="p-2.5 text-center w-28">Дія</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-200">
                 ${roomDefects.length === 0 ? `
-                  <tr><td colspan="6" class="p-6 text-center text-slate-400">Поломок чи дефектів кімнат не зафіксовано.</td></tr>
+                  <tr><td colspan="6" class="p-6 text-center text-slate-400">Дефектів кімнат не зафіксовано.</td></tr>
                 ` : roomDefects.map((d, idx) => `
                   <tr class="hover:bg-slate-50">
-                    <td class="p-2.5 border-r border-slate-300 text-center font-mono text-slate-500">${idx + 1}</td>
-                    <td class="p-2.5 border-r border-slate-300 font-bold text-blue-900">${d.room}</td>
-                    <td class="p-2.5 border-r border-slate-300 font-semibold">${d.type}</td>
-                    <td class="p-2.5 border-r border-slate-300">${d.desc}</td>
-                    <td class="p-2.5 border-r border-slate-300">
+                    <td class="p-2 text-center text-slate-500">${idx + 1}</td>
+                    <td class="p-2 font-bold text-blue-900">${d.room}</td>
+                    <td class="p-2 font-semibold">${d.type}</td>
+                    <td class="p-2">${d.desc}</td>
+                    <td class="p-2">
                       <span class="px-2 py-0.5 rounded text-[10px] font-bold ${d.status === 'Ліквідовано' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
                         ${d.status}
                       </span>
                     </td>
-                    <td class="p-2.5 text-center">
-                      <button onclick="toggleDefectStatus(${idx})" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 border rounded text-[11px]">
-                        ${d.status === 'Ліквідовано' ? 'Відкрити знову' : 'Позначити ліквідованим'}
+                    <td class="p-2 text-center">
+                      <button onclick="toggleDefectStatus(${idx})" class="px-2 py-1 bg-slate-100 border rounded text-[10px]">
+                        ${d.status === 'Ліквідовано' ? 'Відкрити' : 'Ліквідовано'}
                       </button>
                     </td>
                   </tr>
@@ -985,128 +1266,111 @@
       `;
     }
 
-    function saveDefect(e) {
-      e.preventDefault();
-      const newDef = {
-        room: document.getElementById('def-room').value.trim(),
-        type: document.getElementById('def-type').value,
-        desc: document.getElementById('def-desc').value.trim(),
-        status: 'Передано коменданту',
-        date: new Date().toLocaleDateString('uk-UA')
-      };
-      roomDefects.push(newDef);
+    function addDefectPrompt() {
+      const room = prompt("Введіть номер кімнати (напр. 412):");
+      if (!room) return;
+      const desc = prompt("Опишіть несправність (меблі, сантехніка тощо):");
+      if (!desc) return;
+
+      roomDefects.push({
+        room: room,
+        type: 'Побутовий дефект',
+        desc: desc,
+        status: 'Передано коменданту'
+      });
       saveHousingToStorage();
-      closeModal('modal-defect-add');
-      document.getElementById('defect-form').reset();
-      renderHousingEtap4(document.getElementById('housing-sub-content'));
+      renderHousingStage3Defects(document.getElementById('main-content'));
     }
 
     function toggleDefectStatus(idx) {
       if (roomDefects[idx]) {
         roomDefects[idx].status = roomDefects[idx].status === 'Ліквідовано' ? 'Передано коменданту' : 'Ліквідовано';
         saveHousingToStorage();
-        renderHousingEtap4(document.getElementById('housing-sub-content'));
+        renderHousingStage3Defects(document.getElementById('main-content'));
       }
     }
 
-    // --- МОДАЛКА РЕДАГУВАННЯ ПОСЕЛЕННЯ СТУДЕНТА ---
-    function openHousingEditModal(studentId) {
-      const student = studentsList.find(s => String(s.id) === String(studentId));
-      if (!student) return;
+    // 4.1. Збори та вибори старости
+    function renderHousingStage4Elections(main) {
+      main.innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm">
+            <h1 class="font-bold text-slate-800 text-sm">4.1. Збори мешканців та вибори активу гуртожитку[cite: 2]</h1>
+            <div class="text-xs text-slate-500 mt-0.5">Організація перших зборів кімнат та вибори старости блоку/поверху (1–3 вересня)[cite: 1, 2]</div>
+          </div>
 
-      const h = housingData[studentId] || {};
-      document.getElementById('h-student-id').value = studentId;
-      document.getElementById('h-student-name').innerText = student.full_name;
-      document.getElementById('h-student-meta').innerText = `${student.student_card_id} • ${student.payment_type}`;
-      
-      document.getElementById('h-need').value = h.need ? 'true' : 'false';
-      document.getElementById('h-refusal-reason').value = h.refusal_reason || 'Проживає вдома (Київ/область)';
-      document.getElementById('h-benefit').value = h.benefit || 'Без пільг';
-      document.getElementById('h-benefit-status').value = h.benefit_status || 'Не подано';
-      document.getElementById('h-dorm').value = h.dorm || 'Гуртожиток №1';
-      document.getElementById('h-room').value = h.room || '';
+          <div class="bg-white border border-slate-300 p-4 rounded-sm space-y-3 text-xs">
+            <div class="font-bold text-slate-800">Список мешканців блоків групи ФТМ 1-5:</div>
+            <ul class="list-disc list-inside space-y-1 text-slate-700">
+              ${studentsList.filter(s => housingData[s.id]?.need).map(s => `
+                <li><b>${s.full_name}</b> — ${housingData[s.id].dorm}, кімната <b>${housingData[s.id].room}</b></li>
+              `).join('')}
+            </ul>
 
-      toggleRefusalBlock(h.need ? 'true' : 'false');
-      openModal('modal-housing-edit');
-    }
-
-    function toggleRefusalBlock(val) {
-      const isNeed = val === 'true';
-      document.getElementById('block-refusal').classList.toggle('hidden', isNeed);
-      document.getElementById('block-housing-details').classList.toggle('hidden', !isNeed);
-    }
-
-    function saveHousingData(e) {
-      e.preventDefault();
-      const studentId = document.getElementById('h-student-id').value;
-      const isNeed = document.getElementById('h-need').value === 'true';
-
-      if (!housingData[studentId]) housingData[studentId] = {};
-      housingData[studentId].need = isNeed;
-      housingData[studentId].refusal_reason = isNeed ? '' : document.getElementById('h-refusal-reason').value;
-      housingData[studentId].benefit = document.getElementById('h-benefit').value;
-      housingData[studentId].benefit_status = document.getElementById('h-benefit-status').value;
-      housingData[studentId].dorm = document.getElementById('h-dorm').value;
-      housingData[studentId].room = document.getElementById('h-room').value.trim() || '—';
-
-      saveHousingToStorage();
-      closeModal('modal-housing-edit');
-      renderHousingSubView();
-    }
-
-    // --- ДРУК ПРОЄКТУ СПИСКУ ТА ФІНАЛЬНОГО ЗВІТУ ---
-    function printHousingDraftList() {
-      const area = document.getElementById('printable-area');
-      const needStudents = studentsList.filter(s => housingData[s.id]?.need);
-
-      area.innerHTML = `
-        <div style="text-align: center; margin-bottom: 20px;">
-          <h2 style="font-size: 16px; font-weight: bold; margin: 0;">ДЕРЖАВНИЙ ТОРГОВЕЛЬНО-ЕКОНОМІЧНИЙ УНІВЕРСИТЕТ</h2>
-          <h3 style="font-size: 14px; margin: 5px 0;">ПРОЄКТ РОЗПОДІЛУ ЛІЖКО-МІСЦЬ У ГУРТОЖИТКАХ ДТЕУ (2026/2027 н.р.)</h3>
-          <p style="font-size: 12px; margin: 0;">Факультет торгівлі та маркетингу • Академічна група ФТМ 1-5 (Журналістика)</p>
-        </div>
-
-        <table style="width: 100%; border-collapse: collapse; font-size: 11px;" border="1">
-          <thead>
-            <tr style="background-color: #f2f2f2;">
-              <th style="padding: 4px;">№</th>
-              <th style="padding: 4px;">ПІБ Студента</th>
-              <th style="padding: 4px;">Фінансування</th>
-              <th style="padding: 4px;">Пільгова категорія</th>
-              <th style="padding: 4px;">Статус пільги</th>
-              <th style="padding: 4px;">Гуртожиток</th>
-              <th style="padding: 4px;">Кімната / Блок</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${needStudents.map((s, idx) => {
-              const h = housingData[s.id];
-              return `
-                <tr>
-                  <td style="padding: 4px; text-align: center;">${idx + 1}</td>
-                  <td style="padding: 4px; font-weight: bold;">${s.full_name}</td>
-                  <td style="padding: 4px;">${s.payment_type}</td>
-                  <td style="padding: 4px;">${h.benefit}</td>
-                  <td style="padding: 4px;">${h.benefit_status}</td>
-                  <td style="padding: 4px;">${h.dorm}</td>
-                  <td style="padding: 4px; font-weight: bold;">${h.room}</td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
-
-        <div style="margin-top: 30px; display: flex; justify-content: space-between;">
-          <div>Куратор академічної групи: ____________ (Ісіков Я. А.)</div>
-          <div>Заступник декана ФТМ: ____________</div>
+            <div class="pt-3 border-t border-slate-200">
+              <button onclick="alert('Протокол виборів старости блоку успішно збережено за формою ДТЕУ!')" class="px-4 py-2 bg-[#2b569a] text-white rounded font-bold text-xs">
+                Сформувати електронний протокол виборів активу[cite: 1, 2]
+              </button>
+            </div>
+          </div>
         </div>
       `;
-
-      window.print();
     }
 
-    function generateHousingFinalReport() {
-      const area = document.getElementById('printable-area');
+    // 4.2. Вручення довідників
+    function renderHousingStage4Handbook(main) {
+      main.innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm">
+            <h1 class="font-bold text-slate-800 text-sm">4.2. Вручення «Довідника першокурсника» та пам'яток[cite: 2]</h1>
+            <div class="text-xs text-slate-500 mt-0.5">Контроль отримання інформаційних буклетів кожним заселеним студентом[cite: 1, 2]</div>
+          </div>
+
+          <div class="bg-white border border-slate-300 rounded overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="table-header border-b border-slate-300 text-slate-700 font-bold">
+                  <th class="p-2.5 border-r border-slate-300 w-10 text-center">№</th>
+                  <th class="p-2.5 border-r border-slate-300">ПІБ студента</th>
+                  <th class="p-2.5 border-r border-slate-300">Статус вручення</th>
+                  <th class="p-2.5 text-center w-36">Відмітка</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                ${studentsList.filter(s => housingData[s.id]?.need).map((s, idx) => {
+                  const h = housingData[s.id];
+                  return `
+                    <tr class="hover:bg-slate-50">
+                      <td class="p-2 text-center text-slate-500">${idx + 1}</td>
+                      <td class="p-2 font-bold">${s.full_name}</td>
+                      <td class="p-2">
+                        ${h.handbook ? '<span class="text-emerald-700 font-bold">✓ Вручено</span>' : '<span class="text-slate-400">○ Не вручено</span>'}
+                      </td>
+                      <td class="p-2 text-center">
+                        <button onclick="toggleHandbook('${s.id}')" class="px-2 py-1 bg-slate-100 border rounded text-[11px]">
+                          ${h.handbook ? 'Скасувати' : 'Вручено'}
+                        </button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleHandbook(id) {
+      if (housingData[id]) {
+        housingData[id].handbook = !housingData[id].handbook;
+        saveHousingToStorage();
+        renderHousingStage4Handbook(document.getElementById('main-content'));
+      }
+    }
+
+    // 4.3. Фінальний звіт куратора
+    function renderHousingStage4Report(main) {
       const total = studentsList.length;
       const need = studentsList.filter(s => housingData[s.id]?.need).length;
       const settled = studentsList.filter(s => {
@@ -1115,30 +1379,70 @@
       }).length;
       const refused = total - need;
 
-      area.innerHTML = `
-        <div style="text-align: center; margin-bottom: 20px;">
-          <h2 style="font-size: 16px; font-weight: bold; margin: 0;">ДЕРЖАВНИЙ ТОРГОВЕЛЬНО-ЕКОНОМІЧНИЙ УНІВЕРСИТЕТ</h2>
-          <h3 style="font-size: 14px; margin: 5px 0;">ФІНАЛЬНИЙ ЗВІТ КУРАТОРА ПРО РЕЗУЛЬТАТИ ПОСЕЛЕННЯ (Етап IV)</h3>
-          <p style="font-size: 12px; margin: 0;">Академічна група ФТМ 1-5 • Дата формування: ${new Date().toLocaleDateString('uk-UA')}</p>
-        </div>
+      main.innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm flex items-center justify-between">
+            <div>
+              <h1 class="font-bold text-slate-800 text-sm">4.3. Фінальний звіт куратора про результати поселення[cite: 2]</h1>
+              <div class="text-xs text-slate-500 mt-0.5">Зведений підсумок кампанії для заступника декана з виховної роботи[cite: 1, 2]</div>
+            </div>
+            <button onclick="window.print()" class="px-3 py-1.5 bg-[#2b569a] text-white rounded text-xs font-bold">
+              <i class="fa-solid fa-print mr-1"></i> Роздрукувати звіт
+            </button>
+          </div>
 
-        <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px;" border="1">
-          <tbody>
-            <tr><td style="padding: 6px; font-weight: bold; width: 60%;">Всього здобувачів вищої освіти в групі:</td><td style="padding: 6px;">${total} осіб</td></tr>
-            <tr><td style="padding: 6px; font-weight: bold;">Потребували ліжко-місця згідно із заявками:</td><td style="padding: 6px;">${need} осіб</td></tr>
-            <tr><td style="padding: 6px; font-weight: bold;">Фактично пройшли 5 кроків маршруту та заселені:</td><td style="padding: 6px; font-weight: bold; color: green;">${settled} осіб</td></tr>
-            <tr><td style="padding: 6px; font-weight: bold;">Відмовилися від поселення (проживання вдома/оренда):</td><td style="padding: 6px;">${refused} осіб</td></tr>
-            <tr><td style="padding: 6px; font-weight: bold;">Зафіксовано дефектів у дефектній відомості:</td><td style="padding: 6px;">${roomDefects.length} шт.</td></tr>
-          </tbody>
-        </table>
+          <div class="bg-white border border-slate-300 p-6 rounded-sm text-xs space-y-4 max-w-3xl">
+            <h2 class="text-center font-bold text-sm text-slate-900 uppercase">
+              Звіт про поселення студентів 1 курсу академічної групи ФТМ 1-5 (2026/2027 н.р.)
+            </h2>
 
-        <div style="margin-top: 40px; display: flex; justify-content: space-between;">
-          <div>Куратор групи ФТМ 1-5: ____________ (Ісіков Я. А.)</div>
-          <div>Дирекція студмістечка ДТЕУ: ____________</div>
+            <table class="w-full border-collapse border border-slate-300 text-xs">
+              <tbody>
+                <tr><td class="p-2 font-bold bg-slate-50 border border-slate-300">Всього студентів у групі:</td><td class="p-2 border border-slate-300 font-bold">${total} осіб</td></tr>
+                <tr><td class="p-2 font-bold bg-slate-50 border border-slate-300">Потребували гуртожитку згідно із заявками:</td><td class="p-2 border border-slate-300">${need} осіб</td></tr>
+                <tr><td class="p-2 font-bold bg-slate-50 border border-slate-300">Фактично заселено (пройдено 5 кроків):</td><td class="p-2 border border-slate-300 font-bold text-emerald-800">${settled} осіб</td></tr>
+                <tr><td class="p-2 font-bold bg-slate-50 border border-slate-300">Відмовились від поселення:</td><td class="p-2 border border-slate-300">${refused} осіб</td></tr>
+                <tr><td class="p-2 font-bold bg-slate-50 border border-slate-300">Зафіксовано несправностей у дефектній відомості:</td><td class="p-2 border border-slate-300">${roomDefects.length} шт.</td></tr>
+              </tbody>
+            </table>
+
+            <div class="pt-6 flex justify-between text-slate-700">
+              <div>Куратор групи ФТМ 1-5: ____________ (Ісіков Я. А.)</div>
+              <div>Заступник декана: ____________</div>
+            </div>
+          </div>
         </div>
       `;
+    }
 
-      window.print();
+    // 5.1. Налаштування модуля
+    function renderHousingSettings(main) {
+      main.innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm">
+            <h1 class="font-bold text-slate-800 text-sm">5.1. Довідники та налаштування модуля «Поселення»[cite: 2]</h1>
+            <div class="text-xs text-slate-500 mt-0.5">Квоти факультету, довідник гуртожитків, укриттів та тарифи ДТЕУ[cite: 1, 2]</div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div class="bg-white border border-slate-300 p-4 rounded-sm">
+              <div class="font-bold text-blue-900 border-b pb-2 mb-2">Гуртожитки та квоти ФТМ:</div>
+              <ul class="space-y-1.5 text-slate-700">
+                <li>● Гуртожиток №1 (вул. Кіото, 19) — <b>Квота: 20 місць</b>[cite: 1]</li>
+                <li>● Гуртожиток №2 (вул. Матеюка, 2) — <b>Квота: 15 місць</b></li>
+                <li>● Гуртожиток №3 (вул. Матеюка, 3) — <b>Квота: 10 місць</b></li>
+              </ul>
+            </div>
+            <div class="bg-white border border-slate-300 p-4 rounded-sm">
+              <div class="font-bold text-blue-900 border-b pb-2 mb-2">Закріплені укриття (ДТЕУ):</div>
+              <ul class="space-y-1.5 text-slate-700">
+                <li>● Укриття головного навчального корпусу (підвал)[cite: 1]</li>
+                <li>● Захисна споруда цивільного захисту гуртожитку №1[cite: 1]</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     // ==========================================
@@ -1201,7 +1505,7 @@
       document.getElementById('student-form').reset();
       updateCounters();
       if (currentTab === 'students') renderStudentsTable();
-      if (currentTab === 'housing') renderHousingSubView();
+      if (currentTab.startsWith('housing-')) renderCurrentView();
     }
 
     function viewStudentCard(studentId) {
@@ -1269,6 +1573,7 @@
           </table>
         </div>
       `;
+
       openModal('modal-card');
     }
 
