@@ -390,8 +390,8 @@
 
     let currentTab = 'dashboard';
     let isHousingMenuOpen = false;
-    let isRegistryEditing = false; // Режим редагування для реєстру потреби
-    let backupHousingData = null; // Резервна копія для скасування
+    let isRegistryEditing = false;
+    let backupHousingData = null;
     let studentsList = [];
     let housingData = {};
     let roomDefects = [];
@@ -845,7 +845,7 @@
     // СТОРІНКИ МОДУЛЯ ПОСЕЛЕННЯ
     // =========================================================================
 
-    // 1. Реєстр та облік потреби в поселенні (з блокуванням та кнопкою редагування)
+    // 1. Реєстр та облік потреби в поселенні
     function renderHousingRegistry(main) {
       main.innerHTML = `
         <div class="space-y-4">
@@ -934,32 +934,53 @@
       `;
     }
 
-    // Увімкнути режим редагування (зберігаємо бекап)
+    // Увімкнути режим редагування з плавним лоадером
     function enableRegistryEditing() {
+      const loader = document.getElementById('page-loader');
+      if (loader) loader.classList.remove('hidden');
+
       backupHousingData = JSON.parse(JSON.stringify(housingData));
       isRegistryEditing = true;
-      renderHousingRegistry(document.getElementById('main-content'));
+
+      setTimeout(() => {
+        if (loader) loader.classList.add('hidden');
+        renderHousingRegistry(document.getElementById('main-content'));
+      }, 650);
     }
 
-    // Скасувати режим редагування (відновлюємо з бекапу)
+    // Скасувати режим редагування з плавним лоадером
     function cancelRegistryEditing() {
+      const loader = document.getElementById('page-loader');
+      if (loader) loader.classList.remove('hidden');
+
       if (backupHousingData) {
         housingData = JSON.parse(JSON.stringify(backupHousingData));
       }
       isRegistryEditing = false;
-      renderHousingRegistry(document.getElementById('main-content'));
+
+      setTimeout(() => {
+        if (loader) loader.classList.add('hidden');
+        renderHousingRegistry(document.getElementById('main-content'));
+      }, 550);
     }
 
-    // Підтвердити та зберегти остаточно
+    // Підтвердити та зберегти остаточно з плавним лоадером
     function confirmRegistryEditing() {
+      const loader = document.getElementById('page-loader');
+      if (loader) loader.classList.remove('hidden');
+
       saveHousingToStorage();
       isRegistryEditing = false;
       backupHousingData = null;
-      renderHousingRegistry(document.getElementById('main-content'));
+
+      setTimeout(() => {
+        if (loader) loader.classList.add('hidden');
+        renderHousingRegistry(document.getElementById('main-content'));
+      }, 750);
     }
 
     function openHousingEditModal(studentId) {
-      if (!isRegistryEditing) return; // Заборона відкриття поза режимом редагування
+      if (!isRegistryEditing) return;
       const student = studentsList.find(s => String(s.id) === String(studentId));
       if (!student) return;
 
