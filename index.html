@@ -256,7 +256,7 @@
             Скасувати
           </button>
           <button type="submit" class="px-5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white font-bold rounded-sm shadow-sm">
-            <i class="fa-solid fa-check mr-1"></i> Зберегти
+            <i class="fa-solid fa-check mr-1"></i> Зберегти в чернетку
           </button>
         </div>
       </form>
@@ -390,6 +390,8 @@
 
     let currentTab = 'dashboard';
     let isHousingMenuOpen = false;
+    let isRegistryEditing = false; // Режим редагування для реєстру потреби
+    let backupHousingData = null; // Резервна копія для скасування
     let studentsList = [];
     let housingData = {};
     let roomDefects = [];
@@ -843,14 +845,35 @@
     // СТОРІНКИ МОДУЛЯ ПОСЕЛЕННЯ
     // =========================================================================
 
-    // 1. Реєстр та облік потреби в поселенні
+    // 1. Реєстр та облік потреби в поселенні (з блокуванням та кнопкою редагування)
     function renderHousingRegistry(main) {
       main.innerHTML = `
         <div class="space-y-4">
-          <div class="bg-white border border-slate-300 p-4 rounded-sm">
-            <h1 class="font-bold text-slate-800 text-sm">Реєстр та облік потреби в поселенні</h1>
-            <div class="text-xs text-slate-500 mt-0.5">
-              Натисніть на ПІБ студента, щоб внести дані щодо потреби, причини відмови або пільгової категорії.
+          <div class="bg-white border border-slate-300 p-4 rounded-sm flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs">
+            <div>
+              <h1 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                Реєстр та облік потреби в поселенні
+                ${isRegistryEditing ? '<span class="text-[11px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-semibold border border-amber-300">Режим редагування активний</span>' : '<span class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-normal border border-slate-200"><i class="fa-solid fa-lock text-[10px] mr-1"></i>Лише перегляд</span>'}
+              </h1>
+              <div class="text-xs text-slate-500 mt-0.5">
+                ${isRegistryEditing ? 'Натисніть на ПІБ студента для внесення змін. Після завершення обов\'язково підтвердіть збереження.' : 'Внесення змін заблоковано. Натисніть кнопку «Редагувати реєстр», щоб змінити дані.'}
+              </div>
+            </div>
+
+            <!-- Кнопки керування режимом редагування -->
+            <div class="flex items-center gap-2 shrink-0">
+              ${!isRegistryEditing ? `
+                <button onclick="enableRegistryEditing()" class="px-3.5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white rounded text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
+                  <i class="fa-solid fa-pen-to-square"></i> Редагувати реєстр
+                </button>
+              ` : `
+                <button onclick="cancelRegistryEditing()" class="px-3 py-1.5 border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 rounded text-xs font-semibold flex items-center gap-1">
+                  <i class="fa-solid fa-xmark"></i> Скасувати
+                </button>
+                <button onclick="confirmRegistryEditing()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
+                  <i class="fa-solid fa-check"></i> Підтвердити та зберегти
+                </button>
+              `}
             </div>
           </div>
 
@@ -859,7 +882,7 @@
               <thead>
                 <tr class="table-header border-b border-slate-300 text-slate-700 font-bold">
                   <th class="p-2.5 border-r border-slate-300 w-10 text-center">№</th>
-                  <th class="p-2.5 border-r border-slate-300">ПІБ студента (натисніть)</th>
+                  <th class="p-2.5 border-r border-slate-300">${isRegistryEditing ? 'ПІБ студента (натисніть для зміни)' : 'ПІБ студента'}</th>
                   <th class="p-2.5 border-r border-slate-300">Потреба в гуртожитку</th>
                   <th class="p-2.5 border-r border-slate-300">Пільгова категорія</th>
                   <th class="p-2.5 border-r border-slate-300">Верифікація пільги</th>
@@ -882,9 +905,9 @@
                   }
 
                   return `
-                    <tr class="hover:bg-blue-50/40 transition cursor-pointer" onclick="openHousingEditModal('${s.id}')">
+                    <tr class="${isRegistryEditing ? 'hover:bg-amber-50/60 cursor-pointer' : 'hover:bg-slate-50'} transition" onclick="${isRegistryEditing ? `openHousingEditModal('${s.id}')` : ''}">
                       <td class="p-2.5 border-r border-slate-300 text-center font-mono text-slate-500">${idx + 1}</td>
-                      <td class="p-2.5 border-r border-slate-300 font-bold text-blue-900 sute-link">
+                      <td class="p-2.5 border-r border-slate-300 font-bold ${isRegistryEditing ? 'text-blue-900 sute-link' : 'text-slate-900'}">
                         ${s.full_name}
                       </td>
                       <td class="p-2.5 border-r border-slate-300">${needBadge}</td>
@@ -911,7 +934,32 @@
       `;
     }
 
+    // Увімкнути режим редагування (зберігаємо бекап)
+    function enableRegistryEditing() {
+      backupHousingData = JSON.parse(JSON.stringify(housingData));
+      isRegistryEditing = true;
+      renderHousingRegistry(document.getElementById('main-content'));
+    }
+
+    // Скасувати режим редагування (відновлюємо з бекапу)
+    function cancelRegistryEditing() {
+      if (backupHousingData) {
+        housingData = JSON.parse(JSON.stringify(backupHousingData));
+      }
+      isRegistryEditing = false;
+      renderHousingRegistry(document.getElementById('main-content'));
+    }
+
+    // Підтвердити та зберегти остаточно
+    function confirmRegistryEditing() {
+      saveHousingToStorage();
+      isRegistryEditing = false;
+      backupHousingData = null;
+      renderHousingRegistry(document.getElementById('main-content'));
+    }
+
     function openHousingEditModal(studentId) {
+      if (!isRegistryEditing) return; // Заборона відкриття поза режимом редагування
       const student = studentsList.find(s => String(s.id) === String(studentId));
       if (!student) return;
 
@@ -956,9 +1004,8 @@
       housingData[studentId].dorm = 'Гуртожиток №3 (вул. Матеюка, 3)';
       housingData[studentId].room = isNeed ? (document.getElementById('h-room').value.trim() || '—') : '—';
 
-      saveHousingToStorage();
       closeModal('modal-housing-edit');
-      renderCurrentView();
+      renderHousingRegistry(document.getElementById('main-content'));
     }
 
     // 2. Проєкт списку на поселення
