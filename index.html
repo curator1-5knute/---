@@ -131,14 +131,13 @@
       <div class="w-8 h-8 rounded-full border-2 border-slate-300 border-t-[#2b569a] animate-spin"></div>
     </div>
 
-    <!-- Шапка (Header) з живим годинником -->
+    <!-- Шапка (Header) -->
     <header class="h-16 bg-white border-b border-slate-300 px-6 flex items-center justify-between shrink-0">
       <div class="text-xl font-medium text-slate-800 tracking-tight">
         Державний торговельно-економічний університет
       </div>
       
       <div class="flex items-center gap-6 text-xs text-slate-600">
-        <!-- Плашка з датою та живим часом -->
         <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded text-slate-700 font-mono shadow-xs">
           <i class="fa-regular fa-clock text-[#2b569a]"></i>
           <span id="system-live-clock" class="font-bold">--.--.---- --:--:--</span>
@@ -397,7 +396,6 @@
     let roomDefects = [];
     let searchQuery = '';
 
-    // Оновлення живого годинника щосекунди
     function updateLiveClock() {
       const clockEl = document.getElementById('system-live-clock');
       if (!clockEl) return;
@@ -414,11 +412,10 @@
       clockEl.innerText = `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
     }
 
-    // Перевірка системного часу
     function isAugust26Passed() {
       const now = new Date();
       const currentYear = now.getFullYear();
-      const currentMonth = now.getMonth(); // 7 = Серпень
+      const currentMonth = now.getMonth();
       const currentDate = now.getDate();
       const currentHours = now.getHours();
 
@@ -436,7 +433,7 @@
     function isSeptember1Passed() {
       const now = new Date();
       const currentYear = now.getFullYear();
-      const currentMonth = now.getMonth(); // 8 = Вересень
+      const currentMonth = now.getMonth();
 
       if (currentYear > 2026) return true;
       if (currentYear === 2026 && currentMonth >= 8) return true;
@@ -447,7 +444,6 @@
       updateLiveClock();
       setInterval(updateLiveClock, 1000);
 
-      loadSavedHousingData();
       const hash = window.location.hash.replace('#', '') || 'dashboard';
       currentTab = hash;
       
@@ -455,7 +451,7 @@
         isHousingMenuOpen = true;
       }
 
-      fetchStudentsFromCloud();
+      fetchDataFromCloud();
       renderNavigationUI();
       renderCurrentView();
     });
@@ -474,37 +470,77 @@
       }
     });
 
-    function loadSavedHousingData() {
-      const localH = localStorage.getItem('ekurator_housing_meta');
-      if (localH) housingData = JSON.parse(localH);
-      const localDef = localStorage.getItem('ekurator_defects');
-      if (localDef) roomDefects = JSON.parse(localDef);
-    }
-
-    function saveHousingToStorage() {
-      localStorage.setItem('ekurator_housing_meta', JSON.stringify(housingData));
-      localStorage.setItem('ekurator_defects', JSON.stringify(roomDefects));
-      updateCounters();
-    }
-
-    async function fetchStudentsFromCloud() {
+    // Одночасне завантаження студентів, записів поселення та дефектів із хмарної бази Supabase
+    async function fetchDataFromCloud() {
       try {
-        const { data, error } = await supabaseClient
+        // 1. Завантажуємо студентів
+        const { data: stData, error: stError } = await supabaseClient
           .from('students')
           .select('*')
           .order('created_at', { ascending: true });
 
-        if (!error && data) {
-          studentsList = data;
-          localStorage.setItem('ekurator_students', JSON.stringify(data));
+        if (!stError && stData) {
+          studentsList = stData;
+          localStorage.setItem('ekurator_students', JSON.stringify(stData));
         } else {
           const local = localStorage.getItem('ekurator_students');
           if (local) studentsList = JSON.parse(local);
         }
+
+        // 2. Завантажуємо записи поселення з Supabase
+        const { data: hrData, error: hrError } = await supabaseClient
+          .from('housing_records')
+          .select('*');
+
+        if (!hrError && hrData) {
+          hrData.forEach(r => {
+            housingData[r.student_id] = {
+              need: r.need,
+              refusal_reason: r.refusal_reason || '',
+              benefit: r.benefit || 'none',
+              benefit_status: r.benefit_status || 'Не подано',
+              dorm: r.dorm || 'Гуртожиток №3 (вул. Матеюка, 3)',
+              room: r.room || '—',
+              slot: r.slot || '26 серпня (10:00 - 11:00)',
+              briefing: r.briefing || false,
+              docs_passport: r.docs_passport || false,
+              docs_med: r.docs_med || false,
+              docs_photo: r.docs_photo || false,
+              docs_military: r.docs_military || false,
+              docs_payment: r.docs_payment || false,
+              custom_docs: Array.isArray(r.custom_docs) ? r.custom_docs : [],
+              step1: r.step1 || false,
+              step2: r.step2 || false,
+              step3: r.step3 || false,
+              step4: r.step4 || false,
+              step5: r.step5 || false,
+              handbook: r.handbook || false
+            };
+          });
+          localStorage.setItem('ekurator_housing_meta', JSON.stringify(housingData));
+        } else {
+          const localH = localStorage.getItem('ekurator_housing_meta');
+          if (localH) housingData = JSON.parse(localH);
+        }
+
+        // 3. Завантажуємо дефекти кімнат з Supabase
+        const { data: defData, error: defError } = await supabaseClient
+          .from('room_defects')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!defError && defData) {
+          roomDefects = defData;
+          localStorage.setItem('ekurator_defects', JSON.stringify(defData));
+        } else {
+          const localDef = localStorage.getItem('ekurator_defects');
+          if (localDef) roomDefects = JSON.parse(localDef);
+        }
+
       } catch (err) {
-        const local = localStorage.getItem('ekurator_students');
-        if (local) studentsList = JSON.parse(local);
+        console.warn("Працюємо в автономному режимі:", err);
       }
+
       initHousingRecordsForStudents();
       updateCounters();
       if (currentTab === 'students') renderStudentsTable();
@@ -538,7 +574,45 @@
           };
         }
       });
-      saveHousingToStorage();
+      localStorage.setItem('ekurator_housing_meta', JSON.stringify(housingData));
+    }
+
+    // Збереження одного запису студента безпосередньо в хмарну базу Supabase
+    async function syncHousingRecordToCloud(studentId) {
+      const data = housingData[studentId];
+      if (!data) return;
+
+      const recordToSave = {
+        student_id: studentId,
+        need: data.need,
+        refusal_reason: data.refusal_reason,
+        benefit: data.benefit,
+        benefit_status: data.benefit_status,
+        dorm: data.dorm,
+        room: data.room,
+        slot: data.slot,
+        briefing: data.briefing,
+        docs_passport: data.docs_passport,
+        docs_med: data.docs_med,
+        docs_photo: data.docs_photo,
+        docs_military: data.docs_military,
+        docs_payment: data.docs_payment,
+        custom_docs: data.custom_docs,
+        step1: data.step1,
+        step2: data.step2,
+        step3: data.step3,
+        step4: data.step4,
+        step5: data.step5,
+        handbook: data.handbook,
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        await supabaseClient.from('housing_records').upsert(recordToSave);
+      } catch (err) {
+        console.warn("Помилка синхронізації housing_records із Supabase:", err);
+      }
+      localStorage.setItem('ekurator_housing_meta', JSON.stringify(housingData));
     }
 
     function updateCounters() {
@@ -860,14 +934,13 @@
               </div>
             </div>
 
-            <!-- Кнопки керування режимом редагування -->
             <div class="flex items-center gap-2 shrink-0">
               ${!isRegistryEditing ? `
                 <button onclick="enableRegistryEditing()" class="px-3.5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white rounded text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
                   <i class="fa-solid fa-pen-to-square"></i> Редагувати реєстр
                 </button>
               ` : `
-                <button onclick="cancelRegistryEditing()" class="px-3 py-1.5 border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 rounded text-xs font-semibold flex items-center gap-1">
+                <button onclick="cancelRegistryEditing()" class="px-3.5 py-1.5 border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 rounded text-xs font-semibold flex items-center gap-1">
                   <i class="fa-solid fa-xmark"></i> Скасувати
                 </button>
                 <button onclick="confirmRegistryEditing()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
@@ -934,7 +1007,6 @@
       `;
     }
 
-    // Увімкнути режим редагування з плавним лоадером
     function enableRegistryEditing() {
       const loader = document.getElementById('page-loader');
       if (loader) loader.classList.remove('hidden');
@@ -948,7 +1020,6 @@
       }, 650);
     }
 
-    // Скасувати режим редагування з плавним лоадером
     function cancelRegistryEditing() {
       const loader = document.getElementById('page-loader');
       if (loader) loader.classList.remove('hidden');
@@ -964,12 +1035,16 @@
       }, 550);
     }
 
-    // Підтвердити та зберегти остаточно з плавним лоадером
-    function confirmRegistryEditing() {
+    // Підтвердження та масова синхронізація в базу Supabase
+    async function confirmRegistryEditing() {
       const loader = document.getElementById('page-loader');
       if (loader) loader.classList.remove('hidden');
 
-      saveHousingToStorage();
+      // Синхронізуємо всі змінені записи в Supabase
+      for (const s of studentsList) {
+        await syncHousingRecordToCloud(s.id);
+      }
+
       isRegistryEditing = false;
       backupHousingData = null;
 
@@ -1004,7 +1079,7 @@
       document.getElementById('block-housing-details').classList.toggle('hidden', val !== 'true');
     }
 
-    function saveHousingData(e) {
+    async function saveHousingData(e) {
       e.preventDefault();
       const studentId = document.getElementById('h-student-id').value;
       const needVal = document.getElementById('h-need').value;
@@ -1280,7 +1355,7 @@
       renderCustomDocsList();
     }
 
-    function saveStudentChecklist() {
+    async function saveStudentChecklist() {
       if (activeChecklistStudentId && housingData[activeChecklistStudentId]) {
         housingData[activeChecklistStudentId].docs_passport = document.getElementById('cl-doc-passport').checked;
         housingData[activeChecklistStudentId].docs_med = document.getElementById('cl-doc-med').checked;
@@ -1289,7 +1364,7 @@
         housingData[activeChecklistStudentId].docs_payment = document.getElementById('cl-doc-payment').checked;
         housingData[activeChecklistStudentId].custom_docs = tempCustomDocs;
 
-        saveHousingToStorage();
+        await syncHousingRecordToCloud(activeChecklistStudentId);
         closeModal('modal-checklist-edit');
         renderHousingChecklist(document.getElementById('main-content'));
       }
@@ -1343,10 +1418,10 @@
       `;
     }
 
-    function toggleBriefing(id) {
+    async function toggleBriefing(id) {
       if (housingData[id]) {
         housingData[id].briefing = !housingData[id].briefing;
-        saveHousingToStorage();
+        await syncHousingRecordToCloud(id);
         renderHousingBriefings(document.getElementById('main-content'));
       }
     }
@@ -1438,10 +1513,10 @@
       `;
     }
 
-    function toggleStep(id, stepKey) {
+    async function toggleStep(id, stepKey) {
       if (housingData[id]) {
         housingData[id][stepKey] = !housingData[id][stepKey];
-        saveHousingToStorage();
+        await syncHousingRecordToCloud(id);
         renderHousingRoute(document.getElementById('main-content'));
       }
     }
@@ -1466,25 +1541,39 @@
       }
 
       const newDef = {
-        id: 'def_' + Date.now(),
         room: room,
         type: type,
-        desc: desc,
-        photo: photo,
-        status: 'Зафіксовано',
-        date: new Date().toLocaleDateString('uk-UA')
+        description: desc,
+        photo_url: photo || null,
+        status: 'Зафіксовано'
       };
 
-      roomDefects.push(newDef);
-      saveHousingToStorage();
+      try {
+        const { data, error } = await supabaseClient
+          .from('room_defects')
+          .insert([newDef])
+          .select();
+
+        if (!error && data && data[0]) {
+          roomDefects.unshift(data[0]);
+        } else {
+          newDef.id = 'def_' + Date.now();
+          roomDefects.unshift(newDef);
+        }
+      } catch (err) {
+        newDef.id = 'def_' + Date.now();
+        roomDefects.unshift(newDef);
+      }
+
+      localStorage.setItem('ekurator_defects', JSON.stringify(roomDefects));
 
       if (addAnother) {
         document.getElementById('s5-def-desc').value = '';
         document.getElementById('s5-def-photo').value = '';
-        alert("Дефект успішно зафіксовано! Введіть наступний.");
+        alert("Дефект успішно зафіксовано в базі! Введіть наступний.");
       } else {
         closeModal('modal-defect-step5');
-        alert("Дефект кімнати успішно внесено до реєстру!");
+        alert("Дефект кімнати успішно внесено до бази даних!");
         if (currentTab === 'housing-defects') renderHousingDefects(document.getElementById('main-content'));
       }
     }
@@ -1523,16 +1612,16 @@
                     <td class="p-2.5 text-center text-slate-500">${idx + 1}</td>
                     <td class="p-2.5 font-bold font-mono text-blue-900">${d.room}</td>
                     <td class="p-2.5 font-semibold">${d.type}</td>
-                    <td class="p-2.5">${d.desc} ${d.photo ? `<a href="${d.photo}" target="_blank" class="sute-link ml-1">[Фото]</a>` : ''}</td>
+                    <td class="p-2.5">${d.description || d.desc} ${d.photo_url || d.photo ? `<a href="${d.photo_url || d.photo}" target="_blank" class="sute-link ml-1">[Фото]</a>` : ''}</td>
                     <td class="p-2.5">
-                      <select onchange="updateDefectStatus(${idx}, this.value)" class="border p-1 rounded bg-white text-xs font-semibold ${d.status === 'Ліквідовано' ? 'text-emerald-700' : 'text-amber-700'}">
+                      <select onchange="updateDefectStatus('${d.id}', this.value)" class="border p-1 rounded bg-white text-xs font-semibold ${d.status === 'Ліквідовано' ? 'text-emerald-700' : 'text-amber-700'}">
                         <option value="Зафіксовано" ${d.status === 'Зафіксовано' ? 'selected' : ''}>Зафіксовано</option>
                         <option value="Передано коменданту" ${d.status === 'Передано коменданту' ? 'selected' : ''}>Передано коменданту</option>
                         <option value="Ліквідовано" ${d.status === 'Ліквідовано' ? 'selected' : ''}>Ліквідовано</option>
                       </select>
                     </td>
                     <td class="p-2.5 text-center">
-                      <button onclick="deleteDefect(${idx})" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-800 rounded font-semibold text-[11px]">
+                      <button onclick="deleteDefect('${d.id}')" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-800 rounded font-semibold text-[11px]">
                         <i class="fa-solid fa-trash mr-1"></i> Видалити
                       </button>
                     </td>
@@ -1545,18 +1634,29 @@
       `;
     }
 
-    function updateDefectStatus(idx, val) {
-      if (roomDefects[idx]) {
-        roomDefects[idx].status = val;
-        saveHousingToStorage();
+    async function updateDefectStatus(defectId, val) {
+      const def = roomDefects.find(d => String(d.id) === String(defectId));
+      if (def) {
+        def.status = val;
+        try {
+          await supabaseClient.from('room_defects').update({ status: val }).eq('id', defectId);
+        } catch (err) {
+          console.warn("Помилка оновлення дефекту в Supabase:", err);
+        }
+        localStorage.setItem('ekurator_defects', JSON.stringify(roomDefects));
         renderHousingDefects(document.getElementById('main-content'));
       }
     }
 
-    function deleteDefect(idx) {
-      if (confirm("Ви дійсно бажаєте видалити цей запис дефекту?")) {
-        roomDefects.splice(idx, 1);
-        saveHousingToStorage();
+    async function deleteDefect(defectId) {
+      if (confirm("Ви дійсно бажаєте видалити цей запис дефекту з бази даних?")) {
+        try {
+          await supabaseClient.from('room_defects').delete().eq('id', defectId);
+        } catch (err) {
+          console.warn("Помилка видалення дефекту з Supabase:", err);
+        }
+        roomDefects = roomDefects.filter(d => String(d.id) !== String(defectId));
+        localStorage.setItem('ekurator_defects', JSON.stringify(roomDefects));
         renderHousingDefects(document.getElementById('main-content'));
       }
     }
@@ -1609,10 +1709,10 @@
       `;
     }
 
-    function toggleHandbook(id) {
+    async function toggleHandbook(id) {
       if (housingData[id]) {
         housingData[id].handbook = !housingData[id].handbook;
-        saveHousingToStorage();
+        await syncHousingRecordToCloud(id);
         renderHousingHandbook(document.getElementById('main-content'));
       }
     }
