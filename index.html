@@ -158,11 +158,9 @@
   <!-- Головний контент -->
   <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
     
-    <div id="page-loader" class="absolute inset-0 bg-slate-100/75 z-40 flex flex-col items-center justify-center hidden">
-      <div class="bg-white border border-slate-300 p-4 rounded shadow-md flex items-center gap-3 text-xs font-semibold text-slate-700">
-        <i class="fa-solid fa-circle-notch fa-spin text-blue-700 text-lg"></i>
-        <span>Завантаження даних із сервера ДТЕУ...</span>
-      </div>
+    <!-- Ненав'язливий короткий лоадер без тексту -->
+    <div id="page-loader" class="absolute inset-0 bg-slate-50/60 z-40 flex items-center justify-center hidden">
+      <div class="w-8 h-8 rounded-full border-2 border-slate-300 border-t-[#2b569a] animate-spin"></div>
     </div>
 
     <header class="h-16 bg-white border-b border-slate-300 px-6 flex items-center justify-between shrink-0">
@@ -644,10 +642,11 @@
       
       renderNavigationUI();
 
+      // Швидка, реалістична затримка без тексту (~800 мс)
       setTimeout(() => {
         if (loader) loader.classList.add('hidden');
         renderCurrentView();
-      }, 1100);
+      }, 750);
     }
 
     function renderNavigationUI() {
@@ -704,8 +703,6 @@
         renderHousingChecklist(main);
       } else if (currentTab === 'housing-briefings') {
         renderHousingBriefings(main);
-      } else if (currentTab === 'housing-route') {
-        renderHousingRoute(main);
       } else if (currentTab === 'housing-defects') {
         renderHousingDefects(main);
       } else if (currentTab === 'housing-handbook') {
@@ -838,7 +835,7 @@
           <div class="bg-white border border-slate-300 p-4 rounded-sm">
             <h1 class="font-bold text-slate-800 text-sm">Реєстр та облік потреби в поселенні</h1>
             <div class="text-xs text-slate-500 mt-0.5">
-              Натисніть на ПІБ студента, щоб внести дані щодо потреби, причини відмови або пільгової категорії.
+              Натисніть на ПІБ студента, щоб внести дані щодо потреби, причини відмови або пільгової категорії[cite: 1, 2].
             </div>
           </div>
 
@@ -1271,144 +1268,7 @@
       }
     }
 
-    // 6. Очний маршрут поселення
-    function renderHousingRoute(main) {
-      const needStudents = studentsList.filter(s => housingData[s.id]?.need === true);
-
-      main.innerHTML = `
-        <div class="space-y-4">
-          <div class="bg-white border border-slate-300 p-4 rounded-sm flex items-center justify-between">
-            <div>
-              <h1 class="font-bold text-slate-800 text-sm">Очний маршрут поселення</h1>
-              <div class="text-xs text-slate-500 mt-0.5">
-                Послідовний супровід 5 кроків очного дня поселення (Гуртожиток №3)[cite: 1, 2]
-              </div>
-            </div>
-            <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded">
-              ● Очний прийом відкрито
-            </span>
-          </div>
-
-          <div class="space-y-3">
-            ${needStudents.length === 0 ? `
-              <div class="bg-white border border-slate-300 p-8 text-center text-slate-400">Немає студентів, які потребують поселення.</div>
-            ` : needStudents.map((s, idx) => {
-              const h = housingData[s.id];
-              const stepsDone = [h.step1, h.step2, h.step3, h.step4, h.step5].filter(Boolean).length;
-              const isSettled = stepsDone === 5;
-
-              return `
-                <div class="bg-white border border-slate-300 p-4 rounded shadow-sm space-y-3">
-                  <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-                    <div>
-                      <span class="font-bold text-slate-800 text-sm">${idx + 1}. ${s.full_name}</span>
-                      <span class="text-xs text-slate-500 ml-2">(Гуртожиток №3, кімната: <b>${h.room}</b>)</span>
-                    </div>
-                    <span class="px-2.5 py-0.5 rounded text-xs font-bold ${isSettled ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">
-                      ${isSettled ? '✓ ПОВНІСТЮ ЗАСЕЛЕНО' : `Пройдено кроків: ${stepsDone} / 5`}
-                    </span>
-                  </div>
-
-                  <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 text-xs">
-                    
-                    <button onclick="toggleStep('${s.id}', 'step1')" class="p-2.5 rounded border text-left transition ${h.step1 ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'}">
-                      <div class="font-bold">Крок 1. Штаб / Ордер[cite: 1, 2]</div>
-                      <div class="text-[10px] text-slate-500 mt-0.5">Звірка з наказом та візування ордера[cite: 1, 2]</div>
-                      <div class="mt-2 font-bold text-[11px]">${h.step1 ? '✓ Завізовано' : '○ Очікує'}</div>
-                    </button>
-
-                    <button onclick="toggleStep('${s.id}', 'step2')" class="p-2.5 rounded border text-left transition ${h.step2 ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'}">
-                      <div class="font-bold">Крок 2. Медпункт[cite: 1, 2]</div>
-                      <div class="text-[10px] text-slate-500 mt-0.5">Флюорографія + допуск дерматолога[cite: 1, 2]</div>
-                      <div class="mt-2 font-bold text-[11px]">${h.step2 ? '✓ Допуск отримано' : '○ На огляді'}</div>
-                    </button>
-
-                    <button onclick="toggleStep('${s.id}', 'step3')" class="p-2.5 rounded border text-left transition ${h.step3 ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'}">
-                      <div class="font-bold">Крок 3. Бухгалтерія / Пільга[cite: 1, 2]</div>
-                      <div class="text-[10px] text-slate-500 mt-0.5">Квитанція за семестр або 100% пільга[cite: 1, 2]</div>
-                      <div class="mt-2 font-bold text-[11px]">${h.step3 ? '✓ Сплачено / Пільга' : '○ Перевірка'}</div>
-                    </button>
-
-                    <button onclick="toggleStep('${s.id}', 'step4')" class="p-2.5 rounded border text-left transition ${h.step4 ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'}">
-                      <div class="font-bold">Крок 4. Комендант[cite: 1, 2]</div>
-                      <div class="text-[10px] text-slate-500 mt-0.5">Договір найму, укриття, перепустка[cite: 1, 2]</div>
-                      <div class="mt-2 font-bold text-[11px]">${h.step4 ? '✓ Договір підписано' : '○ Оформлення'}</div>
-                    </button>
-
-                    <div class="p-2.5 rounded border flex flex-col justify-between ${h.step5 ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-slate-50 text-slate-600'}">
-                      <div>
-                        <div class="font-bold">Крок 5. Кімната / Завгосп[cite: 1, 2]</div>
-                        <div class="text-[10px] text-slate-500 mt-0.5">Акт прийому майна та ключі[cite: 1, 2]</div>
-                        <button onclick="toggleStep('${s.id}', 'step5')" class="mt-1 text-[11px] font-bold block ${h.step5 ? 'text-emerald-700' : 'text-slate-600'}">
-                          ${h.step5 ? '✓ Заселено' : '○ Підписати акт'}
-                        </button>
-                      </div>
-                      
-                      <button onclick="openDefectStep5Modal('${h.room}')" class="mt-2 text-[10px] bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded font-bold">
-                        <i class="fa-solid fa-screwdriver-wrench mr-1"></i> Фіксація дефекту[cite: 1, 2]
-                      </button>
-                    </div>
-
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    function toggleStep(id, stepKey) {
-      if (housingData[id]) {
-        housingData[id][stepKey] = !housingData[id][stepKey];
-        saveHousingToStorage();
-        renderHousingRoute(document.getElementById('main-content'));
-      }
-    }
-
-    function openDefectStep5Modal(roomNumber) {
-      document.getElementById('s5-def-room').value = (roomNumber && roomNumber !== '—') ? roomNumber : '';
-      document.getElementById('step5-defect-form').reset();
-      if (roomNumber && roomNumber !== '—') document.getElementById('s5-def-room').value = roomNumber;
-      openModal('modal-defect-step5');
-    }
-
-    async function saveDefectFromStep5(e, addAnother = false) {
-      if (e) e.preventDefault();
-      const room = document.getElementById('s5-def-room').value.trim();
-      const type = document.getElementById('s5-def-type').value;
-      const desc = document.getElementById('s5-def-desc').value.trim();
-      const photo = document.getElementById('s5-def-photo').value.trim();
-
-      if (!room || !desc) {
-        alert("Вкажіть номер кімнати та опис!");
-        return;
-      }
-
-      const newDef = {
-        id: 'def_' + Date.now(),
-        room: room,
-        type: type,
-        desc: desc,
-        photo: photo,
-        status: 'Зафіксовано',
-        date: new Date().toLocaleDateString('uk-UA')
-      };
-
-      roomDefects.push(newDef);
-      saveHousingToStorage();
-
-      if (addAnother) {
-        document.getElementById('s5-def-desc').value = '';
-        document.getElementById('s5-def-photo').value = '';
-        alert("Дефект успішно зафіксовано! Введіть наступний.");
-      } else {
-        closeModal('modal-defect-step5');
-        alert("Дефект кімнати успішно внесено до реєстру!");
-      }
-    }
-
-    // 7. Реєстр дефектів кімнат
+    // 6. Реєстр дефектів кімнат
     function renderHousingDefects(main) {
       main.innerHTML = `
         <div class="space-y-4">
@@ -1480,7 +1340,50 @@
       }
     }
 
-    // 8. Вручення довідників
+    function openDefectStep5Modal(roomNumber) {
+      document.getElementById('s5-def-room').value = (roomNumber && roomNumber !== '—') ? roomNumber : '';
+      document.getElementById('step5-defect-form').reset();
+      if (roomNumber && roomNumber !== '—') document.getElementById('s5-def-room').value = roomNumber;
+      openModal('modal-defect-step5');
+    }
+
+    async function saveDefectFromStep5(e, addAnother = false) {
+      if (e) e.preventDefault();
+      const room = document.getElementById('s5-def-room').value.trim();
+      const type = document.getElementById('s5-def-type').value;
+      const desc = document.getElementById('s5-def-desc').value.trim();
+      const photo = document.getElementById('s5-def-photo').value.trim();
+
+      if (!room || !desc) {
+        alert("Вкажіть номер кімнати та опис!");
+        return;
+      }
+
+      const newDef = {
+        id: 'def_' + Date.now(),
+        room: room,
+        type: type,
+        desc: desc,
+        photo: photo,
+        status: 'Зафіксовано',
+        date: new Date().toLocaleDateString('uk-UA')
+      };
+
+      roomDefects.push(newDef);
+      saveHousingToStorage();
+
+      if (addAnother) {
+        document.getElementById('s5-def-desc').value = '';
+        document.getElementById('s5-def-photo').value = '';
+        alert("Дефект успішно зафіксовано! Введіть наступний.");
+      } else {
+        closeModal('modal-defect-step5');
+        alert("Дефект кімнати успішно внесено до реєстру!");
+        if (currentTab === 'housing-defects') renderHousingDefects(document.getElementById('main-content'));
+      }
+    }
+
+    // 7. Вручення довідників
     function renderHousingHandbook(main) {
       const needStudents = studentsList.filter(s => housingData[s.id]?.need === true);
 
@@ -1536,7 +1439,7 @@
       }
     }
 
-    // 9. Фінальний звіт про поселення
+    // 8. Фінальний звіт про поселення
     function renderHousingReport(main) {
       const total = studentsList.length;
       const need = studentsList.filter(s => housingData[s.id]?.need === true).length;
