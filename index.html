@@ -97,9 +97,15 @@
           <button onclick="navigate('housing-briefings')" id="subnav-housing-briefings" class="mia-submenu-item">
             Журнал інструктажів
           </button>
-          <button onclick="navigate('housing-route')" id="subnav-housing-route" class="mia-submenu-item">
-            Очний маршрут поселення
-          </button>
+          
+          <!-- Заблокована сіра кнопка з підказкою при наведенні -->
+          <div title="Відкриється 26 серпня 2026 року о 10:00 згідно з регламентом ДТЕУ" class="w-full flex items-center justify-between px-3.5 py-1.5 text-slate-400 bg-slate-100/70 cursor-not-allowed select-none text-[12px] font-normal border-y border-slate-100">
+            <span class="flex items-center gap-1.5">
+              <i class="fa-solid fa-lock text-[10px] text-slate-400"></i> Очний маршрут поселення
+            </span>
+            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.2 rounded font-mono">26.08</span>
+          </div>
+
           <button onclick="navigate('housing-defects')" id="subnav-housing-defects" class="mia-submenu-item">
             Реєстр дефектів кімнат
           </button>
@@ -152,7 +158,6 @@
   <!-- Головний контент -->
   <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
     
-    <!-- Індикатор завантаження (1-2 сек) -->
     <div id="page-loader" class="absolute inset-0 bg-slate-100/75 z-40 flex flex-col items-center justify-center hidden">
       <div class="bg-white border border-slate-300 p-4 rounded shadow-md flex items-center gap-3 text-xs font-semibold text-slate-700">
         <i class="fa-solid fa-circle-notch fa-spin text-blue-700 text-lg"></i>
@@ -514,10 +519,6 @@
     let housingData = {};
     let roomDefects = [];
     let searchQuery = '';
-    let isRouteUnlocked = false; // Для можливості тестового розблокування
-
-    // Дата та час початку очного дня поселення: 26 серпня 2026, 10:00:00
-    const SETTLEMENT_UNLOCK_TIME = new Date("2026-08-26T10:00:00").getTime();
 
     window.addEventListener('DOMContentLoaded', () => {
       loadSavedHousingData();
@@ -537,7 +538,11 @@
       const hash = window.location.hash.replace('#', '') || 'dashboard';
       if (hash !== currentTab) {
         currentTab = hash;
-        if (currentTab.startsWith('housing-')) isHousingMenuOpen = true;
+        if (currentTab.startsWith('housing-')) {
+          isHousingMenuOpen = true;
+        } else {
+          isHousingMenuOpen = false;
+        }
         renderNavigationUI();
         renderCurrentView();
       }
@@ -580,14 +585,13 @@
       if (currentTab.startsWith('housing-')) renderCurrentView();
     }
 
-    // Ініціалізація нових студентів: За замовчуванням гуртожиток №3, слот 26 серпня 10:00, хрестики в чек-листі, статус пільги - не визначено
     function initHousingRecordsForStudents() {
       studentsList.forEach(s => {
         if (!housingData[s.id]) {
           housingData[s.id] = {
-            need: null, // не визначено
+            need: null,
             refusal_reason: '',
-            benefit: 'none', // не визначено
+            benefit: 'none',
             benefit_status: 'Не подано',
             dorm: 'Гуртожиток №3 (вул. Матеюка, 3)',
             room: '—',
@@ -623,7 +627,6 @@
       }
     }
 
-    // Навігація з реалістичною затримкою 1.2 секунди
     function navigate(tabKey, updateHash = true) {
       if (currentTab === tabKey) return;
 
@@ -632,7 +635,13 @@
 
       currentTab = tabKey;
       if (updateHash) window.location.hash = tabKey;
-      if (currentTab.startsWith('housing-')) isHousingMenuOpen = true;
+      
+      if (currentTab.startsWith('housing-')) {
+        isHousingMenuOpen = true;
+      } else {
+        isHousingMenuOpen = false;
+      }
+      
       renderNavigationUI();
 
       setTimeout(() => {
@@ -829,7 +838,7 @@
           <div class="bg-white border border-slate-300 p-4 rounded-sm">
             <h1 class="font-bold text-slate-800 text-sm">Реєстр та облік потреби в поселенні</h1>
             <div class="text-xs text-slate-500 mt-0.5">
-              Натисніть на ПІБ студента, щоб внести дані щодо потреби, причини відмови або пільгової категорії[cite: 1, 2].
+              Натисніть на ПІБ студента, щоб внести дані щодо потреби, причини відмови або пільгової категорії.
             </div>
           </div>
 
@@ -851,7 +860,6 @@
                 ` : studentsList.map((s, idx) => {
                   const h = housingData[s.id] || {};
                   
-                  // Відображення не заповнених даних
                   let needBadge = '<span class="text-amber-600 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">⚠ Потрібно внести дані</span>';
                   if (h.need === true) needBadge = '<span class="text-emerald-700 font-bold">✓ Потребує</span>';
                   if (h.need === false) needBadge = `<span class="text-rose-700 font-bold">✕ Відмова</span> <span class="text-[11px] text-slate-500 font-normal">(${h.refusal_reason || 'Власне житло'})</span>`;
@@ -1040,7 +1048,7 @@
       window.print();
     }
 
-    // 3. Планувальник тайм-слотів прибуття (Фіксований слот від деканату)
+    // 3. Планувальник тайм-слотів прибуття
     function renderHousingSlots(main) {
       const needStudents = studentsList.filter(s => housingData[s.id]?.need === true);
 
@@ -1051,7 +1059,6 @@
             <div class="text-xs text-slate-500 mt-0.5">Розклад прибуття студентів академічної групи ФТМ 1-5 до Гуртожитку №3[cite: 1, 2]</div>
           </div>
 
-          <!-- Інформаційна плашка деканату -->
           <div class="bg-blue-50 border border-blue-200 p-3 rounded text-xs text-blue-950 flex items-start gap-2.5">
             <i class="fa-solid fa-lock text-blue-700 mt-0.5"></i>
             <div>
@@ -1093,7 +1100,7 @@
       `;
     }
 
-    // 4. Чек-лист обов'язкових документів (за замовчуванням хрестики)
+    // 4. Чек-лист обов'язкових документів
     function renderHousingChecklist(main) {
       const needStudents = studentsList.filter(s => housingData[s.id]?.need === true);
 
@@ -1264,42 +1271,8 @@
       }
     }
 
-    // 6. Очний маршрут поселення (Блокування до 26 серпня 10:00)
+    // 6. Очний маршрут поселення
     function renderHousingRoute(main) {
-      const now = new Date().getTime();
-      const isTimePassed = now >= SETTLEMENT_UNLOCK_TIME || isRouteUnlocked;
-
-      if (!isTimePassed) {
-        main.innerHTML = `
-          <div class="space-y-4">
-            <div class="bg-white border border-slate-300 p-8 rounded text-center max-w-2xl mx-auto shadow-sm space-y-4">
-              <div class="w-16 h-16 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto text-2xl border border-amber-200">
-                <i class="fa-solid fa-lock"></i>
-              </div>
-              <div>
-                <h2 class="text-lg font-bold text-slate-900">Доступ закрито згідно з регламентом ДТЕУ[cite: 1, 2]</h2>
-                <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                  Робоче місце куратора для очного проведення «Маршруту поселення» відкриється <b>26 серпня 2026 року о 10:00:00</b> — відповідно до затвердженого тайм-слоту академічної групи ФТМ 1-5[cite: 1, 2].
-                </p>
-              </div>
-
-              <div class="p-4 bg-slate-50 border border-slate-200 rounded inline-block text-xs font-mono text-slate-700">
-                Поточний серверний час: <b>${new Date().toLocaleString('uk-UA')}</b><br>
-                Час відкриття доступу: <b>26.08.2026, 10:00:00</b>[cite: 1, 2]
-              </div>
-
-              <div class="pt-2">
-                <button onclick="unlockRouteForTesting()" class="text-[11px] text-blue-600 underline hover:text-blue-800">
-                  (Тестовий режим: Розблокувати маршрут куратора зараз)
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
-        return;
-      }
-
-      // Якщо час настав — відображаємо повноцінний 5-кроковий маршрут
       const needStudents = studentsList.filter(s => housingData[s.id]?.need === true);
 
       main.innerHTML = `
@@ -1383,11 +1356,6 @@
           </div>
         </div>
       `;
-    }
-
-    function unlockRouteForTesting() {
-      isRouteUnlocked = true;
-      renderHousingRoute(document.getElementById('main-content'));
     }
 
     function toggleStep(id, stepKey) {
