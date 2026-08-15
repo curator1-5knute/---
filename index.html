@@ -223,7 +223,7 @@
     </div>
   </div>
 
-  <!-- Модальне вікно: Картка студента (у стилі IS-Pro / Деканат) -->
+  <!-- Модальне вікно: Картка студента -->
   <div id="modal-card" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
     <div class="bg-white border border-slate-400 rounded-sm shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
       <div class="bg-slate-200 border-b border-slate-300 px-4 py-2 flex items-center justify-between text-xs font-bold text-slate-800">
@@ -243,8 +243,31 @@
     </div>
   </div>
 
+  <!-- Модальне вікно: Повідомлення про наповнення модуля -->
+  <div id="modal-under-construction" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white border border-slate-400 rounded-sm shadow-xl w-full max-w-md">
+      <div class="sute-blue text-white px-4 py-2 flex items-center justify-between font-bold text-xs">
+        <span class="flex items-center gap-2"><i class="fa-solid fa-circle-info"></i> Повідомлення системи</span>
+        <button onclick="closeModal('modal-under-construction')" class="text-white hover:text-red-200 text-sm">✕</button>
+      </div>
+      <div class="p-5 text-center space-y-3">
+        <div class="w-12 h-12 rounded-full bg-blue-50 text-[#2b569a] flex items-center justify-center mx-auto text-xl border border-blue-200">
+          <i class="fa-solid fa-bars-progress"></i>
+        </div>
+        <div>
+          <h3 id="uc-module-title" class="font-bold text-slate-800 text-sm">Модуль у розробці</h3>
+          <p class="text-xs text-slate-500 mt-1">Цей сервіс системи «єКуратор» перебуває на етапі наповнення та налаштування бізнес-логіки згідно з технічним регламентом[cite: 1].</p>
+        </div>
+      </div>
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-center">
+        <button onclick="closeModal('modal-under-construction')" class="px-5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white font-semibold rounded-sm text-xs">
+          Зрозуміло
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // --- ПІДКЛЮЧЕННЯ ДО ТВОЄЇ ХМАРНОЇ БАЗИ SUPABASE ---
     const SUPABASE_URL = "https://uwaxgxosskcelneqoudn.supabase.co";
     const SUPABASE_KEY = "sb_publishable_O2kslXPA90MIYozyXeejvg_e2kQaviv";
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -253,13 +276,22 @@
     let studentsList = [];
     let searchQuery = '';
 
-    // Ініціалізація додатку
+    const moduleNamesMap = {
+      housing: '1. Поселення та студмістечко',
+      attendance: '2. Відвідуваність та навчальна дисципліна',
+      academic: '3. Контроль успішності та сесія',
+      rating: '4. Стипендіальний рейтинг та портфоліо',
+      military: '5. Військовий облік та ТЦК',
+      social: '6. Соціальний супровід та пільги',
+      safety: '7. Адаптація, самоврядування та безпека',
+      reports: '8. Звітність та аналітика куратора'
+    };
+
     window.addEventListener('DOMContentLoaded', () => {
       fetchStudentsFromCloud();
       renderCurrentView();
     });
 
-    // Завантаження студентів з хмари
     async function fetchStudentsFromCloud() {
       try {
         const { data, error } = await supabaseClient
@@ -268,8 +300,7 @@
           .order('created_at', { ascending: true });
 
         if (error) {
-          console.error("Помилка завантаження з Supabase:", error);
-          // Фоллбек на локальне сховище якщо мережі нема
+          console.error("Помилка Supabase:", error);
           const local = localStorage.getItem('ekurator_students');
           if (local) studentsList = JSON.parse(local);
         } else if (data) {
@@ -277,7 +308,7 @@
           localStorage.setItem('ekurator_students', JSON.stringify(data));
         }
       } catch (err) {
-        console.warn("Працюємо в режимі збереження:", err);
+        console.warn("Фоллбек:", err);
       }
       updateCounters();
       if (currentTab === 'students') renderStudentsTable();
@@ -288,11 +319,9 @@
       if (countEl) countEl.innerText = studentsList.length;
     }
 
-    // Навігація між сторінками
     function navigate(tabKey) {
       currentTab = tabKey;
       
-      // Скидання стилів кнопок сайдбара
       const allButtons = document.querySelectorAll('aside nav button');
       allButtons.forEach(btn => {
         btn.className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover";
@@ -304,9 +333,18 @@
       }
 
       renderCurrentView();
+
+      // Якщо це один із модулів у розробці — показуємо спливаюче повідомлення
+      if (moduleNamesMap[tabKey]) {
+        showUnderConstructionModal(moduleNamesMap[tabKey]);
+      }
     }
 
-    // Рендер поточної сторінки
+    function showUnderConstructionModal(name) {
+      document.getElementById('uc-module-title').innerText = name;
+      openModal('modal-under-construction');
+    }
+
     function renderCurrentView() {
       const main = document.getElementById('main-content');
       
@@ -323,7 +361,6 @@
       } else if (currentTab === 'students') {
         main.innerHTML = `
           <div class="space-y-4">
-            <!-- Шапка сторінки Списку групи -->
             <div class="bg-white border border-slate-300 p-4 rounded-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
               <div>
                 <h1 class="text-base font-bold text-slate-800 flex items-center gap-2">
@@ -342,7 +379,6 @@
               </div>
             </div>
 
-            <!-- Фільтр та пошук -->
             <div class="bg-white border border-slate-300 p-3 rounded-sm flex items-center gap-3 text-xs">
               <div class="relative flex-1">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400"></i>
@@ -353,7 +389,6 @@
               </div>
             </div>
 
-            <!-- Таблиця студентів -->
             <div class="bg-white border border-slate-300 rounded-sm overflow-x-auto shadow-sm">
               <table class="w-full text-left border-collapse text-xs">
                 <thead>
@@ -368,32 +403,36 @@
                     <th class="p-2.5 text-center w-28">Дії</th>
                   </tr>
                 </thead>
-                <tbody id="students-table-body" class="divide-y divide-slate-200">
-                  <!-- Рендериться через renderStudentsTable() -->
-                </tbody>
+                <tbody id="students-table-body" class="divide-y divide-slate-200"></tbody>
               </table>
             </div>
           </div>
         `;
         renderStudentsTable();
       } else {
+        const title = moduleNamesMap[currentTab] || 'Модуль системи';
         main.innerHTML = `
           <div class="bg-white border border-slate-300 p-8 text-center rounded-sm">
-            <i class="fa-solid fa-screwdriver-wrench text-3xl text-slate-400 mb-2"></i>
-            <div class="font-bold text-slate-700">Розділ у процесі підключення</div>
-            <div class="text-xs text-slate-500 mt-1">Модуль буде розроблено на наступному етапі згідно з ТЗ.</div>
+            <div class="w-12 h-12 rounded-full bg-blue-50 text-[#2b569a] flex items-center justify-center mx-auto text-xl border border-blue-200 mb-3">
+              <i class="fa-solid fa-screwdriver-wrench"></i>
+            </div>
+            <div class="font-bold text-slate-800 text-base">${title}</div>
+            <div class="text-xs text-slate-500 mt-1.5 max-w-md mx-auto">
+              Розділ активовано в системі. Наразі триває наповнення функціональними блоками та інтеграція з базою групи ФТМ 1-5[cite: 1].
+            </div>
+            <button onclick="navigate('students')" class="mt-4 px-4 py-1.5 bg-[#2b569a] text-white rounded-sm text-xs font-semibold hover:bg-[#1f4277]">
+              Повернутися до Списку групи
+            </button>
           </div>
         `;
       }
     }
 
-    // Пошук
     function handleSearch(val) {
       searchQuery = val.toLowerCase().trim();
       renderStudentsTable();
     }
 
-    // Рендер рядків таблиці
     function renderStudentsTable() {
       const tbody = document.getElementById('students-table-body');
       if (!tbody) return;
@@ -447,7 +486,6 @@
       `).join('');
     }
 
-    // Збереження студента та генерація номерів
     async function saveStudent(e) {
       e.preventDefault();
       
@@ -456,11 +494,7 @@
       submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Збереження...`;
 
       const seqNum = String(studentsList.length + 1).padStart(4, '0');
-      
-      // Генерація номерів за правилом:
-      // Студентський: 2026-B-FTM061-0001
       const studentCardId = `2026-B-FTM061-${seqNum}`;
-      // Залікова: 261D0610001 (Рік:26, Рівень/Форма: 1D, Спеціальність: 061, Порядковий: 0001)
       const recordBookNumber = `261D061${seqNum}`;
 
       const newStudent = {
@@ -490,7 +524,6 @@
 
         if (error) {
           console.error("Помилка Supabase:", error);
-          // Якщо сталася помилка — генеруємо локальний ID
           newStudent.id = 'loc_' + Date.now();
           studentsList.push(newStudent);
           localStorage.setItem('ekurator_students', JSON.stringify(studentsList));
@@ -513,7 +546,6 @@
       renderStudentsTable();
     }
 
-    // Перегляд детальної картки студента (у стилі деканату IS-Pro)
     function viewStudentCard(studentId) {
       const student = studentsList.find(s => String(s.id) === String(studentId));
       if (!student) return;
@@ -583,7 +615,6 @@
       openModal('modal-card');
     }
 
-    // Утиліти модальних вікон
     function openModal(id) {
       document.getElementById(id).classList.remove('hidden');
     }
