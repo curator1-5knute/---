@@ -159,106 +159,6 @@
     <main id="main-content" class="flex-1 overflow-y-auto p-6"></main>
   </div>
 
-  <!-- МОДАЛКА: Реєстрація студента -->
-  <div id="modal-register" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
-    <div class="bg-white border border-slate-400 rounded-sm shadow-lg w-full max-w-3xl max-h-[90vh] flex flex-col">
-      <div class="sute-blue text-white px-4 py-2.5 flex items-center justify-between font-bold text-sm">
-        <span><i class="fa-solid fa-user-plus mr-2"></i>Реєстраційна картка студента в групі ФТМ 1-5</span>
-        <button onclick="closeModal('modal-register')" class="text-white hover:text-red-200 text-lg">✕</button>
-      </div>
-
-      <form id="student-form" onsubmit="saveStudent(event)" class="p-5 overflow-y-auto flex-1 space-y-4 text-xs">
-        <div class="border border-slate-300 p-3 bg-slate-50/50 rounded-sm">
-          <div class="font-bold text-slate-900 border-b border-slate-200 pb-1 mb-2.5 text-[13px] text-[#2b569a]">
-            1. Персональні ідентифікатори особи
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div class="md:col-span-2">
-              <label class="block font-semibold mb-1 text-slate-700">ПІБ студента (повністю) *</label>
-              <input type="text" id="inp-fullname" required placeholder="напр. Шевченко Тарас Григорович" class="w-full border border-slate-300 px-2.5 py-1.5 rounded-sm bg-white focus:outline-blue-600">
-            </div>
-            <div>
-              <label class="block font-semibold mb-1 text-slate-700">Дата народження *</label>
-              <input type="date" id="inp-birthdate" required class="w-full border border-slate-300 px-2.5 py-1.5 rounded-sm bg-white focus:outline-blue-600">
-            </div>
-            <div>
-              <label class="block font-semibold mb-1 text-slate-700">РНОКПП (ІПН — 10 цифр) *</label>
-              <input type="text" id="inp-rnokpp" required maxlength="10" placeholder="1234567890" pattern="[0-9]{10}" class="w-full border border-slate-300 px-2.5 py-1.5 rounded-sm bg-white focus:outline-blue-600 font-mono">
-            </div>
-            <div>
-              <label class="block font-semibold mb-1 text-slate-700">Тип документа *</label>
-              <select id="inp-doctype" class="w-full border border-slate-300 px-2.5 py-1.5 rounded-sm bg-white focus:outline-blue-600">
-                <option value="ID-картка">ID-картка (Паспорт)</option>
-                <option value="Паспорт-книжечка">Паспорт громадянина України (книжечка)</option>
-                <option value="Закордонний паспорт">Закордонний паспорт</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-semibold mb-1 text-slate-700">Серія та/або номер документа *</label>
-              <input type="text" id="inp-docnumber" required placeholder="001234567 або СН 123456" class="w-full border border-slate-300 px-2.5 py-1.5 rounded-sm bg-white focus:outline-blue-600 font-mono">
-            </div>
-          </div>
-        </div>
-
-        <div class="border border-slate-300 p-3 bg-slate-50/50 rounded-sm">
-          <div class="font-bold text-slate-900 border-b border-slate-200 pb-1 mb-2.5 text-[13px] text-[#2b569a]">
-            2. Академічна прив'язка (ДТЕУ)
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div>
-              <label class="block text-slate-500 mb-1">Факультет</label>
-              <input type="text" value="ФТМ" disabled class="w-full border border-slate-300 px-2.5 py-1.5 rounded-sm bg-slate-200 text-slate-600 font-medium">
-            </div>
-            <div>
-              <label class="block text-slate-500 mb-1">Спеціальність</label>
-              <input type="text" value="061 Журналістика" disabled class="w-full border border-slate-300 px-2.5 py-1.5 rounded-sm bg-slate-200 text-slate-600 font-medium">
-            </div>
-            <div>
-              <label class="block text-slate-500 mb-1">Курс та форма</label>
-              <input type="text" value="1 курс, Денна" disabled class="w-full border border-slate-300 px-2.5 py-1.5 rounded-sm bg-slate-200 text-slate-600 font-medium">
-            </div>
-            <div class="md:col-span-2">
-              <label class="block text-slate-500 mb-1">Освітня програма</label>
-              <input type="text" value="Реклама і зв'язки з громадськістю" disabled class="w-full border border-slate-300 px-2.5 py-1.5 rounded-sm bg-slate-200 text-slate-600 font-medium">
-            </div>
-            <div>
-              <label class="block font-semibold mb-1 text-slate-700">Форма фінансування *</label>
-              <select id="inp-payment" class="w-full border border-slate-300 px-2.5 py-1.5 rounded-sm bg-white focus:outline-blue-600 font-semibold text-blue-900">
-                <option value="Бюджет">Бюджет</option>
-                <option value="Контракт">Контракт</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div class="border border-slate-300 p-3 bg-slate-50/50 rounded-sm">
-          <div class="font-bold text-slate-900 border-b border-slate-200 pb-1 mb-2.5 text-[13px] text-[#2b569a]">
-            3. Контактні дані
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label class="block font-semibold mb-1 text-slate-700">Номер телефону *</label>
-              <input type="tel" id="inp-phone" required placeholder="+380..." class="w-full border border-slate-300 px-2.5 py-1.5 rounded-sm bg-white focus:outline-blue-600">
-            </div>
-            <div>
-              <label class="block font-semibold mb-1 text-slate-700">Особиста ел. пошта *</label>
-              <input type="email" id="inp-email" required placeholder="student@gmail.com" class="w-full border border-slate-300 px-2.5 py-1.5 rounded-sm bg-white focus:outline-blue-600">
-            </div>
-          </div>
-        </div>
-
-        <div class="flex justify-end gap-2 pt-2 border-t border-slate-300">
-          <button type="button" onclick="closeModal('modal-register')" class="px-4 py-1.5 border border-slate-300 rounded-sm text-slate-700 bg-slate-100 hover:bg-slate-200">
-            Скасувати
-          </button>
-          <button type="submit" id="btn-submit-student" class="px-5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white font-bold rounded-sm shadow-sm flex items-center gap-1.5">
-            <i class="fa-solid fa-floppy-disk"></i> Зберегти в базу
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <!-- МОДАЛКА: Картка студента -->
   <div id="modal-card" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
     <div class="bg-white border border-slate-400 rounded-sm shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
@@ -847,10 +747,6 @@
                 Спеціальність: 061 Журналістика • ОП «Реклама і зв'язки з громадськістю» (2026/2027)
               </div>
             </div>
-
-            <button onclick="openModal('modal-register')" class="w-full md:w-auto bg-[#2b569a] hover:bg-[#1f4277] text-white px-4 py-2 rounded-sm font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition">
-              <i class="fa-solid fa-user-plus"></i> Зареєструвати студента в групі
-            </button>
           </div>
 
           <div class="bg-white border border-slate-300 p-3 rounded-sm flex items-center gap-3 text-xs">
@@ -909,7 +805,7 @@
           <tr>
             <td colspan="8" class="p-8 text-center text-slate-400">
               <i class="fa-solid fa-folder-open text-2xl mb-1 block"></i>
-              Студентів у групі не зареєстровано. Натисніть кнопку вище, щоб додати першого студента.
+              Студентів у групі не знайдено. Додайте записи через базу даних Supabase.
             </td>
           </tr>
         `;
@@ -1178,7 +1074,7 @@
           <div class="bg-blue-50 border border-blue-200 p-3 rounded text-xs text-blue-950 flex items-start gap-2.5">
             <i class="fa-solid fa-lock text-blue-700 mt-0.5"></i>
             <div>
-              <b>За академічною групою ФТМ 1-5 офіційно закріплено єдиний часовий слот для очного прибуття та заселення — <span class="bg-blue-200/70 text-blue-900 font-bold px-2 py-0.5 rounded">26 серпня 2026 р. (10:00 - 11:00)</span>. Зміна слоту заблокована дирекцією студмістечка.
+              <b>Фіксований регламент деканату ФТМ:</b> За академічною групою ФТМ 1-5 офіційно закріплено єдиний часовий слот для очного прибуття та заселення — <span class="bg-blue-200/70 text-blue-900 font-bold px-2 py-0.5 rounded">26 серпня 2026 р. (10:00 - 11:00)</span>. Зміна слоту заблокована дирекцією студмістечка.
             </div>
           </div>
 
@@ -1697,69 +1593,6 @@
           </div>
         </div>
       `;
-    }
-
-    // ==========================================
-    // ЗБЕРЕЖЕННЯ ТА КАРТКА СТУДЕНТА
-    // ==========================================
-    async function saveStudent(e) {
-      e.preventDefault();
-      
-      const submitBtn = document.getElementById('btn-submit-student');
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Збереження...`;
-
-      const seqNum = String(studentsList.length + 1).padStart(4, '0');
-      const studentCardId = `2026-B-FTM061-${seqNum}`;
-      const recordBookNumber = `261D061${seqNum}`;
-
-      const newStudent = {
-        full_name: document.getElementById('inp-fullname').value.trim(),
-        birth_date: document.getElementById('inp-birthdate').value,
-        rnokpp: document.getElementById('inp-rnokpp').value.trim(),
-        document_type: document.getElementById('inp-doctype').value,
-        document_number: document.getElementById('inp-docnumber').value.trim(),
-        faculty: 'ФТМ',
-        specialty: '061 Журналістика',
-        study_program: "Реклама і зв'язки з громадськістю",
-        course: 1,
-        study_form: 'Денна',
-        payment_type: document.getElementById('inp-payment').value,
-        phone: document.getElementById('inp-phone').value.trim(),
-        email: document.getElementById('inp-email').value.trim(),
-        group_code: 'ФТМ 1-5',
-        student_card_id: studentCardId,
-        record_book_number: recordBookNumber
-      };
-
-      try {
-        const { data, error } = await supabaseClient
-          .from('students')
-          .insert([newStudent])
-          .select();
-
-        if (!error && data && data[0]) {
-          studentsList.push(data[0]);
-        } else {
-          newStudent.id = 'loc_' + Date.now();
-          studentsList.push(newStudent);
-        }
-      } catch (err) {
-        newStudent.id = 'loc_' + Date.now();
-        studentsList.push(newStudent);
-      }
-
-      localStorage.setItem('ekurator_students', JSON.stringify(studentsList));
-      initHousingRecordsForStudents();
-
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Зберегти в базу`;
-
-      closeModal('modal-register');
-      document.getElementById('student-form').reset();
-      updateCounters();
-      if (currentTab === 'students') renderStudentsTable();
-      if (currentTab.startsWith('housing-')) renderCurrentView();
     }
 
     function viewStudentCard(studentId) {
