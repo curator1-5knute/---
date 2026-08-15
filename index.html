@@ -3,210 +3,172 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ДТЕУ • ІС «єКуратор»</title>
-  <!-- Tailwind CSS & FontAwesome -->
+  <title>Система супроводу академічної групи «єКуратор» — ДТЕУ</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-    .sute-sidebar { background: linear-gradient(180deg, #1b3a6b 0%, #152e55 100%); }
-    .sute-active { background: rgba(255, 255, 255, 0.12); border-left: 4px solid #38bdf8; }
-    .sute-hover:hover { background: rgba(255, 255, 255, 0.07); }
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    .moodle-nav-active { background-color: #e9ecef; color: #1f4788; font-weight: 700; border-left: 3px solid #1f4788; }
+    .moodle-nav-item:hover { background-color: #f1f3f5; color: #1f4788; }
+    .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(0,0,0,.02); }
   </style>
 </head>
-<body class="bg-[#f4f6f9] text-slate-800 flex h-screen overflow-hidden text-sm">
+<body class="bg-[#f2f4f8] text-[#333333] flex flex-col h-screen overflow-hidden text-[13px]">
 
-  <!-- Сайдбар (Стильний класичний темно-синій ДТЕУ) -->
-  <aside class="w-64 sute-sidebar text-white flex flex-col h-full shrink-0 select-none shadow-lg z-20">
-    
-    <!-- Верхній лого-блок -->
-    <div class="h-16 flex items-center gap-3 px-5 border-b border-white/10 bg-black/10">
-      <div class="w-9 h-9 rounded-lg bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-white">
-        <i class="fa-solid fa-graduation-cap text-lg text-sky-300"></i>
+  <!-- 1. Верхня офіційна університетська панель (Header) -->
+  <header class="bg-[#1b3f75] text-white border-b-4 border-[#e0a800] px-6 py-2.5 flex items-center justify-between shadow-sm shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="bg-white/10 p-2 rounded border border-white/20">
+        <i class="fa-solid fa-graduation-cap text-2xl text-[#fcd34d]"></i>
       </div>
       <div>
-        <div class="font-bold text-sm tracking-wide text-white">єКуратор</div>
-        <div class="text-[11px] text-blue-200/70 font-medium">ДТЕУ • Портал супроводу</div>
+        <div class="font-bold text-[15px] tracking-tight leading-tight">ДЕРЖАВНИЙ ТОРГОВЕЛЬНО-ЕКОНОМІЧНИЙ УНІВЕРСИТЕТ</div>
+        <div class="text-[11px] text-blue-200">Автоматизована інформаційна система «єКуратор»</div>
       </div>
     </div>
 
-    <!-- Навігаційне меню 8 модулів -->
-    <nav class="flex-1 overflow-y-auto py-3 px-2 space-y-0.5 text-[13px] custom-scroll">
-      
-      <div class="px-3 pt-1 pb-1.5 text-[10px] font-bold text-blue-300/60 uppercase tracking-wider">Основне</div>
-      
-      <button onclick="navigate('dashboard')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-md sute-active font-semibold text-white transition">
-        <span class="flex items-center gap-3"><i class="fa-solid fa-house w-4 text-sky-400"></i> Головна панель</span>
-      </button>
-
-      <button onclick="navigate('students')" class="w-full flex items-center justify-between px-3.5 py-2 rounded-md text-blue-100/90 sute-hover transition">
-        <span class="flex items-center gap-3"><i class="fa-solid fa-users w-4 text-blue-300"></i> Список групи</span>
-        <span class="text-[10px] bg-blue-500/30 text-sky-200 px-1.5 py-0.5 rounded font-mono">28</span>
-      </button>
-
-      <div class="px-3 pt-3 pb-1 text-[10px] font-bold text-blue-300/60 uppercase tracking-wider">Модулі супроводу</div>
-      
-      <button onclick="navigate('housing')" class="w-full flex items-center justify-between px-3.5 py-2 rounded-md text-blue-100/90 sute-hover transition">
-        <span class="flex items-center gap-3"><i class="fa-solid fa-hotel w-4 text-amber-300"></i> 1. Поселення</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
-      </button>
-
-      <button onclick="navigate('attendance')" class="w-full flex items-center justify-between px-3.5 py-2 rounded-md text-blue-100/90 sute-hover transition">
-        <span class="flex items-center gap-3"><i class="fa-solid fa-calendar-check w-4 text-emerald-300"></i> 2. Відвідуваність</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
-      </button>
-
-      <button onclick="navigate('academic')" class="w-full flex items-center justify-between px-3.5 py-2 rounded-md text-blue-100/90 sute-hover transition">
-        <span class="flex items-center gap-3"><i class="fa-solid fa-chart-line w-4 text-violet-300"></i> 3. Успішність і борги</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
-      </button>
-
-      <button onclick="navigate('rating')" class="w-full flex items-center justify-between px-3.5 py-2 rounded-md text-blue-100/90 sute-hover transition">
-        <span class="flex items-center gap-3"><i class="fa-solid fa-award w-4 text-yellow-300"></i> 4. Рейтинг / Стипендія</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
-      </button>
-
-      <button onclick="navigate('military')" class="w-full flex items-center justify-between px-3.5 py-2 rounded-md text-blue-100/90 sute-hover transition">
-        <span class="flex items-center gap-3"><i class="fa-solid fa-shield-halved w-4 text-rose-300"></i> 5. Військовий облік</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
-      </button>
-
-      <button onclick="navigate('social')" class="w-full flex items-center justify-between px-3.5 py-2 rounded-md text-blue-100/90 sute-hover transition">
-        <span class="flex items-center gap-3"><i class="fa-solid fa-hand-holding-heart w-4 text-pink-300"></i> 6. Соціальний захист</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
-      </button>
-
-      <button onclick="navigate('safety')" class="w-full flex items-center justify-between px-3.5 py-2 rounded-md text-blue-100/90 sute-hover transition">
-        <span class="flex items-center gap-3"><i class="fa-solid fa-compass w-4 text-teal-300"></i> 7. Безпека та актив</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
-      </button>
-
-      <button onclick="navigate('reports')" class="w-full flex items-center justify-between px-3.5 py-2 rounded-md text-blue-100/90 sute-hover transition">
-        <span class="flex items-center gap-3"><i class="fa-solid fa-file-lines w-4 text-slate-300"></i> 8. Звітність</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
-      </button>
-
-    </nav>
-
-    <!-- Інфо групи внизу сайдбара -->
-    <div class="p-3 bg-black/20 text-xs text-blue-200/90 border-t border-white/10">
-      <div class="flex items-center justify-between">
-        <span class="text-blue-300 text-[11px]">Група:</span>
-        <span class="font-semibold text-white bg-blue-600/50 px-2 py-0.5 rounded text-[11px]">ФІТ-1-2</span>
+    <!-- Профіль викладача / куратора -->
+    <div class="flex items-center gap-4 text-[12px]">
+      <div class="text-right hidden sm:block">
+        <div class="font-bold text-white">Ісіков Я. А.</div>
+        <div class="text-blue-200 text-[11px]">Куратор групи ФІТ-1-2</div>
       </div>
-      <div class="text-[11px] text-blue-300/70 mt-1">2026/2027 н.р. • 1 семестр</div>
+      <div class="w-8 h-8 rounded bg-[#e0a800] text-[#1b3f75] font-bold flex items-center justify-center text-sm shadow">
+        ЯІ
+      </div>
+      <a href="#" class="text-blue-200 hover:text-white ml-2 text-[14px]" title="Вихід"><i class="fa-solid fa-right-from-bracket"></i></a>
     </div>
-  </aside>
+  </header>
 
-  <!-- Основна область -->
-  <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+  <!-- 2. Смуга навігації / Хлібні крихти (Breadcrumbs) -->
+  <div class="bg-white border-b border-[#dee2e6] px-6 py-1.5 text-[11px] text-slate-500 flex items-center justify-between shrink-0">
+    <div class="flex items-center gap-2">
+      <a href="#" class="text-[#1b3f75] hover:underline"><i class="fa-solid fa-house"></i> Головна</a>
+      <span>/</span>
+      <a href="#" class="text-[#1b3f75] hover:underline">Факультет ІТ</a>
+      <span>/</span>
+      <span class="text-slate-700 font-semibold">Група ФІТ-1-2 (2026/2027)</span>
+    </div>
+    <div class="text-[11px] text-slate-500">
+      Поточна дата: <span class="font-semibold text-slate-700">15 серпня 2026 р.</span>
+    </div>
+  </div>
+
+  <!-- 3. Основна частина: Сайдбар + Робоча зона -->
+  <div class="flex-1 flex min-h-0 overflow-hidden">
     
-    <!-- Шапка (Header) -->
-    <header class="h-16 bg-white border-b border-slate-200/80 px-6 flex items-center justify-between shrink-0 shadow-sm">
-      <div class="flex items-center gap-3">
-        <span class="font-semibold text-slate-800 text-base">Державний торговельно-економічний університет</span>
-        <span class="text-xs bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded-full font-medium">єКуратор v1.0</span>
-      </div>
-
-      <div class="flex items-center gap-5 text-xs">
-        <a href="mailto:support@knute.edu.ua" class="text-blue-700 hover:text-blue-900 font-medium flex items-center gap-1.5">
-          <i class="fa-regular fa-envelope"></i> Техпідтримка
-        </a>
-        <div class="h-4 w-px bg-slate-300"></div>
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-full bg-blue-700 text-white flex items-center justify-center font-bold text-xs shadow-sm">
-            КР
-          </div>
-          <div>
-            <div class="font-semibold text-slate-800 leading-tight">Куратор академічної групи</div>
-            <div class="text-[11px] text-slate-500">Викладач кафедри</div>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- Робоча зона -->
-    <main id="main-content" class="flex-1 overflow-y-auto p-6 space-y-5">
+    <!-- Ліве академічне меню (стиль Moodle / Деканат) -->
+    <aside class="w-60 bg-white border-r border-[#dee2e6] flex flex-col h-full shrink-0 select-none overflow-y-auto">
       
-      <!-- Системне сповіщення (Alert у стилі ДТЕУ/ЄДЕБО) -->
-      <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 px-4 py-3 rounded-lg flex items-center justify-between text-xs shadow-sm">
-        <div class="flex items-center gap-2.5">
-          <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
-          <span><b>Авторизація успішна.</b> Вітаємо в системі оперативного супроводу студентів «єКуратор».</span>
-        </div>
-        <button class="text-emerald-700 hover:text-emerald-950 font-bold text-base leading-none">×</button>
+      <div class="p-3 bg-[#f8f9fa] border-b border-[#dee2e6] text-[11px] font-bold text-[#495057] uppercase tracking-wider">
+        <i class="fa-solid fa-bars mr-1.5 text-slate-400"></i> Навігація курсу
       </div>
 
-      <!-- Віджети ключових показників групи -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <nav class="py-1">
+        <button onclick="navigate('dashboard')" class="w-full text-left px-3.5 py-2 moodle-nav-active flex items-center gap-2.5">
+          <i class="fa-solid fa-gauge-high w-4 text-[#1b3f75]"></i> Головний огляд
+        </button>
+        <button onclick="navigate('students')" class="w-full text-left px-3.5 py-2 text-[#495057] moodle-nav-item flex items-center justify-between">
+          <span class="flex items-center gap-2.5"><i class="fa-solid fa-address-book w-4 text-slate-500"></i> Склад групи</span>
+          <span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded font-mono">28</span>
+        </button>
+
+        <div class="px-3 pt-3 pb-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Розділи супроводу</div>
+
+        <button onclick="navigate('housing')" class="w-full text-left px-3.5 py-1.5 text-[#495057] moodle-nav-item flex items-center gap-2.5">
+          <i class="fa-solid fa-building-user w-4 text-slate-500"></i> 1. Поселення в гуртожиток
+        </button>
+        <button onclick="navigate('attendance')" class="w-full text-left px-3.5 py-1.5 text-[#495057] moodle-nav-item flex items-center gap-2.5">
+          <i class="fa-solid fa-calendar-days w-4 text-slate-500"></i> 2. Журнал відвідування
+        </button>
+        <button onclick="navigate('academic')" class="w-full text-left px-3.5 py-1.5 text-[#495057] moodle-nav-item flex items-center gap-2.5">
+          <i class="fa-solid fa-book-bookmark w-4 text-slate-500"></i> 3. Успішність та екзамени
+        </button>
+        <button onclick="navigate('rating')" class="w-full text-left px-3.5 py-1.5 text-[#495057] moodle-nav-item flex items-center gap-2.5">
+          <i class="fa-solid fa-medal w-4 text-slate-500"></i> 4. Стипендіальний рейтинг
+        </button>
+        <button onclick="navigate('military')" class="w-full text-left px-3.5 py-1.5 text-[#495057] moodle-nav-item flex items-center gap-2.5">
+          <i class="fa-solid fa-file-shield w-4 text-slate-500"></i> 5. Військовий облік (ТЦК)
+        </button>
+        <button onclick="navigate('social')" class="w-full text-left px-3.5 py-1.5 text-[#495057] moodle-nav-item flex items-center gap-2.5">
+          <i class="fa-solid fa-user-shield w-4 text-slate-500"></i> 6. Соціальний паспорт
+        </button>
+        <button onclick="navigate('safety')" class="w-full text-left px-3.5 py-1.5 text-[#495057] moodle-nav-item flex items-center gap-2.5">
+          <i class="fa-solid fa-person-shelter w-4 text-slate-500"></i> 7. Безпека та кураторські
+        </button>
+        <button onclick="navigate('reports')" class="w-full text-left px-3.5 py-1.5 text-[#495057] moodle-nav-item flex items-center gap-2.5">
+          <i class="fa-solid fa-file-export w-4 text-slate-500"></i> 8. Семестрові звіти
+        </button>
+      </nav>
+
+      <!-- Блок деканату / підтримки внизу -->
+      <div class="mt-auto p-3 bg-[#f8f9fa] border-t border-[#dee2e6] text-[11px] text-slate-600">
+        <div class="font-bold text-[#1b3f75]">Деканат ФІТ</div>
+        <div>Тел: (044) 531-31-00</div>
+        <div class="text-[10px] text-slate-400 mt-1">Сервер: ДТЕУ-LMS-Node1</div>
+      </div>
+    </aside>
+
+    <!-- Основний робочий контент -->
+    <main id="main-content" class="flex-1 overflow-y-auto p-5 space-y-4">
+      
+      <!-- Блок Оголошення деканату -->
+      <div class="bg-white border border-[#dee2e6] rounded shadow-sm">
+        <div class="bg-[#f8f9fa] border-b border-[#dee2e6] px-4 py-2 font-bold text-[#1b3f75] flex items-center gap-2">
+          <i class="fa-solid fa-bullhorn text-[#e0a800]"></i> Інформаційне повідомлення деканату
+        </div>
+        <div class="p-4 text-[12px] text-slate-700 leading-relaxed space-y-2">
+          <p>Шановні куратори перших курсів! До <b>22 серпня 2026 року</b> необхідно верифікувати пільгові категорії та передати списки на поселення до студентського містечка ДТЕУ.</p>
+          <div class="bg-[#e8f4fd] border-l-4 border-[#1b3f75] p-2 text-[#0c5460]">
+            Всі регламентні форми та накази формуються у відповідних вкладках системи[cite: 1].
+          </div>
+        </div>
+      </div>
+
+      <!-- Зведена таблиця стану групи -->
+      <div class="bg-white border border-[#dee2e6] rounded shadow-sm">
+        <div class="bg-[#f8f9fa] border-b border-[#dee2e6] px-4 py-2 font-bold text-slate-800 flex items-center justify-between">
+          <span><i class="fa-solid fa-table-list mr-1.5 text-slate-400"></i> Зведені показники групи ФІТ-1-2</span>
+          <span class="text-[11px] font-normal text-slate-500">Оновлено: Сьогодні, 19:28</span>
+        </div>
         
-        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm hover:border-slate-300 transition">
-          <div class="flex items-center justify-between text-xs text-slate-500 mb-1">
-            <span>Всього студентів</span>
-            <i class="fa-solid fa-users text-blue-600"></i>
-          </div>
-          <div class="text-2xl font-bold text-slate-900">28</div>
-          <div class="text-[11px] text-emerald-600 font-medium mt-1">● 100% зараховано в групу</div>
-        </div>
-
-        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm hover:border-slate-300 transition">
-          <div class="flex items-center justify-between text-xs text-slate-500 mb-1">
-            <span>Потребують гуртожитку</span>
-            <i class="fa-solid fa-hotel text-amber-600"></i>
-          </div>
-          <div class="text-2xl font-bold text-amber-600">14</div>
-          <div class="text-[11px] text-slate-500 mt-1">Модуль 1 • Поселення</div>
-        </div>
-
-        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm hover:border-slate-300 transition">
-          <div class="flex items-center justify-between text-xs text-slate-500 mb-1">
-            <span>Пільгові категорії</span>
-            <i class="fa-solid fa-hand-holding-heart text-pink-600"></i>
-          </div>
-          <div class="text-2xl font-bold text-pink-600">5</div>
-          <div class="text-[11px] text-slate-500 mt-1">Модуль 6 • Соцпаспорт</div>
-        </div>
-
-        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm hover:border-slate-300 transition">
-          <div class="flex items-center justify-between text-xs text-slate-500 mb-1">
-            <span>Військовий облік</span>
-            <i class="fa-solid fa-shield-halved text-rose-600"></i>
-          </div>
-          <div class="text-2xl font-bold text-rose-600">16</div>
-          <div class="text-[11px] text-slate-500 mt-1">Модуль 5 • ТЦК та СП</div>
-        </div>
-
-      </div>
-
-      <!-- Центральний оглядовий блок -->
-      <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-6">
-        <div class="border-b border-slate-200 pb-3 mb-4 flex items-center justify-between">
-          <h2 class="font-bold text-slate-900 text-base">Оперативні завдання куратора на серпень 2026</h2>
-          <span class="text-xs text-slate-500 font-medium">Календарний регламент вступної кампанії</span>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-          
-          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-md">
-            <div class="font-bold text-slate-800 mb-2 flex items-center gap-2">
-              <i class="fa-solid fa-list-check text-blue-700"></i> Першочергові дії:
-            </div>
-            <ul class="space-y-1.5 text-slate-600 list-disc list-inside">
-              <li>Перевірити заяви на поселення в гуртожиток (Модуль 1)</li>
-              <li>Сформувати проєкт списку для деканату до 22 серпня[cite: 1]</li>
-              <li>Провести інструктажі з безпеки та укриттів (Модуль 7)[cite: 1]</li>
-            </ul>
-          </div>
-
-          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-md">
-            <div class="font-bold text-slate-800 mb-2 flex items-center gap-2">
-              <i class="fa-solid fa-circle-info text-blue-700"></i> Регламентні норми ДТЕУ:
-            </div>
-            <p class="text-slate-600 leading-relaxed">
-              Усі накази про зарахування, довідки для ТЦК та соціальні пільги верифікуються в автоматизованому режимі з формуванням протоколів за формами університету[cite: 1].
-            </p>
-          </div>
-
+        <div class="p-0 overflow-x-auto">
+          <table class="w-full text-left border-collapse table-striped text-[12px]">
+            <thead>
+              <tr class="bg-[#f1f3f5] border-b border-[#dee2e6] text-slate-700">
+                <th class="p-2.5 font-bold border-r border-[#dee2e6]">Показник</th>
+                <th class="p-2.5 font-bold border-r border-[#dee2e6]">Кількість</th>
+                <th class="p-2.5 font-bold border-r border-[#dee2e6]">Статус обробки</th>
+                <th class="p-2.5 font-bold">Відповідальний розділ</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#dee2e6]">
+              <tr>
+                <td class="p-2.5 font-medium border-r border-[#dee2e6]">Зараховано до групи (всього)</td>
+                <td class="p-2.5 font-bold border-r border-[#dee2e6]">28 осіб</td>
+                <td class="p-2.5 border-r border-[#dee2e6]"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[11px] font-semibold">Наказ №1420-ст</span></td>
+                <td class="p-2.5 text-[#1b3f75] hover:underline cursor-pointer">Склад групи</td>
+              </tr>
+              <tr>
+                <td class="p-2.5 font-medium border-r border-[#dee2e6]">Потребують гуртожитку (іногородні)</td>
+                <td class="p-2.5 font-bold border-r border-[#dee2e6]">14 осіб</td>
+                <td class="p-2.5 border-r border-[#dee2e6]"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[11px] font-semibold">Формування списку</span></td>
+                <td class="p-2.5 text-[#1b3f75] hover:underline cursor-pointer">1. Поселення[cite: 1]</td>
+              </tr>
+              <tr>
+                <td class="p-2.5 font-medium border-r border-[#dee2e6]">Пільгові категорії (УБД, ВПО, сироти)</td>
+                <td class="p-2.5 font-bold border-r border-[#dee2e6]">5 осіб</td>
+                <td class="p-2.5 border-r border-[#dee2e6]"><span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-[11px] font-semibold">Потребує верифікації</span></td>
+                <td class="p-2.5 text-[#1b3f75] hover:underline cursor-pointer">6. Соцпаспорт[cite: 1]</td>
+              </tr>
+              <tr>
+                <td class="p-2.5 font-medium border-r border-[#dee2e6]">Військовозобов'язані (приписне / ВОД)</td>
+                <td class="p-2.5 font-bold border-r border-[#dee2e6]">16 осіб</td>
+                <td class="p-2.5 border-r border-[#dee2e6]"><span class="bg-slate-100 text-slate-800 px-2 py-0.5 rounded text-[11px] font-semibold">На звірці з ТЦК</span></td>
+                <td class="p-2.5 text-[#1b3f75] hover:underline cursor-pointer">5. Військовий облік[cite: 1]</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -215,7 +177,7 @@
 
   <script>
     function navigate(moduleKey) {
-      console.log("Перехід до модуля:", moduleKey);
+      console.log("Відкрито розділ LMS:", moduleKey);
     }
   </script>
 </body>
