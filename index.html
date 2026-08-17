@@ -1502,6 +1502,7 @@
       const navFinance = document.getElementById('nav-finance');
       const navMilitary = document.getElementById('nav-military');
       if (navFinance) navFinance.className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition font-normal";
+      if (navMilitary) navMilitary.className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition font-normal";
       document.querySelectorAll('.mia-submenu-item').forEach(el => el.classList.remove('active'));
 
       if (currentTab === 'dashboard') {
