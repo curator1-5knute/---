@@ -105,9 +105,7 @@
           <i id="arrow-housing" class="fa-solid fa-chevron-right text-[11px] transition-transform duration-200"></i>
         </button>
 
-        <div id="sub-housing" class="mia-submenu hidden">
-          <!-- Генерується функцією renderHousingSubmenu() -->
-        </div>
+        <div id="sub-housing" class="mia-submenu hidden"></div>
       </div>
 
       <!-- Інші модулі -->
@@ -575,6 +573,9 @@
     });
 
     async function fetchDataFromCloud() {
+      const loader = document.getElementById('page-loader');
+      if (loader) loader.classList.remove('hidden');
+
       try {
         const { data: stData, error: stError } = await supabaseClient
           .from('students')
@@ -657,6 +658,8 @@
 
       } catch (err) {
         console.warn("Працюємо в автономному режимі:", err);
+      } finally {
+        if (loader) loader.classList.add('hidden');
       }
 
       initHousingRecordsForStudents();
@@ -796,11 +799,13 @@
       setTimeout(() => {
         if (loader) loader.classList.add('hidden');
         renderCurrentView();
-      }, 750);
+      }, 300);
     }
 
     function renderHousingSubmenu() {
       const subMenu = document.getElementById('sub-housing');
+      if (!subMenu) return;
+      
       const isAug26 = isAugust26Passed();
       const isSep1 = isSeptember1Passed();
 
@@ -943,7 +948,7 @@
               <i class="fa-solid fa-circle-check text-green-600"></i>
               <span>Привіт, Ісіков Ярослав Андрійович.</span>
             </div>
-            <button class="text-green-800 hover:opacity-75 font-bold">×</button>
+            <button class="text-green-800 hover:opacity-75 font-bold" onclick="this.parentElement.remove()">×</button>
           </div>
         `;
       } else if (currentTab === 'students') {
@@ -1077,7 +1082,6 @@
       `).join('');
     }
 
-    // ================= СПОРТИВНІ СЕКЦІЇ =================
     function renderSportsView(main) {
       const assignedCount = studentsList.filter(s => sportsData[s.id]?.section).length;
       
@@ -1280,7 +1284,6 @@
       renderSportsView(document.getElementById('main-content'));
     }
 
-    // ================= ПОСЕЛЕННЯ =================
     function renderHousingRegistry(main) {
       main.innerHTML = `
         <div class="space-y-4">
@@ -1378,7 +1381,7 @@
       setTimeout(() => {
         if (loader) loader.classList.add('hidden');
         renderHousingRegistry(document.getElementById('main-content'));
-      }, 650);
+      }, 300);
     }
 
     function cancelRegistryEditing() {
@@ -1393,7 +1396,7 @@
       setTimeout(() => {
         if (loader) loader.classList.add('hidden');
         renderHousingRegistry(document.getElementById('main-content'));
-      }, 550);
+      }, 300);
     }
 
     async function confirmRegistryEditing() {
@@ -1410,7 +1413,7 @@
       setTimeout(() => {
         if (loader) loader.classList.add('hidden');
         renderHousingRegistry(document.getElementById('main-content'));
-      }, 750);
+      }, 300);
     }
 
     function openHousingEditModal(studentId) {
