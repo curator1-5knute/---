@@ -126,7 +126,7 @@
   <!-- Головний контент -->
   <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
     
-    <!-- Ненав'язливий короткий лоадер -->
+    <!-- Лоадер -->
     <div id="page-loader" class="absolute inset-0 bg-slate-50/60 z-40 flex items-center justify-center hidden">
       <div class="w-8 h-8 rounded-full border-2 border-slate-300 border-t-[#2b569a] animate-spin"></div>
     </div>
@@ -470,10 +470,8 @@
       }
     });
 
-    // Одночасне завантаження студентів, записів поселення та дефектів із хмарної бази Supabase
     async function fetchDataFromCloud() {
       try {
-        // 1. Завантажуємо студентів
         const { data: stData, error: stError } = await supabaseClient
           .from('students')
           .select('*')
@@ -487,7 +485,6 @@
           if (local) studentsList = JSON.parse(local);
         }
 
-        // 2. Завантажуємо записи поселення з Supabase
         const { data: hrData, error: hrError } = await supabaseClient
           .from('housing_records')
           .select('*');
@@ -523,7 +520,6 @@
           if (localH) housingData = JSON.parse(localH);
         }
 
-        // 3. Завантажуємо дефекти кімнат з Supabase
         const { data: defData, error: defError } = await supabaseClient
           .from('room_defects')
           .select('*')
@@ -577,7 +573,6 @@
       localStorage.setItem('ekurator_housing_meta', JSON.stringify(housingData));
     }
 
-    // Збереження одного запису студента безпосередньо в хмарну базу Supabase
     async function syncHousingRecordToCloud(studentId) {
       const data = housingData[studentId];
       if (!data) return;
@@ -666,7 +661,6 @@
           Планувальник тайм-слотів прибуття
         </button>
         
-        <!-- Чек-лист документів -->
         ${isAug26 ? `
           <button onclick="navigate('housing-checklist')" id="subnav-housing-checklist" class="mia-submenu-item">
             Чек-лист обов'язкових документів
@@ -678,7 +672,6 @@
           </div>
         `}
 
-        <!-- Журнал інструктажів -->
         ${isAug26 ? `
           <button onclick="navigate('housing-briefings')" id="subnav-housing-briefings" class="mia-submenu-item">
             Журнал інструктажів
@@ -690,7 +683,6 @@
           </div>
         `}
         
-        <!-- Очний маршрут поселення -->
         ${isAug26 ? `
           <button onclick="navigate('housing-route')" id="subnav-housing-route" class="mia-submenu-item">
             Очний маршрут поселення
@@ -702,7 +694,6 @@
           </div>
         `}
 
-        <!-- Реєстр дефектів -->
         ${isAug26 ? `
           <button onclick="navigate('housing-defects')" id="subnav-housing-defects" class="mia-submenu-item">
             Реєстр дефектів кімнат
@@ -714,7 +705,6 @@
           </div>
         `}
 
-        <!-- Вручення довідників -->
         ${isSep1 ? `
           <button onclick="navigate('housing-handbook')" id="subnav-housing-handbook" class="mia-submenu-item">
             Вручення довідників першокурсника
@@ -726,7 +716,6 @@
           </div>
         `}
 
-        <!-- Фінальний звіт -->
         ${isSep1 ? `
           <button onclick="navigate('housing-report')" id="subnav-housing-report" class="mia-submenu-item">
             Фінальний звіт про поселення
@@ -807,9 +796,6 @@
       }
     }
 
-    // ==========================================
-    // СПИСОК ГРУПИ
-    // ==========================================
     function renderStudentsView(main) {
       main.innerHTML = `
         <div class="space-y-4">
@@ -867,10 +853,10 @@
       if (!tbody) return;
 
       const filtered = studentsList.filter(s => 
-        s.full_name.toLowerCase().includes(searchQuery) ||
-        s.rnokpp.includes(searchQuery) ||
-        s.student_card_id.toLowerCase().includes(searchQuery) ||
-        s.record_book_number.toLowerCase().includes(searchQuery)
+        (s.full_name || '').toLowerCase().includes(searchQuery) ||
+        (s.rnokpp || '').includes(searchQuery) ||
+        (s.student_card_id || '').toLowerCase().includes(searchQuery) ||
+        (s.record_book_number || '').toLowerCase().includes(searchQuery)
       );
 
       const counterEl = document.getElementById('filtered-count');
@@ -915,11 +901,6 @@
       `).join('');
     }
 
-    // =========================================================================
-    // СТОРІНКИ МОДУЛЯ ПОСЕЛЕННЯ
-    // =========================================================================
-
-    // 1. Реєстр та облік потреби в поселенні
     function renderHousingRegistry(main) {
       main.innerHTML = `
         <div class="space-y-4">
@@ -1035,12 +1016,10 @@
       }, 550);
     }
 
-    // Підтвердження та масова синхронізація в базу Supabase
     async function confirmRegistryEditing() {
       const loader = document.getElementById('page-loader');
       if (loader) loader.classList.remove('hidden');
 
-      // Синхронізуємо всі змінені записи в Supabase
       for (const s of studentsList) {
         await syncHousingRecordToCloud(s.id);
       }
@@ -1104,7 +1083,6 @@
       renderHousingRegistry(document.getElementById('main-content'));
     }
 
-    // 2. Проєкт списку на поселення
     function renderHousingList(main) {
       const needStudents = studentsList.filter(s => housingData[s.id]?.need === true);
 
@@ -1203,7 +1181,6 @@
       window.print();
     }
 
-    // 3. Планувальник тайм-слотів прибуття
     function renderHousingSlots(main) {
       const needStudents = studentsList.filter(s => housingData[s.id]?.need === true);
 
@@ -1255,7 +1232,6 @@
       `;
     }
 
-    // 4. Чек-лист обов'язкових документів
     function renderHousingChecklist(main) {
       const needStudents = studentsList.filter(s => housingData[s.id]?.need === true);
 
@@ -1370,7 +1346,6 @@
       }
     }
 
-    // 5. Журнал інструктажів
     function renderHousingBriefings(main) {
       const needStudents = studentsList.filter(s => housingData[s.id]?.need === true);
 
@@ -1426,7 +1401,6 @@
       }
     }
 
-    // 6. Очний маршрут поселення
     function renderHousingRoute(main) {
       const needStudents = studentsList.filter(s => housingData[s.id]?.need === true);
 
@@ -1578,7 +1552,6 @@
       }
     }
 
-    // 7. Реєстр дефектів кімнат
     function renderHousingDefects(main) {
       main.innerHTML = `
         <div class="space-y-4">
@@ -1661,7 +1634,6 @@
       }
     }
 
-    // 8. Вручення довідників
     function renderHousingHandbook(main) {
       const needStudents = studentsList.filter(s => housingData[s.id]?.need === true);
 
@@ -1717,7 +1689,6 @@
       }
     }
 
-    // 9. Фінальний звіт про поселення
     function renderHousingReport(main) {
       const total = studentsList.length;
       const need = studentsList.filter(s => housingData[s.id]?.need === true).length;
