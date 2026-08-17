@@ -114,11 +114,13 @@
         <i class="fa-solid fa-chevron-right text-[10px]"></i>
       </button>
 
-      <!-- Інші модулі -->
-      <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none font-normal">
+      <!-- Модуль УСПІШНІСТЬ І БОРГИ (АКТИВНИЙ) -->
+      <button id="nav-grades" onclick="navigate('grades')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition font-normal">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-chart-line w-4"></i> Успішність і борги</span>
-        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
-      </div>
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+      </button>
+
+      <!-- Інші модулі -->
       <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none font-normal">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-award w-4"></i> Стипендія / Рейтинг</span>
         <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
@@ -476,7 +478,6 @@
       </div>
 
       <div class="p-5 overflow-y-auto space-y-4 text-xs flex-1">
-        <!-- Блок метаданих пари -->
         <div class="bg-slate-50 border border-slate-200 p-3 rounded flex flex-wrap items-center justify-between gap-2">
           <div>
             <div class="text-[11px] text-slate-500 font-medium">Дисципліна та вид пари:</div>
@@ -489,7 +490,6 @@
           <div id="modal-att-late-badge"></div>
         </div>
 
-        <!-- Пояснення при пізньому редагуванні -->
         <div id="modal-att-late-container" class="hidden bg-amber-50 border border-amber-300 p-3 rounded space-y-2">
           <div class="flex items-center gap-1.5 font-bold text-amber-900 text-xs">
             <i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Протокол запізнілого внесення / редагування відомості
@@ -500,7 +500,6 @@
           <textarea id="modal-att-reason" rows="2" placeholder="Вкажіть причину несвоєчасного внесення даних (напр. лікарняний куратора, уточнення деканату тощо)..." class="w-full border border-amber-300 p-2 rounded text-xs bg-white focus:outline-amber-600 font-medium"></textarea>
         </div>
 
-        <!-- Кнопки масової відмітки -->
         <div class="flex items-center justify-between border-b pb-2 pt-1">
           <span class="font-bold text-slate-700">Список академічної групи:</span>
           <div class="flex gap-2">
@@ -513,7 +512,6 @@
           </div>
         </div>
 
-        <!-- Таблиця студентів -->
         <div class="border border-slate-200 rounded max-h-72 overflow-y-auto">
           <table class="w-full text-left text-xs border-collapse">
             <thead class="bg-slate-100 sticky top-0 border-b border-slate-300">
@@ -539,6 +537,66 @@
     </div>
   </div>
 
+  <!-- МОДАЛКА: Редагування балів успішності студента -->
+  <div id="modal-grades-edit" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white border border-slate-400 rounded-sm shadow-2xl w-full max-w-lg flex flex-col">
+      <div class="sute-blue text-white px-4 py-2.5 flex items-center justify-between font-bold text-xs">
+        <span><i class="fa-solid fa-graduation-cap mr-2"></i>Внесення модульно-рейтингових балів</span>
+        <button onclick="closeModal('modal-grades-edit')" class="text-white hover:text-red-200 text-base">✕</button>
+      </div>
+
+      <form id="grades-edit-form" onsubmit="saveStudentGrade(event)" class="p-5 space-y-4 text-xs">
+        <input type="hidden" id="gr-student-id">
+        <input type="hidden" id="gr-discipline-id">
+
+        <div class="bg-slate-100 p-3 rounded border border-slate-300">
+          <div class="text-[11px] text-slate-500 font-medium">Студент та дисципліна:</div>
+          <div id="gr-student-name" class="font-bold text-slate-900 text-sm">...</div>
+          <div id="gr-discipline-title" class="text-blue-900 font-semibold mt-0.5">...</div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Робота на парах (макс. 40)</label>
+            <input type="number" id="gr-work" min="0" max="40" value="0" oninput="recalcModalGradeSum()" class="w-full border border-slate-300 p-2 rounded bg-white font-bold text-center">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Атестація 1 (макс. 30)</label>
+            <input type="number" id="gr-att1" min="0" max="30" value="0" oninput="recalcModalGradeSum()" class="w-full border border-slate-300 p-2 rounded bg-white font-bold text-center">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Атестація 2 / Екз (макс. 30)</label>
+            <input type="number" id="gr-att2" min="0" max="30" value="0" oninput="recalcModalGradeSum()" class="w-full border border-slate-300 p-2 rounded bg-white font-bold text-center">
+          </div>
+        </div>
+
+        <div class="p-3 bg-blue-50/70 border border-blue-200 rounded flex items-center justify-between">
+          <div>
+            <div class="text-[11px] text-slate-600 font-medium">Підсумковий бал (100-бальна шкала ДТЕУ):</div>
+            <div class="text-xs font-semibold text-slate-800">
+              Шкала ECTS: <span id="gr-calc-ects" class="font-bold text-blue-900">—</span> | Національна: <span id="gr-calc-nat" class="font-bold text-blue-900">—</span>
+            </div>
+          </div>
+          <div id="gr-calc-sum" class="text-2xl font-black text-[#2b569a]">0</div>
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Примітка викладача / куратора</label>
+          <input type="text" id="gr-comment" placeholder="напр. Ліквідувати заборгованість до 25.11" class="w-full border border-slate-300 p-2 rounded bg-white">
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-300">
+          <button type="button" onclick="closeModal('modal-grades-edit')" class="px-4 py-1.5 border border-slate-300 rounded text-slate-700 bg-slate-100 hover:bg-slate-200 font-medium">
+            Скасувати
+          </button>
+          <button type="submit" class="px-5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white font-bold rounded shadow-sm">
+            <i class="fa-solid fa-check mr-1"></i> Зберегти оцінку
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="printable-area" class="hidden p-8 text-black text-xs"></div>
 
   <script>
@@ -556,6 +614,7 @@
     let sportsData = {};
     let roomDefects = [];
     let attendanceData = {};
+    let gradesData = {};
     let searchQuery = '';
 
     const AVAILABLE_SECTIONS = [
@@ -698,6 +757,7 @@
 
     let selectedDisciplineId = "journalism";
     let selectedLessonType = "lectures";
+    let selectedGradeDisciplineId = "all";
 
     function updateLiveClock() {
       const clockEl = document.getElementById('system-live-clock');
@@ -885,6 +945,28 @@
           if (localAtt) attendanceData = JSON.parse(localAtt);
         }
 
+        // Завантаження оцінок успішності
+        const { data: grData, error: grError } = await supabaseClient
+          .from('grade_records')
+          .select('*');
+
+        if (!grError && grData) {
+          gradesData = {};
+          grData.forEach(r => {
+            gradesData[r.id] = {
+              work: r.work || 0,
+              att1: r.att1 || 0,
+              att2: r.att2 || 0,
+              comment: r.comment || '',
+              updated_at: r.updated_at
+            };
+          });
+          localStorage.setItem('ekurator_grades', JSON.stringify(gradesData));
+        } else {
+          const localGr = localStorage.getItem('ekurator_grades');
+          if (localGr) gradesData = JSON.parse(localGr);
+        }
+
       } catch (err) {
         console.warn("Автономний режим:", err);
       } finally {
@@ -896,6 +978,7 @@
       if (currentTab === 'students') renderStudentsTable();
       if (currentTab === 'students-sports') renderSportsTable();
       if (currentTab === 'attendance') renderAttendanceView(document.getElementById('main-content'));
+      if (currentTab === 'grades') renderGradesView(document.getElementById('main-content'));
       if (currentTab.startsWith('housing-')) renderCurrentView();
     }
 
@@ -1151,12 +1234,15 @@
 
       document.getElementById('nav-dashboard').className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover font-normal";
       document.getElementById('nav-attendance').className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition font-normal";
+      document.getElementById('nav-grades').className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition font-normal";
       document.querySelectorAll('.mia-submenu-item').forEach(el => el.classList.remove('active'));
 
       if (currentTab === 'dashboard') {
         document.getElementById('nav-dashboard').className = "w-full flex items-center justify-between px-4 py-2.5 bg-blue-800 border-l-4 border-amber-400 text-white font-normal";
       } else if (currentTab === 'attendance') {
         document.getElementById('nav-attendance').className = "w-full flex items-center justify-between px-4 py-2.5 bg-blue-800 border-l-4 border-amber-400 text-white font-normal";
+      } else if (currentTab === 'grades') {
+        document.getElementById('nav-grades').className = "w-full flex items-center justify-between px-4 py-2.5 bg-blue-800 border-l-4 border-amber-400 text-white font-normal";
       } else if (currentTab === 'students') {
         const activeSub = document.getElementById('subnav-students');
         if (activeSub) activeSub.classList.add('active');
@@ -1188,6 +1274,8 @@
         renderSportsView(main);
       } else if (currentTab === 'attendance') {
         renderAttendanceView(main);
+      } else if (currentTab === 'grades') {
+        renderGradesView(main);
       } else if (currentTab === 'housing-registry') {
         renderHousingRegistry(main);
       } else if (currentTab === 'housing-list') {
@@ -1261,6 +1349,7 @@
       searchQuery = val.toLowerCase().trim();
       if (currentTab === 'students') renderStudentsTable();
       if (currentTab === 'students-sports') renderSportsTable();
+      if (currentTab === 'grades') renderGradesTable();
     }
 
     function renderStudentsTable() {
@@ -2604,6 +2693,435 @@
       closeModal('modal-attendance');
       renderAttendanceView(document.getElementById('main-content'));
       alert("Відомість відвідуваності успішно збережено в хмарі!");
+    }
+
+    // ================= МОДУЛЬ УСПІШНОСТІ ТА БОРГІВ =================
+    function getEctsGrade(score) {
+      if (score >= 90) return { ects: 'A', national: 'Відмінно', color: 'text-emerald-700 bg-emerald-100 border-emerald-300' };
+      if (score >= 82) return { ects: 'B', national: 'Добре', color: 'text-blue-700 bg-blue-100 border-blue-300' };
+      if (score >= 75) return { ects: 'C', national: 'Добре', color: 'text-cyan-700 bg-cyan-100 border-cyan-300' };
+      if (score >= 67) return { ects: 'D', national: 'Задовільно', color: 'text-amber-700 bg-amber-100 border-amber-300' };
+      if (score >= 60) return { ects: 'E', national: 'Задовільно', color: 'text-yellow-700 bg-yellow-100 border-yellow-300' };
+      if (score >= 35) return { ects: 'FX', national: 'Незадовільно (з можливістю перескладання)', color: 'text-rose-700 bg-rose-100 border-rose-300 font-bold' };
+      return { ects: 'F', national: 'Незадовільно (з обов\'язковим повторним курсом)', color: 'text-red-900 bg-red-200 border-red-400 font-bold' };
+    }
+
+    function calculateStudentDisciplineGrade(studentId, disciplineId) {
+      const key = `${disciplineId}_${studentId}`;
+      const rec = gradesData[key] || { work: 0, att1: 0, att2: 0, comment: '' };
+      const total = Number(rec.work || 0) + Number(rec.att1 || 0) + Number(rec.att2 || 0);
+      return {
+        work: Number(rec.work || 0),
+        att1: Number(rec.att1 || 0),
+        att2: Number(rec.att2 || 0),
+        total: Math.min(100, total),
+        comment: rec.comment || '',
+        ...getEctsGrade(total)
+      };
+    }
+
+    function renderGradesView(main) {
+      let totalScores = 0;
+      let evaluatedCount = 0;
+      let debtsCount = 0;
+      let excellentCount = 0;
+
+      studentsList.forEach(s => {
+        let hasDebt = false;
+        let sTotal = 0;
+        let sDiscCount = 0;
+
+        SCHEDULE_DATA.forEach(d => {
+          const g = calculateStudentDisciplineGrade(s.id, d.id);
+          if (g.work > 0 || g.att1 > 0 || g.att2 > 0) {
+            sTotal += g.total;
+            sDiscCount++;
+            if (g.total < 60) hasDebt = true;
+          }
+        });
+
+        if (sDiscCount > 0) {
+          const avg = sTotal / sDiscCount;
+          totalScores += avg;
+          evaluatedCount++;
+          if (avg >= 90) excellentCount++;
+        }
+        if (hasDebt) debtsCount++;
+      });
+
+      const groupAvgScore = evaluatedCount > 0 ? (totalScores / evaluatedCount).toFixed(1) : '—';
+
+      main.innerHTML = `
+        <div class="space-y-4">
+          <!-- Верхній аналітичний блок -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white border border-slate-300 p-4 rounded shadow-sm flex items-center justify-between">
+              <div>
+                <div class="text-[11px] font-bold text-slate-500 uppercase">Середній бал групи</div>
+                <div class="text-2xl font-black text-[#2b569a] mt-0.5">${groupAvgScore} <span class="text-xs text-slate-400 font-normal">/ 100</span></div>
+              </div>
+              <div class="w-10 h-10 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-800 text-lg">
+                <i class="fa-solid fa-chart-simple"></i>
+              </div>
+            </div>
+
+            <div class="bg-white border border-slate-300 p-4 rounded shadow-sm flex items-center justify-between">
+              <div>
+                <div class="text-[11px] font-bold text-slate-500 uppercase">Академічні борги (&lt;60)</div>
+                <div class="text-2xl font-black ${debtsCount > 0 ? 'text-rose-600' : 'text-slate-800'} mt-0.5">${debtsCount} <span class="text-xs text-slate-400 font-normal">студентів</span></div>
+              </div>
+              <div class="w-10 h-10 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-700 text-lg">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+              </div>
+            </div>
+
+            <div class="bg-white border border-slate-300 p-4 rounded shadow-sm flex items-center justify-between">
+              <div>
+                <div class="text-[11px] font-bold text-slate-500 uppercase">Відмінники (90–100)</div>
+                <div class="text-2xl font-black text-emerald-600 mt-0.5">${excellentCount} <span class="text-xs text-slate-400 font-normal">студентів</span></div>
+              </div>
+              <div class="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 text-lg">
+                <i class="fa-solid fa-award"></i>
+              </div>
+            </div>
+
+            <div class="bg-white border border-slate-300 p-4 rounded shadow-sm flex items-center justify-between">
+              <div>
+                <div class="text-[11px] font-bold text-slate-500 uppercase">Оцінено в системі</div>
+                <div class="text-2xl font-black text-slate-800 mt-0.5">${evaluatedCount} <span class="text-xs text-slate-400 font-normal">/ ${studentsList.length}</span></div>
+              </div>
+              <div class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 text-lg">
+                <i class="fa-solid fa-user-graduate"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Панель керування та фільтрації -->
+          <div class="bg-white border border-slate-300 p-4 rounded-sm shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex-1 max-w-md w-full">
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Фільтр за навчальною дисципліною</label>
+              <select onchange="changeGradeDiscipline(this.value)" class="w-full border border-slate-300 p-2 rounded bg-white font-bold text-xs text-slate-800 focus:outline-blue-600 shadow-sm">
+                <option value="all" ${selectedGradeDisciplineId === 'all' ? 'selected' : ''}>— Зведена відомість за всіма дисциплінами —</option>
+                ${SCHEDULE_DATA.map(d => `
+                  <option value="${d.id}" ${d.id === selectedGradeDisciplineId ? 'selected' : ''}>
+                    ${d.title} (ФТМ 1-5)
+                  </option>
+                `).join('')}
+              </select>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0 self-end md:self-auto">
+              <button onclick="printOfficialGradesList()" class="px-3.5 py-2 bg-[#2b569a] hover:bg-[#1f4277] text-white rounded text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
+                <i class="fa-solid fa-print"></i> Роздрукувати відомість
+              </button>
+            </div>
+          </div>
+
+          <!-- Пошук -->
+          <div class="bg-white border border-slate-300 p-3 rounded-sm flex items-center gap-3 text-xs">
+            <div class="relative flex-1">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400"></i>
+              <input type="text" oninput="handleSearch(this.value)" placeholder="Пошук студента за ПІБ у відомості успішності..." class="w-full border border-slate-300 pl-8 pr-3 py-1.5 rounded-sm focus:outline-blue-600">
+            </div>
+          </div>
+
+          <!-- Таблиця успішності -->
+          <div class="bg-white border border-slate-300 rounded shadow-sm overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="table-header border-b border-slate-300 text-slate-700 font-bold">
+                  <th class="p-2.5 border-r border-slate-300 w-10 text-center">№</th>
+                  <th class="p-2.5 border-r border-slate-300 w-64">ПІБ студента</th>
+                  
+                  ${selectedGradeDisciplineId === 'all' ? `
+                    ${SCHEDULE_DATA.map(d => `
+                      <th class="p-2.5 border-r border-slate-300 text-center" title="${d.title}">${d.title}</th>
+                    `).join('')}
+                    <th class="p-2.5 border-r border-slate-300 text-center w-24">Сер. бал</th>
+                    <th class="p-2.5 border-r border-slate-300 text-center w-28">Статус допуску</th>
+                  ` : `
+                    <th class="p-2.5 border-r border-slate-300 text-center w-28">Робота (макс 40)</th>
+                    <th class="p-2.5 border-r border-slate-300 text-center w-28">Атестація 1 (макс 30)</th>
+                    <th class="p-2.5 border-r border-slate-300 text-center w-28">Атестація 2 / Екз (30)</th>
+                    <th class="p-2.5 border-r border-slate-300 text-center w-24 bg-blue-50/50 text-blue-900">Разом (100)</th>
+                    <th class="p-2.5 border-r border-slate-300 text-center w-24">ECTS / Оцінка</th>
+                    <th class="p-2.5 border-r border-slate-300">Примітка</th>
+                    <th class="p-2.5 text-center w-28">Дії</th>
+                  `}
+                </tr>
+              </thead>
+              <tbody id="grades-table-body" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
+        </div>
+      `;
+
+      renderGradesTable();
+    }
+
+    function changeGradeDiscipline(val) {
+      selectedGradeDisciplineId = val;
+      renderGradesView(document.getElementById('main-content'));
+    }
+
+    function renderGradesTable() {
+      const tbody = document.getElementById('grades-table-body');
+      if (!tbody) return;
+
+      const filtered = studentsList.filter(s => 
+        (s.full_name || '').toLowerCase().includes(searchQuery) ||
+        (s.student_card_id || '').toLowerCase().includes(searchQuery)
+      );
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="${selectedGradeDisciplineId === 'all' ? SCHEDULE_DATA.length + 4 : 9}" class="p-8 text-center text-slate-400">
+              Студентів у групі не знайдено.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      if (selectedGradeDisciplineId === 'all') {
+        tbody.innerHTML = filtered.map((s, idx) => {
+          let sum = 0;
+          let count = 0;
+          let hasDebt = false;
+
+          const discCells = SCHEDULE_DATA.map(d => {
+            const g = calculateStudentDisciplineGrade(s.id, d.id);
+            if (g.work > 0 || g.att1 > 0 || g.att2 > 0) {
+              sum += g.total;
+              count++;
+              if (g.total < 60) hasDebt = true;
+              return `
+                <td class="p-2.5 border-r border-slate-300 text-center">
+                  <span class="px-2 py-0.5 rounded text-[11px] font-bold border ${g.color}">
+                    ${g.total} (${g.ects})
+                  </span>
+                </td>
+              `;
+            } else {
+              return `<td class="p-2.5 border-r border-slate-300 text-center text-slate-300 font-medium">—</td>`;
+            }
+          }).join('');
+
+          const avgScore = count > 0 ? (sum / count).toFixed(1) : '—';
+
+          return `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="p-2.5 border-r border-slate-300 text-center text-slate-500 font-semibold">${idx + 1}</td>
+              <td class="p-2.5 border-r border-slate-300 font-bold text-slate-900">
+                ${s.full_name}
+                <div class="text-[10px] text-slate-400 font-normal">${s.student_card_id} • ${s.payment_type}</div>
+              </td>
+              ${discCells}
+              <td class="p-2.5 border-r border-slate-300 text-center font-black text-slate-900 text-xs">${avgScore}</td>
+              <td class="p-2.5 border-r border-slate-300 text-center">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${hasDebt ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">
+                  ${hasDebt ? '⚠ Боржник' : (count > 0 ? '✓ Допущено' : 'Очікує')}
+                </span>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } else {
+        const d = SCHEDULE_DATA.find(item => item.id === selectedGradeDisciplineId);
+
+        tbody.innerHTML = filtered.map((s, idx) => {
+          const g = calculateStudentDisciplineGrade(s.id, d.id);
+          const hasScore = (g.work > 0 || g.att1 > 0 || g.att2 > 0);
+
+          return `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="p-2.5 border-r border-slate-300 text-center text-slate-500 font-semibold">${idx + 1}</td>
+              <td class="p-2.5 border-r border-slate-300 font-bold text-slate-900">
+                ${s.full_name}
+                <div class="text-[10px] text-slate-400 font-normal">${s.student_card_id}</div>
+              </td>
+              <td class="p-2.5 border-r border-slate-300 text-center font-semibold text-slate-700">${hasScore ? g.work : '—'}</td>
+              <td class="p-2.5 border-r border-slate-300 text-center font-semibold text-slate-700">${hasScore ? g.att1 : '—'}</td>
+              <td class="p-2.5 border-r border-slate-300 text-center font-semibold text-slate-700">${hasScore ? g.att2 : '—'}</td>
+              <td class="p-2.5 border-r border-slate-300 text-center font-black text-xs text-blue-950 bg-blue-50/40">
+                ${hasScore ? g.total : '—'}
+              </td>
+              <td class="p-2.5 border-r border-slate-300 text-center">
+                ${hasScore ? `
+                  <span class="px-2 py-0.5 rounded text-[11px] font-bold border ${g.color}">
+                    ${g.ects} • ${g.national}
+                  </span>
+                ` : `<span class="text-slate-400 italic">Не атестовано</span>`}
+              </td>
+              <td class="p-2.5 border-r border-slate-300 text-[11px] text-slate-600">${g.comment || '<span class="text-slate-300">—</span>'}</td>
+              <td class="p-2.5 text-center">
+                <button onclick="openGradeModal('${s.id}', '${d.id}')" class="px-2.5 py-1 bg-[#2b569a] hover:bg-[#1f4277] text-white rounded text-[11px] font-semibold flex items-center gap-1 mx-auto shadow-sm">
+                  <i class="fa-solid fa-pen-to-square"></i> Бали
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    function openGradeModal(studentId, disciplineId) {
+      const student = studentsList.find(s => String(s.id) === String(studentId));
+      const discipline = SCHEDULE_DATA.find(d => d.id === disciplineId);
+      if (!student || !discipline) return;
+
+      const g = calculateStudentDisciplineGrade(studentId, disciplineId);
+
+      document.getElementById('gr-student-id').value = studentId;
+      document.getElementById('gr-discipline-id').value = disciplineId;
+      document.getElementById('gr-student-name').innerText = student.full_name;
+      document.getElementById('gr-discipline-title').innerText = `${discipline.title} (ФТМ 1-5)`;
+
+      document.getElementById('gr-work').value = g.work;
+      document.getElementById('gr-att1').value = g.att1;
+      document.getElementById('gr-att2').value = g.att2;
+      document.getElementById('gr-comment').value = g.comment;
+
+      recalcModalGradeSum();
+      openModal('modal-grades-edit');
+    }
+
+    function recalcModalGradeSum() {
+      const w = Math.min(40, Math.max(0, Number(document.getElementById('gr-work').value) || 0));
+      const a1 = Math.min(30, Math.max(0, Number(document.getElementById('gr-att1').value) || 0));
+      const a2 = Math.min(30, Math.max(0, Number(document.getElementById('gr-att2').value) || 0));
+
+      const sum = Math.min(100, w + a1 + a2);
+      const ectsInfo = getEctsGrade(sum);
+
+      document.getElementById('gr-calc-sum').innerText = sum;
+      document.getElementById('gr-calc-ects').innerText = ectsInfo.ects;
+      document.getElementById('gr-calc-nat').innerText = ectsInfo.national;
+    }
+
+    async function saveStudentGrade(e) {
+      e.preventDefault();
+      const studentId = document.getElementById('gr-student-id').value;
+      const disciplineId = document.getElementById('gr-discipline-id').value;
+      const key = `${disciplineId}_${studentId}`;
+
+      const work = Math.min(40, Math.max(0, Number(document.getElementById('gr-work').value) || 0));
+      const att1 = Math.min(30, Math.max(0, Number(document.getElementById('gr-att1').value) || 0));
+      const att2 = Math.min(30, Math.max(0, Number(document.getElementById('gr-att2').value) || 0));
+      const comment = document.getElementById('gr-comment').value.trim();
+
+      const gradeRecord = {
+        id: key,
+        student_id: studentId,
+        discipline_id: disciplineId,
+        work,
+        att1,
+        att2,
+        comment,
+        updated_at: new Date().toISOString()
+      };
+
+      gradesData[key] = gradeRecord;
+      localStorage.setItem('ekurator_grades', JSON.stringify(gradesData));
+
+      try {
+        const { error } = await supabaseClient
+          .from('grade_records')
+          .upsert(gradeRecord);
+
+        if (error) throw error;
+      } catch (err) {
+        console.warn("Помилка збереження grade_records в Supabase:", err);
+      }
+
+      closeModal('modal-grades-edit');
+      renderGradesView(document.getElementById('main-content'));
+    }
+
+    function printOfficialGradesList() {
+      const area = document.getElementById('printable-area');
+      const isAll = selectedGradeDisciplineId === 'all';
+      const activeDisc = SCHEDULE_DATA.find(d => d.id === selectedGradeDisciplineId);
+
+      area.innerHTML = `
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="font-size: 16px; font-weight: bold; margin: 0;">ДЕРЖАВНИЙ ТОРГОВЕЛЬНО-ЕКОНОМІЧНИЙ УНІВЕРСИТЕТ</h2>
+          <h3 style="font-size: 14px; margin: 5px 0;">АКАДЕМІЧНА ВІДОМІСТЬ УСПІШНОСТІ СТУДЕНТІВ (2026/2027 н.р.)</h3>
+          <p style="font-size: 12px; margin: 0;">Факультет торгівлі та маркетингу • Група ФТМ 1-5 • ${isAll ? 'Зведена відомість' : `Дисципліна: ${activeDisc.title}`}</p>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; font-size: 11px;" border="1">
+          <thead>
+            <tr style="background-color: #f2f2f2;">
+              <th style="padding: 6px; width: 30px;">№</th>
+              <th style="padding: 6px;">ПІБ Студента</th>
+              <th style="padding: 6px; width: 80px;">Студентський</th>
+              ${isAll ? `
+                ${SCHEDULE_DATA.map(d => `<th style="padding: 6px;">${d.title}</th>`).join('')}
+                <th style="padding: 6px; width: 60px;">Сер. бал</th>
+              ` : `
+                <th style="padding: 6px; width: 60px;">Робота</th>
+                <th style="padding: 6px; width: 60px;">Атест. 1</th>
+                <th style="padding: 6px; width: 60px;">Атест. 2</th>
+                <th style="padding: 6px; width: 60px;">Разом</th>
+                <th style="padding: 6px; width: 60px;">ECTS</th>
+                <th style="padding: 6px; width: 100px;">Оцінка</th>
+              `}
+            </tr>
+          </thead>
+          <tbody>
+            ${studentsList.map((s, idx) => {
+              if (isAll) {
+                let sum = 0;
+                let count = 0;
+                const dCols = SCHEDULE_DATA.map(d => {
+                  const g = calculateStudentDisciplineGrade(s.id, d.id);
+                  if (g.work > 0 || g.att1 > 0 || g.att2 > 0) {
+                    sum += g.total;
+                    count++;
+                    return `<td style="padding: 6px; text-align: center;">${g.total} (${g.ects})</td>`;
+                  }
+                  return `<td style="padding: 6px; text-align: center; color: #999;">—</td>`;
+                }).join('');
+
+                const avg = count > 0 ? (sum / count).toFixed(1) : '—';
+                return `
+                  <tr>
+                    <td style="padding: 6px; text-align: center;">${idx + 1}</td>
+                    <td style="padding: 6px; font-weight: bold;">${s.full_name}</td>
+                    <td style="padding: 6px; text-align: center;">${s.student_card_id}</td>
+                    ${dCols}
+                    <td style="padding: 6px; text-align: center; font-weight: bold;">${avg}</td>
+                  </tr>
+                `;
+              } else {
+                const g = calculateStudentDisciplineGrade(s.id, activeDisc.id);
+                return `
+                  <tr>
+                    <td style="padding: 6px; text-align: center;">${idx + 1}</td>
+                    <td style="padding: 6px; font-weight: bold;">${s.full_name}</td>
+                    <td style="padding: 6px; text-align: center;">${s.student_card_id}</td>
+                    <td style="padding: 6px; text-align: center;">${g.work}</td>
+                    <td style="padding: 6px; text-align: center;">${g.att1}</td>
+                    <td style="padding: 6px; text-align: center;">${g.att2}</td>
+                    <td style="padding: 6px; text-align: center; font-weight: bold;">${g.total}</td>
+                    <td style="padding: 6px; text-align: center; font-weight: bold;">${g.ects}</td>
+                    <td style="padding: 6px; text-align: center;">${g.national}</td>
+                  </tr>
+                `;
+              }
+            }).join('')}
+          </tbody>
+        </table>
+
+        <div style="margin-top: 30px; display: flex; justify-content: space-between;">
+          <div>Куратор групи ФТМ 1-5: ____________ (Ісіков Я. А.)</div>
+          <div>Заступник декана: ____________</div>
+        </div>
+      `;
+
+      window.print();
     }
 
     function viewStudentCard(studentId) {
