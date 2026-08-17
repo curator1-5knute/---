@@ -199,7 +199,7 @@
   <div id="modal-card" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
     <div class="bg-white border border-slate-400 rounded-sm shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
       <div class="bg-slate-200 border-b border-slate-300 px-4 py-2 flex items-center justify-between text-xs font-bold text-slate-800">
-        <span>[Картка студента. Особова справа — ДТЕУ]</span>
+        <span>[Картка студента. Особова справа — ДТЕУ] → Військовий облік</span>
         <button onclick="closeModal('modal-card')" class="text-slate-600 hover:text-black text-base font-bold">✕</button>
       </div>
       <div id="card-content" class="p-6 overflow-y-auto flex-1 text-xs"></div>
@@ -714,7 +714,10 @@
     let roomDefects = [];
     let attendanceData = {};
     let gradesData = {};
+    let militaryData = {};
+    let activeStudentCardTab = 'general';
     let searchQuery = '';
+    militaryData = JSON.parse(localStorage.getItem('ekurator_military_data') || '{}');
 
     const AVAILABLE_SECTIONS = [
       { id: 'Волейбол', label: 'Волейбол', icon: 'fa-volleyball', color: 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100' },
@@ -3948,69 +3951,182 @@
       const student = studentsList.find(s => String(s.id) === String(studentId));
       if (!student) return;
 
-      const container = document.getElementById('card-content');
-      container.innerHTML = `
-        <div class="border border-slate-400 bg-white">
-          <table class="w-full border-collapse border border-slate-400 text-xs">
-            <tbody>
-              <tr class="border-b border-slate-300">
-                <td class="p-2 font-bold bg-slate-100 w-48 border-r border-slate-300">Прізвище І.Б. / ПІБ</td>
-                <td class="p-2 font-bold text-slate-900" colspan="3">${student.full_name}</td>
-              </tr>
-              <tr class="border-b border-slate-300">
-                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Номер студентського квитка</td>
-                <td class="p-2 text-blue-900 font-semibold border-r border-slate-300">${student.student_card_id}</td>
-                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300 w-48">Номер залікової книжки</td>
-                <td class="p-2 text-emerald-800 font-bold">${student.record_book_number}</td>
-              </tr>
-              <tr class="border-b border-slate-300">
-                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">РНОКПП (ІПН)</td>
-                <td class="p-2 text-slate-800 font-medium border-r border-slate-300">${student.rnokpp}</td>
-                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Документ особи</td>
-                <td class="p-2">${student.document_type}: <span class="font-medium text-slate-800">${student.document_number}</span></td>
-              </tr>
-              <tr class="border-b border-slate-300">
-                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Дата народження</td>
-                <td class="p-2" colspan="3">${student.birth_date}</td>
-              </tr>
-              <tr class="border-b border-slate-300 bg-slate-50 font-bold text-[#2b569a]">
-                <td class="p-2" colspan="4">Академічні відомості (ДТЕУ)</td>
-              </tr>
-              <tr class="border-b border-slate-300">
-                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Факультет</td>
-                <td class="p-2 border-r border-slate-300">${student.faculty}</td>
-                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Спеціальність</td>
-                <td class="p-2">${student.specialty}</td>
-              </tr>
-              <tr class="border-b border-slate-300">
-                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Освітня програма</td>
-                <td class="p-2" colspan="3">${student.study_program}</td>
-              </tr>
-              <tr class="border-b border-slate-300">
-                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Форма навчання / Курс</td>
-                <td class="p-2 border-r border-slate-300">${student.study_form} / ${student.course} курс</td>
-                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Академічна група</td>
-                <td class="p-2 font-bold">${student.group_code}</td>
-              </tr>
-              <tr class="border-b border-slate-300">
-                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Система фінансування</td>
-                <td class="p-2 font-semibold text-blue-900" colspan="3">${student.payment_type}</td>
-              </tr>
-              <tr class="border-b border-slate-300 bg-slate-50 font-bold text-[#2b569a]">
-                <td class="p-2" colspan="4">Контактні дані</td>
-              </tr>
-              <tr>
-                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Номер телефону</td>
-                <td class="p-2 border-r border-slate-300 text-slate-800 font-medium">${student.phone}</td>
-                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Електронна пошта</td>
-                <td class="p-2">${student.email}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      `;
-
+      activeStudentCardTab = 'general';
+      renderStudentCard(student);
       openModal('modal-card');
+    }
+
+    function switchStudentCardTab(tab) {
+      const studentId = document.getElementById('card-student-id')?.value;
+      const student = studentsList.find(s => String(s.id) === String(studentId));
+      if (!student) return;
+
+      activeStudentCardTab = tab;
+      renderStudentCard(student);
+    }
+
+    function renderStudentCard(student) {
+      const container = document.getElementById('card-content');
+      const military = militaryData[student.id] || {};
+
+      container.innerHTML = `
+        <input type="hidden" id="card-student-id" value="${student.id}">
+
+        <div class="border-b border-slate-300 mb-4 flex items-center gap-1">
+          <button onclick="switchStudentCardTab('general')"
+            class="px-4 py-2 text-xs font-bold border-b-2 ${activeStudentCardTab === 'general' ? 'border-[#2b569a] text-[#2b569a]' : 'border-transparent text-slate-500 hover:text-slate-800'}">
+            <i class="fa-regular fa-id-card mr-1"></i> Основні дані
+          </button>
+          <button onclick="switchStudentCardTab('military')"
+            class="px-4 py-2 text-xs font-bold border-b-2 ${activeStudentCardTab === 'military' ? 'border-[#2b569a] text-[#2b569a]' : 'border-transparent text-slate-500 hover:text-slate-800'}">
+            <i class="fa-solid fa-shield-halved mr-1"></i> Військовий облік
+          </button>
+        </div>
+
+        ${activeStudentCardTab === 'general' ? `
+          <div class="border border-slate-400 bg-white">
+            <table class="w-full border-collapse border border-slate-400 text-xs">
+              <tbody>
+                <tr class="border-b border-slate-300">
+                  <td class="p-2 font-bold bg-slate-100 w-48 border-r border-slate-300">Прізвище І.Б. / ПІБ</td>
+                  <td class="p-2 font-bold text-slate-900" colspan="3">${student.full_name}</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Номер студентського квитка</td>
+                  <td class="p-2 text-blue-900 font-semibold border-r border-slate-300">${student.student_card_id}</td>
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300 w-48">Номер залікової книжки</td>
+                  <td class="p-2 text-emerald-800 font-bold">${student.record_book_number}</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">РНОКПП (ІПН)</td>
+                  <td class="p-2 text-slate-800 font-medium border-r border-slate-300">${student.rnokpp}</td>
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Документ особи</td>
+                  <td class="p-2">${student.document_type}: <span class="font-medium text-slate-800">${student.document_number}</span></td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Дата народження</td>
+                  <td class="p-2" colspan="3">${student.birth_date}</td>
+                </tr>
+                <tr class="border-b border-slate-300 bg-slate-50 font-bold text-[#2b569a]">
+                  <td class="p-2" colspan="4">Академічні відомості (ДТЕУ)</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Факультет</td>
+                  <td class="p-2 border-r border-slate-300">${student.faculty}</td>
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Спеціальність</td>
+                  <td class="p-2">${student.specialty}</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Освітня програма</td>
+                  <td class="p-2" colspan="3">${student.study_program}</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Форма навчання / Курс</td>
+                  <td class="p-2 border-r border-slate-300">${student.study_form} / ${student.course} курс</td>
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Академічна група</td>
+                  <td class="p-2 font-bold">${student.group_code}</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Система фінансування</td>
+                  <td class="p-2 font-semibold text-blue-900" colspan="3">${student.payment_type}</td>
+                </tr>
+                <tr class="border-b border-slate-300 bg-slate-50 font-bold text-[#2b569a]">
+                  <td class="p-2" colspan="4">Контактні дані</td>
+                </tr>
+                <tr>
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Номер телефону</td>
+                  <td class="p-2 border-r border-slate-300 text-slate-800 font-medium">${student.phone}</td>
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Електронна пошта</td>
+                  <td class="p-2">${student.email}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ` : `
+          <div class="space-y-4">
+            <div class="bg-slate-50 border border-slate-300 p-3 rounded-sm">
+              <div class="text-[11px] text-slate-500">Студент</div>
+              <div class="font-bold text-slate-900 text-sm">${student.full_name}</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">Академічна група: ${student.group_code}</div>
+            </div>
+
+            <div class="border border-slate-300 rounded-sm overflow-hidden">
+              <div class="bg-slate-100 border-b border-slate-300 px-3 py-2 font-bold text-xs text-[#2b569a]">
+                <i class="fa-solid fa-shield-halved mr-1"></i> Військово-облікові дані
+              </div>
+              <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div><label class="block font-semibold mb-1">Група обліку</label><input id="mil-accounting-group" value="${military.accounting_group || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+                <div><label class="block font-semibold mb-1">Категорія обліку</label><input id="mil-accounting-category" value="${military.accounting_category || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+                <div><label class="block font-semibold mb-1">Склад</label><input id="mil-composition" value="${military.composition || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+                <div><label class="block font-semibold mb-1">Військове звання</label><input id="mil-rank" value="${military.rank || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+                <div><label class="block font-semibold mb-1">Військово-обліковий документ</label><input id="mil-document" value="${military.document || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+                <div><label class="block font-semibold mb-1">Серія і номер документа</label><input id="mil-document-number" value="${military.document_number || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+                <div><label class="block font-semibold mb-1">Дата видачі документа</label><input id="mil-document-date" type="date" value="${military.document_issue_date || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+                <div><label class="block font-semibold mb-1">Військово-облікова спеціальність</label><input id="mil-specialty" value="${military.specialty || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+                <div><label class="block font-semibold mb-1">Придатність до військової служби</label><input id="mil-fitness" value="${military.fitness || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+                <div><label class="block font-semibold mb-1">Перебуває на спеціальному обліку №</label><input id="mil-special-number" value="${military.special_number || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+                <div class="md:col-span-2"><label class="block font-semibold mb-1">Найменування районного (міського) військового комісаріату за місцем проживання</label><input id="mil-office-residence" value="${military.office_residence || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+                <div class="md:col-span-2"><label class="block font-semibold mb-1">Найменування районного (міського) військового комісаріату за місцем реєстрації</label><input id="mil-office-registration" value="${military.office_registration || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+              </div>
+            </div>
+
+            <div class="border border-slate-300 rounded-sm overflow-hidden">
+              <div class="bg-slate-100 border-b border-slate-300 px-3 py-2 font-bold text-xs text-[#2b569a]">Мобілізаційні дані</div>
+              <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                <div><label class="block font-semibold mb-1">Мобілізаційне розпорядження</label><input id="mil-mobilization-order" value="${military.mobilization_order || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+                <div><label class="block font-semibold mb-1">Дата видачі мобілізаційного розпорядження</label><input id="mil-mobilization-date" type="date" value="${military.mobilization_date || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+                <div><label class="block font-semibold mb-1">Номер команди</label><input id="mil-team-number" value="${military.team_number || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+              </div>
+            </div>
+
+            <div class="border border-slate-300 rounded-sm overflow-hidden">
+              <div class="bg-slate-100 border-b border-slate-300 px-3 py-2 font-bold text-xs text-[#2b569a]">Статуси військового обліку</div>
+              <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div><label class="block font-semibold mb-1">Поставлено на облік</label><select id="mil-registered" class="w-full border border-slate-300 p-2 rounded bg-white"><option value="">—</option><option value="Так" ${military.registered === 'Так' ? 'selected' : ''}>Так</option><option value="Ні" ${military.registered === 'Ні' ? 'selected' : ''}>Ні</option></select></div>
+                <div><label class="block font-semibold mb-1">Військовий обов'язок</label><input id="mil-duty" value="${military.duty || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+                <div><label class="block font-semibold mb-1">Знятий (виключений) з військового обліку</label><select id="mil-removed" class="w-full border border-slate-300 p-2 rounded bg-white"><option value="">—</option><option value="Так" ${military.removed === 'Так' ? 'selected' : ''}>Так</option><option value="Ні" ${military.removed === 'Ні' ? 'selected' : ''}>Ні</option></select></div>
+                <div class="md:col-span-2"><label class="block font-semibold mb-1">Причина зняття (виключення) з військового обліку</label><textarea id="mil-removal-reason" rows="2" class="w-full border border-slate-300 p-2 rounded bg-white">${military.removal_reason || ''}</textarea></div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-slate-300">
+              <div class="text-[10px] text-slate-500">Дані вкладки прив'язані до конкретного студента.</div>
+              <button onclick="saveMilitaryRecord('${student.id}')" class="px-5 py-2 bg-[#2b569a] hover:bg-[#1f4277] text-white font-bold rounded-sm shadow-sm text-xs">
+                <i class="fa-solid fa-floppy-disk mr-1"></i> Зберегти військовий облік
+              </button>
+            </div>
+          </div>
+        `}
+      `;
+    }
+
+    function saveMilitaryRecord(studentId) {
+      militaryData[studentId] = {
+        accounting_group: document.getElementById('mil-accounting-group')?.value || '',
+        accounting_category: document.getElementById('mil-accounting-category')?.value || '',
+        composition: document.getElementById('mil-composition')?.value || '',
+        rank: document.getElementById('mil-rank')?.value || '',
+        document: document.getElementById('mil-document')?.value || '',
+        document_number: document.getElementById('mil-document-number')?.value || '',
+        document_issue_date: document.getElementById('mil-document-date')?.value || '',
+        specialty: document.getElementById('mil-specialty')?.value || '',
+        fitness: document.getElementById('mil-fitness')?.value || '',
+        office_residence: document.getElementById('mil-office-residence')?.value || '',
+        office_registration: document.getElementById('mil-office-registration')?.value || '',
+        special_number: document.getElementById('mil-special-number')?.value || '',
+        mobilization_order: document.getElementById('mil-mobilization-order')?.value || '',
+        mobilization_date: document.getElementById('mil-mobilization-date')?.value || '',
+        team_number: document.getElementById('mil-team-number')?.value || '',
+        registered: document.getElementById('mil-registered')?.value || '',
+        duty: document.getElementById('mil-duty')?.value || '',
+        removed: document.getElementById('mil-removed')?.value || '',
+        removal_reason: document.getElementById('mil-removal-reason')?.value || ''
+      };
+
+      localStorage.setItem('ekurator_military_data', JSON.stringify(militaryData));
+      alert('Військово-облікові дані збережено.');
+      const student = studentsList.find(s => String(s.id) === String(studentId));
+      if (student) renderStudentCard(student);
     }
 
     function openModal(id) {
