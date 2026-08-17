@@ -968,26 +968,54 @@
           if (localAtt) attendanceData = JSON.parse(localAtt);
         }
 
-        // Завантаження оцінок успішності
+        // Завантаження оцінок успішності з реальної структури grade_records
         const { data: grData, error: grError } = await supabaseClient
           .from('grade_records')
           .select('*');
 
         if (!grError && grData) {
           gradesData = {};
+          generatedEctsData = {};
+
           grData.forEach(r => {
-            gradesData[r.id] = {
-              work: r.work || 0,
-              att1: r.att1 || 0,
-              att2: r.att2 || 0,
-              comment: r.comment || '',
+            const gradeKey = `${r.discipline_id}_${r.student_id}`;
+            const work = Number(r.current_score || 0);
+            const att1 = Number(r.mkr1_score || 0);
+            const att2 = Number(r.mkr2_score || 0);
+            const exam = Number(r.exam_score || 0);
+            const calculatedTotal = Math.min(100, work + att1 + att2 + exam);
+            const total = Number(r.total_score ?? calculatedTotal);
+
+            gradesData[gradeKey] = {
+              id: r.id,
+              student_id: r.student_id,
+              discipline_id: r.discipline_id,
+              work,
+              att1,
+              att2,
+              exam,
+              total,
+              ects: r.ects_grade || null,
+              attestation_1: r.attestation_1 || 'Очікує',
+              attestation_2: r.attestation_2 || 'Очікує',
+              debt_status: r.debt_status || (total < 60 ? 'Є борг' : 'Немає'),
+              comment: r.debt_comment || '',
               updated_at: r.updated_at
             };
+
+            // ECTS вважаємо згенерованим лише якщо воно було записане в БД.
+            // Значення F за замовчуванням при балах <35 не вважаємо генерацією.
+            if (r.ects_grade && !(r.ects_grade === 'F' && total < 35)) {
+              generatedEctsData[gradeKey] = true;
+            }
           });
           localStorage.setItem('ekurator_grades', JSON.stringify(gradesData));
+          localStorage.setItem('ekurator_generated_ects', JSON.stringify(generatedEctsData));
         } else {
           const localGr = localStorage.getItem('ekurator_grades');
           if (localGr) gradesData = JSON.parse(localGr);
+          const localEcts = localStorage.getItem('ekurator_generated_ects');
+          if (localEcts) generatedEctsData = JSON.parse(localEcts);
         }
 
       } catch (err) {
@@ -2765,16 +2793,24 @@
 
     function calculateStudentDisciplineGrade(studentId, disciplineId) {
       const key = `${disciplineId}_${studentId}`;
-      const rec = gradesData[key] || { work: 0, att1: 0, att2: 0, comment: '' };
-      const total = Number(rec.work || 0) + Number(rec.att1 || 0) + Number(rec.att2 || 0);
+      const rec = gradesData[key] || { work: 0, att1: 0, att2: 0, exam: 0, comment: '', ects: null };
+      const work = Number(rec.work || 0);
+      const att1 = Number(rec.att1 || 0);
+      const att2 = Number(rec.att2 || 0);
+      const exam = Number(rec.exam || 0);
+      const total = Number.isFinite(Number(rec.total))
+        ? Math.min(100, Number(rec.total))
+        : Math.min(100, work + att1 + att2 + exam);
 
       return {
-        work: Number(rec.work || 0),
-        att1: Number(rec.att1 || 0),
-        att2: Number(rec.att2 || 0),
-        total: Math.min(100, total),
+        work,
+        att1,
+        att2,
+        exam,
+        total,
         comment: rec.comment || '',
-        ...getEctsGrade(Math.min(100, total))
+        storedEcts: rec.ects || null,
+        ...getEctsGrade(total)
       };
     }
 
@@ -2808,22 +2844,70 @@
       };
     }
 
-    function generateEctsGradeForStudent(studentId, disciplineId) {
+    async function generateEctsGradeForStudent(studentId, disciplineId) {
       if (!hasStudentGrade(studentId, disciplineId)) {
         alert('Спочатку внесіть хоча б один бал за цією дисципліною.');
         return;
       }
 
       const key = `${disciplineId}_${studentId}`;
-      generatedEctsData[key] = true;
+      const g = calculateStudentDisciplineGrade(studentId, disciplineId);
+      const ectsInfo = getEctsGrade(g.total);
+      const rec = gradesData[key] || {};
 
-      if (currentTab === 'grades-journal' || currentTab === 'grades') {
+      try {
+        const payload = {
+          id: rec.id || key,
+          student_id: studentId,
+          discipline_id: disciplineId,
+          current_score: g.work,
+          mkr1_score: g.att1,
+          mkr2_score: g.att2,
+          exam_score: g.exam || 0,
+          total_score: g.total,
+          ects_grade: ectsInfo.ects,
+          attestation_1: rec.attestation_1 || (g.att1 > 0 ? 'Складено' : 'Очікує'),
+          attestation_2: rec.attestation_2 || (g.att2 > 0 ? 'Складено' : 'Очікує'),
+          debt_status: g.total < 60 ? 'Є борг' : 'Немає',
+          debt_comment: rec.comment || null,
+          updated_at: new Date().toISOString()
+        };
+
+        const { data, error } = await supabaseClient
+          .from('grade_records')
+          .upsert(payload, { onConflict: 'student_id,discipline_id' })
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        gradesData[key] = {
+          ...rec,
+          ...payload,
+          id: data?.id || payload.id,
+          ects: ectsInfo.ects,
+          total: g.total,
+          comment: rec.comment || ''
+        };
+        generatedEctsData[key] = true;
+        localStorage.setItem('ekurator_grades', JSON.stringify(gradesData));
+        localStorage.setItem('ekurator_generated_ects', JSON.stringify(generatedEctsData));
+
+        showGradesCloudMessage('success', `ECTS ${ectsInfo.ects} збережено у Supabase.`);
         renderGradesJournalTable();
+      } catch (err) {
+        console.error('Помилка генерації ECTS:', err);
+        showGradesCloudMessage(
+          'error',
+          `Не вдалося зберегти ECTS у хмару${err?.code ? ` [${err.code}]` : ''}.\n${err?.message || 'Невідома помилка'}${err?.hint ? `\n${err.hint}` : ''}`
+        );
       }
     }
 
     function clearGeneratedEctsForStudent(studentId, disciplineId) {
-      delete generatedEctsData[`${disciplineId}_${studentId}`];
+      const key = `${disciplineId}_${studentId}`;
+      delete generatedEctsData[key];
+      localStorage.setItem('ekurator_generated_ects', JSON.stringify(generatedEctsData));
       renderGradesJournalTable();
     }
 
@@ -2965,7 +3049,6 @@
 
     function changeGradeDiscipline(val) {
       selectedGradeDisciplineId = val;
-      generatedEctsData = {};
       renderGradesJournalView(document.getElementById('main-content'));
     }
 
@@ -3216,6 +3299,7 @@
 
     async function saveStudentGrade(e) {
       e.preventDefault();
+
       const studentId = document.getElementById('gr-student-id').value;
       const disciplineId = document.getElementById('gr-discipline-id').value;
       const key = `${disciplineId}_${studentId}`;
@@ -3224,39 +3308,113 @@
       const att1 = Math.min(30, Math.max(0, Number(document.getElementById('gr-att1').value) || 0));
       const att2 = Math.min(30, Math.max(0, Number(document.getElementById('gr-att2').value) || 0));
       const comment = document.getElementById('gr-comment').value.trim();
+      const total = Math.min(100, work + att1 + att2);
+      const updatedAt = new Date().toISOString();
+      const previous = gradesData[key] || {};
 
+      // Відповідність полям реальної таблиці public.grade_records:
+      // current_score = поточна робота, mkr1_score = А1, mkr2_score = А2.
+      // exam_score залишаємо 0, оскільки поточна форма має одну 30-бальну колонку А2/Екз.
+      // ECTS навмисно скидаємо в NULL: воно генерується окремою кнопкою.
       const gradeRecord = {
-        id: key,
+        id: previous.id || key,
         student_id: studentId,
         discipline_id: disciplineId,
+        current_score: work,
+        mkr1_score: att1,
+        mkr2_score: att2,
+        exam_score: Number(previous.exam || 0),
+        total_score: total,
+        ects_grade: null,
+        attestation_1: att1 > 0 ? 'Складено' : 'Очікує',
+        attestation_2: att2 > 0 ? 'Складено' : 'Очікує',
+        debt_status: total < 60 ? 'Є борг' : 'Немає',
+        debt_comment: comment || null,
+        updated_at: updatedAt
+      };
+
+      // Миттєво оновлюємо локальний стан, але джерелом після перезавантаження буде Supabase.
+      gradesData[key] = {
+        ...previous,
+        ...gradeRecord,
         work,
         att1,
         att2,
-        comment,
-        updated_at: new Date().toISOString()
+        exam: gradeRecord.exam_score,
+        total,
+        ects: null,
+        comment
       };
-
-      gradesData[key] = gradeRecord;
       delete generatedEctsData[key];
       localStorage.setItem('ekurator_grades', JSON.stringify(gradesData));
+      localStorage.setItem('ekurator_generated_ects', JSON.stringify(generatedEctsData));
 
-      try {
-        const { error } = await supabaseClient
-          .from('grade_records')
-          .upsert(gradeRecord);
-
-        if (error) throw error;
-      } catch (err) {
-        console.warn("Помилка збереження grade_records в Supabase:", err);
+      const saveButton = document.querySelector('#grades-edit-form button[type="submit"]');
+      const originalButtonHtml = saveButton ? saveButton.innerHTML : '';
+      if (saveButton) {
+        saveButton.disabled = true;
+        saveButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Збереження...';
       }
 
-      closeModal('modal-grades-edit');
+      try {
+        const { data, error } = await supabaseClient
+          .from('grade_records')
+          .upsert(gradeRecord, { onConflict: 'student_id,discipline_id' })
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        if (data) {
+          gradesData[key] = {
+            ...gradesData[key],
+            id: data.id,
+            updated_at: data.updated_at || updatedAt
+          };
+          localStorage.setItem('ekurator_grades', JSON.stringify(gradesData));
+        }
+
+        showGradesCloudMessage('success', 'Оцінку збережено у Supabase. ECTS можна згенерувати окремо.');
+        closeModal('modal-grades-edit');
+      } catch (err) {
+        console.error('Помилка збереження grade_records в Supabase:', err);
+        const code = err?.code ? ` [${err.code}]` : '';
+        const hint = err?.hint ? `\n${err.hint}` : '';
+        showGradesCloudMessage(
+          'error',
+          `Не вдалося зберегти оцінку у хмару${code}. Дані залишилися локально.\n${err?.message || 'Невідома помилка'}${hint}`
+        );
+      } finally {
+        if (saveButton) {
+          saveButton.disabled = false;
+          saveButton.innerHTML = originalButtonHtml;
+        }
+      }
 
       if (currentTab === 'grades-attestation') {
         renderGradesAttestationView(document.getElementById('main-content'));
       } else {
         renderGradesJournalView(document.getElementById('main-content'));
       }
+    }
+
+    function showGradesCloudMessage(type, message) {
+      let el = document.getElementById('grades-cloud-message');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'grades-cloud-message';
+        el.className = 'fixed right-5 bottom-5 z-[100] max-w-md whitespace-pre-line rounded shadow-2xl px-4 py-3 text-xs font-semibold border';
+        document.body.appendChild(el);
+      }
+
+      el.className = `fixed right-5 bottom-5 z-[100] max-w-md whitespace-pre-line rounded shadow-2xl px-4 py-3 text-xs font-semibold border ${
+        type === 'success'
+          ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+          : 'bg-rose-50 text-rose-800 border-rose-300'
+      }`;
+      el.innerText = message;
+      clearTimeout(window.__gradesCloudMessageTimer);
+      window.__gradesCloudMessageTimer = setTimeout(() => el.remove(), type === 'success' ? 3000 : 9000);
     }
 
     function printOfficialGradesList() {
