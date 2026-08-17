@@ -4043,57 +4043,25 @@
             </table>
           </div>
         ` : `
-          <div class="space-y-4">
-            <div class="bg-slate-50 border border-slate-300 p-3 rounded-sm">
-              <div class="text-[11px] text-slate-500">Студент</div>
-              <div class="font-bold text-slate-900 text-sm">${student.full_name}</div>
-              <div class="text-[11px] text-slate-500 mt-0.5">Академічна група: ${student.group_code}</div>
-            </div>
-
-            <div class="border border-slate-300 rounded-sm overflow-hidden">
-              <div class="bg-slate-100 border-b border-slate-300 px-3 py-2 font-bold text-xs text-[#2b569a]">
-                <i class="fa-solid fa-shield-halved mr-1"></i> Військово-облікові дані
+          <div class="min-h-[360px] flex items-center justify-center p-6">
+            <div class="w-full max-w-2xl border border-slate-300 bg-white rounded-sm shadow-sm">
+              <div class="px-5 py-4 border-b border-slate-300 bg-slate-50">
+                <div class="flex items-center gap-2 text-slate-800 font-bold text-sm">
+                  <i class="fa-solid fa-shield-halved text-[#2b569a]"></i>
+                  Військовий облік не ведеться
+                </div>
               </div>
-              <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div><label class="block font-semibold mb-1">Група обліку</label><input id="mil-accounting-group" value="${military.accounting_group || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
-                <div><label class="block font-semibold mb-1">Категорія обліку</label><input id="mil-accounting-category" value="${military.accounting_category || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
-                <div><label class="block font-semibold mb-1">Склад</label><input id="mil-composition" value="${military.composition || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
-                <div><label class="block font-semibold mb-1">Військове звання</label><input id="mil-rank" value="${military.rank || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
-                <div><label class="block font-semibold mb-1">Військово-обліковий документ</label><input id="mil-document" value="${military.document || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
-                <div><label class="block font-semibold mb-1">Серія і номер документа</label><input id="mil-document-number" value="${military.document_number || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
-                <div><label class="block font-semibold mb-1">Дата видачі документа</label><input id="mil-document-date" type="date" value="${military.document_issue_date || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
-                <div><label class="block font-semibold mb-1">Військово-облікова спеціальність</label><input id="mil-specialty" value="${military.specialty || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
-                <div><label class="block font-semibold mb-1">Придатність до військової служби</label><input id="mil-fitness" value="${military.fitness || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
-                <div><label class="block font-semibold mb-1">Перебуває на спеціальному обліку №</label><input id="mil-special-number" value="${military.special_number || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
-                <div class="md:col-span-2"><label class="block font-semibold mb-1">Найменування районного (міського) військового комісаріату за місцем проживання</label><input id="mil-office-residence" value="${military.office_residence || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
-                <div class="md:col-span-2"><label class="block font-semibold mb-1">Найменування районного (міського) військового комісаріату за місцем реєстрації</label><input id="mil-office-registration" value="${military.office_registration || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+              <div class="px-5 py-6 text-center">
+                <div class="mx-auto mb-4 w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
+                  <i class="fa-solid fa-file-circle-xmark text-xl text-slate-400"></i>
+                </div>
+                <p class="text-sm text-slate-700 font-medium">
+                  Для студентів поточної академічної групи військово-облікові дані відсутні.
+                </p>
+                <p class="mt-2 text-sm font-bold text-slate-900">
+                  Записи для відображення не знайдено.
+                </p>
               </div>
-            </div>
-
-            <div class="border border-slate-300 rounded-sm overflow-hidden">
-              <div class="bg-slate-100 border-b border-slate-300 px-3 py-2 font-bold text-xs text-[#2b569a]">Мобілізаційні дані</div>
-              <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                <div><label class="block font-semibold mb-1">Мобілізаційне розпорядження</label><input id="mil-mobilization-order" value="${military.mobilization_order || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
-                <div><label class="block font-semibold mb-1">Дата видачі мобілізаційного розпорядження</label><input id="mil-mobilization-date" type="date" value="${military.mobilization_date || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
-                <div><label class="block font-semibold mb-1">Номер команди</label><input id="mil-team-number" value="${military.team_number || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
-              </div>
-            </div>
-
-            <div class="border border-slate-300 rounded-sm overflow-hidden">
-              <div class="bg-slate-100 border-b border-slate-300 px-3 py-2 font-bold text-xs text-[#2b569a]">Статуси військового обліку</div>
-              <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div><label class="block font-semibold mb-1">Поставлено на облік</label><select id="mil-registered" class="w-full border border-slate-300 p-2 rounded bg-white"><option value="">—</option><option value="Так" ${military.registered === 'Так' ? 'selected' : ''}>Так</option><option value="Ні" ${military.registered === 'Ні' ? 'selected' : ''}>Ні</option></select></div>
-                <div><label class="block font-semibold mb-1">Військовий обов'язок</label><input id="mil-duty" value="${military.duty || ''}" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
-                <div><label class="block font-semibold mb-1">Знятий (виключений) з військового обліку</label><select id="mil-removed" class="w-full border border-slate-300 p-2 rounded bg-white"><option value="">—</option><option value="Так" ${military.removed === 'Так' ? 'selected' : ''}>Так</option><option value="Ні" ${military.removed === 'Ні' ? 'selected' : ''}>Ні</option></select></div>
-                <div class="md:col-span-2"><label class="block font-semibold mb-1">Причина зняття (виключення) з військового обліку</label><textarea id="mil-removal-reason" rows="2" class="w-full border border-slate-300 p-2 rounded bg-white">${military.removal_reason || ''}</textarea></div>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between pt-2 border-t border-slate-300">
-              <div class="text-[10px] text-slate-500">Дані вкладки прив'язані до конкретного студента.</div>
-              <button onclick="saveMilitaryRecord('${student.id}')" class="px-5 py-2 bg-[#2b569a] hover:bg-[#1f4277] text-white font-bold rounded-sm shadow-sm text-xs">
-                <i class="fa-solid fa-floppy-disk mr-1"></i> Зберегти військовий облік
-              </button>
             </div>
           </div>
         `}
