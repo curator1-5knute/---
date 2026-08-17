@@ -82,7 +82,7 @@
             Академічний реєстр
           </button>
           <button onclick="navigate('students-sports')" id="subnav-students-sports" class="mia-submenu-item">
-            <i class="fa-solid fa-person-running mr-1.5 text-blue-600"></i> Спортивні секції
+            Спортивні секції
           </button>
         </div>
       </div>
@@ -538,8 +538,13 @@
       const hash = window.location.hash.replace('#', '') || 'dashboard';
       currentTab = hash;
       
-      if (currentTab.startsWith('housing-')) isHousingMenuOpen = true;
-      if (currentTab.startsWith('students')) isStudentsMenuOpen = true;
+      if (currentTab.startsWith('housing-')) {
+        isHousingMenuOpen = true;
+        isStudentsMenuOpen = false;
+      } else if (currentTab.startsWith('students')) {
+        isStudentsMenuOpen = true;
+        isHousingMenuOpen = false;
+      }
 
       fetchDataFromCloud();
       renderNavigationUI();
@@ -550,8 +555,16 @@
       const hash = window.location.hash.replace('#', '') || 'dashboard';
       if (hash !== currentTab) {
         currentTab = hash;
-        if (currentTab.startsWith('housing-')) isHousingMenuOpen = true;
-        if (currentTab.startsWith('students')) isStudentsMenuOpen = true;
+        if (currentTab.startsWith('housing-')) {
+          isHousingMenuOpen = true;
+          isStudentsMenuOpen = false;
+        } else if (currentTab.startsWith('students')) {
+          isStudentsMenuOpen = true;
+          isHousingMenuOpen = false;
+        } else {
+          isHousingMenuOpen = false;
+          isStudentsMenuOpen = false;
+        }
         renderNavigationUI();
         renderCurrentView();
       }
@@ -607,7 +620,6 @@
           if (localH) housingData = JSON.parse(localH);
         }
 
-        // Завантаження спортивних секцій
         const { data: spData, error: spError } = await supabaseClient
           .from('sports_sections')
           .select('*');
@@ -646,7 +658,7 @@
       initHousingRecordsForStudents();
       updateCounters();
       if (currentTab === 'students') renderStudentsTable();
-      if (currentTab === 'students-sports') renderSportsView(document.getElementById('main-content'));
+      if (currentTab === 'students-sports') renderSportsTable();
       if (currentTab.startsWith('housing-')) renderCurrentView();
     }
 
@@ -742,11 +754,14 @@
       if (countEl) countEl.innerText = studentsList.length;
     }
 
+    // Взаємовиключне відкриття/закриття меню (Аккордеон)
     function toggleMenu(menuKey) {
       if (menuKey === 'housing') {
         isHousingMenuOpen = !isHousingMenuOpen;
+        if (isHousingMenuOpen) isStudentsMenuOpen = false;
       } else if (menuKey === 'students') {
         isStudentsMenuOpen = !isStudentsMenuOpen;
+        if (isStudentsMenuOpen) isHousingMenuOpen = false;
       }
       renderNavigationUI();
     }
@@ -762,9 +777,13 @@
       
       if (currentTab.startsWith('housing-')) {
         isHousingMenuOpen = true;
-      }
-      if (currentTab.startsWith('students')) {
+        isStudentsMenuOpen = false;
+      } else if (currentTab.startsWith('students')) {
         isStudentsMenuOpen = true;
+        isHousingMenuOpen = false;
+      } else {
+        isHousingMenuOpen = false;
+        isStudentsMenuOpen = false;
       }
       
       renderNavigationUI();
@@ -1924,7 +1943,7 @@
             <table class="w-full text-left text-xs border-collapse">
               <thead>
                 <tr class="table-header border-b text-slate-700 font-bold">
-                  <th class="p-2.5 border-r w-10 text-center">№</th>
+                  <th class="p-2.5 border-r border-slate-300 w-10 text-center">№</th>
                   <th class="p-2.5 border-r">Кімната</th>
                   <th class="p-2.5 border-r">Тип дефекту</th>
                   <th class="p-2.5 border-r">Опис несправності</th>
