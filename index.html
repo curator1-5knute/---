@@ -162,13 +162,13 @@
       </div>
       
       <div class="flex items-center gap-6 text-xs text-slate-600">
-        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded text-slate-700 font-medium shadow-xs">
+        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded text-slate-700 font-medium shadow-sm">
           <i class="fa-regular fa-clock text-[#2b569a]"></i>
           <span id="system-live-clock" class="font-semibold">--.--.---- --:--:--</span>
         </div>
 
         <span class="text-slate-300">|</span>
-        <a href="#" class="sute-link flex items-center gap-1.5"><i class="fa-regular fa-envelope"></i> Зворотній зв'язок</a>
+        <a href="#" class="sute-link flex items-center gap-1.5"><i class="fa-regular fa-envelope"></i> Зворотний зв'язок</a>
         <span class="text-slate-300">|</span>
         <span class="text-blue-700 font-semibold cursor-pointer">Українська</span>
         <span class="text-slate-300">|</span>
@@ -726,7 +726,8 @@
       };
 
       try {
-        await supabaseClient.from('housing_records').upsert(recordToSave);
+        const { error } = await supabaseClient.from('housing_records').upsert(recordToSave);
+        if (error) throw error;
       } catch (err) {
         console.warn("Помилка синхронізації housing_records із Supabase:", err);
       }
@@ -746,7 +747,8 @@
       };
 
       try {
-        await supabaseClient.from('sports_sections').upsert(recordToSave);
+        const { error } = await supabaseClient.from('sports_sections').upsert(recordToSave);
+        if (error) throw error;
       } catch (err) {
         console.warn("Помилка синхронізації sports_sections із Supabase:", err);
       }
@@ -820,7 +822,7 @@
         ` : `
           <div title="Відкриється 26 серпня 2026 року о 10:00 під час очної перевірки документів" class="w-full flex items-center justify-between px-3.5 py-1.5 text-slate-400 bg-slate-100/70 cursor-not-allowed select-none text-[12px] font-normal border-y border-slate-100">
             <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-[10px] text-slate-400"></i> Чек-лист документів</span>
-            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.2 rounded font-semibold">26.08</span>
+            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded font-semibold">26.08</span>
           </div>
         `}
 
@@ -831,7 +833,7 @@
         ` : `
           <div title="Відкриється 26 серпня 2026 року о 10:00 під час проведення інструктажів" class="w-full flex items-center justify-between px-3.5 py-1.5 text-slate-400 bg-slate-100/70 cursor-not-allowed select-none text-[12px] font-normal border-b border-slate-100">
             <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-[10px] text-slate-400"></i> Журнал інструктажів</span>
-            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.2 rounded font-semibold">26.08</span>
+            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded font-semibold">26.08</span>
           </div>
         `}
         
@@ -842,7 +844,7 @@
         ` : `
           <div title="Відкриється 26 серпня 2026 року о 10:00 згідно з регламентом ДТЕУ" class="w-full flex items-center justify-between px-3.5 py-1.5 text-slate-400 bg-slate-100/70 cursor-not-allowed select-none text-[12px] font-normal border-b border-slate-100">
             <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-[10px] text-slate-400"></i> Очний маршрут поселення</span>
-            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.2 rounded font-semibold">26.08</span>
+            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded font-semibold">26.08</span>
           </div>
         `}
 
@@ -853,7 +855,7 @@
         ` : `
           <div title="Відкриється 26 серпня 2026 року о 10:00 під час очного огляду кімнат" class="w-full flex items-center justify-between px-3.5 py-1.5 text-slate-400 bg-slate-100/70 cursor-not-allowed select-none text-[12px] font-normal border-b border-slate-100">
             <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-[10px] text-slate-400"></i> Реєстр дефектів кімнат</span>
-            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.2 rounded font-semibold">26.08</span>
+            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded font-semibold">26.08</span>
           </div>
         `}
 
@@ -864,7 +866,7 @@
         ` : `
           <div title="Відкриється 1 вересня 2026 року під час проведення перших зборів" class="w-full flex items-center justify-between px-3.5 py-1.5 text-slate-400 bg-slate-100/70 cursor-not-allowed select-none text-[12px] font-normal border-b border-slate-100">
             <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-[10px] text-slate-400"></i> Вручення довідників</span>
-            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.2 rounded font-semibold">01.09</span>
+            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded font-semibold">01.09</span>
           </div>
         `}
 
@@ -875,7 +877,7 @@
         ` : `
           <div title="Формування фінального звіту відкриється 1 вересня після завершення заселення" class="w-full flex items-center justify-between px-3.5 py-1.5 text-slate-400 bg-slate-100/70 cursor-not-allowed select-none text-[12px] font-normal">
             <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-[10px] text-slate-400"></i> Фінальний звіт про поселення</span>
-            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.2 rounded font-semibold">01.09</span>
+            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded font-semibold">01.09</span>
           </div>
         `}
       `;
@@ -1081,7 +1083,7 @@
       
       main.innerHTML = `
         <div class="space-y-4">
-          <div class="bg-white border border-slate-300 p-4 rounded-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-xs">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-sm">
             <div>
               <h1 class="text-base font-bold text-slate-800 flex items-center gap-2">
                 <i class="fa-solid fa-person-running text-[#2b569a]"></i>
@@ -1158,7 +1160,7 @@
             <td class="p-2.5 border-r border-slate-300">
               ${hasSection ? `
                 <div class="flex items-center gap-2">
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-900 border border-blue-300 shadow-2xs">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-900 border border-blue-300 shadow-sm">
                     <i class="fa-solid fa-circle-check text-blue-600"></i> ${currentSection}
                   </span>
                   <button onclick="removeStudentFromSection('${s.id}')" title="Скасувати запис" class="text-slate-400 hover:text-rose-600 text-xs px-1">
@@ -1187,7 +1189,7 @@
             </td>
             <td class="p-2.5 text-center">
               ${hasSection ? `
-                <button onclick="openTransferModal('${s.id}')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 rounded font-semibold text-[11px] flex items-center gap-1.5 mx-auto shadow-2xs">
+                <button onclick="openTransferModal('${s.id}')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 rounded font-semibold text-[11px] flex items-center gap-1.5 mx-auto shadow-sm">
                   <i class="fa-solid fa-arrow-right-arrow-left text-amber-700"></i> Перевести
                 </button>
               ` : `
@@ -1217,7 +1219,8 @@
       if (confirm("Скасувати запис студента на спортивну секцію?")) {
         delete sportsData[studentId];
         try {
-          await supabaseClient.from('sports_sections').delete().eq('student_id', studentId);
+          const { error } = await supabaseClient.from('sports_sections').delete().eq('student_id', studentId);
+          if (error) throw error;
         } catch (e) {
           console.warn("Помилка видалення секції з БД:", e);
         }
@@ -1281,7 +1284,7 @@
     function renderHousingRegistry(main) {
       main.innerHTML = `
         <div class="space-y-4">
-          <div class="bg-white border border-slate-300 p-4 rounded-sm flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
             <div>
               <h1 class="font-bold text-slate-800 text-sm flex items-center gap-2">
                 Реєстр та облік потреби в поселенні
@@ -1294,14 +1297,14 @@
 
             <div class="flex items-center gap-2 shrink-0">
               ${!isRegistryEditing ? `
-                <button onclick="enableRegistryEditing()" class="px-3.5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white rounded text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
+                <button onclick="enableRegistryEditing()" class="px-3.5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white rounded text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
                   <i class="fa-solid fa-pen-to-square"></i> Редагувати реєстр
                 </button>
               ` : `
                 <button onclick="cancelRegistryEditing()" class="px-3.5 py-1.5 border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 rounded text-xs font-semibold flex items-center gap-1">
                   <i class="fa-solid fa-xmark"></i> Скасувати
                 </button>
-                <button onclick="confirmRegistryEditing()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
+                <button onclick="confirmRegistryEditing()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
                   <i class="fa-solid fa-check"></i> Підтвердити та зберегти
                 </button>
               `}
@@ -1989,7 +1992,8 @@
       if (def) {
         def.status = val;
         try {
-          await supabaseClient.from('room_defects').update({ status: val }).eq('id', defectId);
+          const { error } = await supabaseClient.from('room_defects').update({ status: val }).eq('id', defectId);
+          if (error) throw error;
         } catch (err) {
           console.warn("Помилка оновлення дефекту в Supabase:", err);
         }
@@ -2001,7 +2005,8 @@
     async function deleteDefect(defectId) {
       if (confirm("Ви дійсно бажаєте видалити цей запис дефекту з бази даних?")) {
         try {
-          await supabaseClient.from('room_defects').delete().eq('id', defectId);
+          const { error } = await supabaseClient.from('room_defects').delete().eq('id', defectId);
+          if (error) throw error;
         } catch (err) {
           console.warn("Помилка видалення дефекту з Supabase:", err);
         }
