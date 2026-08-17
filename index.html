@@ -67,10 +67,25 @@
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-house w-4"></i> ГОЛОВНА СТОРІНКА</span>
       </button>
 
-      <button id="nav-students" onclick="navigate('students')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover">
-        <span class="flex items-center gap-2.5"><i class="fa-solid fa-users w-4"></i> СПИСОК ГРУПИ</span>
-        <span id="sidebar-count" class="text-[11px] bg-blue-950/60 px-1.5 py-0.5 rounded font-mono">0</span>
-      </button>
+      <!-- Модуль СПИСОК ГРУПИ -->
+      <div>
+        <button id="btn-group-students" onclick="toggleMenu('students')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition">
+          <span class="flex items-center gap-2.5 font-bold"><i class="fa-solid fa-users w-4"></i> СПИСОК ГРУПИ</span>
+          <div class="flex items-center gap-2">
+            <span id="sidebar-count" class="text-[11px] bg-blue-950/60 px-1.5 py-0.5 rounded font-mono">0</span>
+            <i id="arrow-students" class="fa-solid fa-chevron-right text-[11px] transition-transform duration-200"></i>
+          </div>
+        </button>
+
+        <div id="sub-students" class="mia-submenu hidden">
+          <button onclick="navigate('students')" id="subnav-students" class="mia-submenu-item">
+            Академічний реєстр
+          </button>
+          <button onclick="navigate('students-sports')" id="subnav-students-sports" class="mia-submenu-item">
+            <i class="fa-solid fa-person-running mr-1.5 text-blue-600"></i> Спортивні секції
+          </button>
+        </div>
+      </div>
 
       <div class="px-4 pt-3 pb-1 text-[11px] font-bold text-blue-200/70 uppercase">Сервіси супроводу</div>
       
@@ -171,6 +186,69 @@
           Закрити картку
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА: Офіційне переведення до іншої спортивної секції -->
+  <div id="modal-transfer-sports" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white border border-slate-400 rounded-sm shadow-2xl w-full max-w-lg flex flex-col">
+      <div class="sute-blue text-white px-4 py-2.5 flex items-center justify-between font-bold text-xs">
+        <span><i class="fa-solid fa-arrow-right-arrow-left mr-2"></i>Протокол переведення на іншу спортивну секцію</span>
+        <button onclick="closeModal('modal-transfer-sports')" class="text-white hover:text-red-200 text-base">✕</button>
+      </div>
+
+      <form id="transfer-sports-form" onsubmit="executeSportsTransfer(event)" class="p-5 space-y-4 text-xs">
+        <input type="hidden" id="tr-student-id">
+
+        <div class="bg-slate-100 p-3 rounded border border-slate-300">
+          <div class="text-[11px] text-slate-500 font-medium">Студент:</div>
+          <div id="tr-student-name" class="font-bold text-slate-900 text-sm">...</div>
+          <div class="mt-1 flex items-center gap-2">
+            <span class="text-slate-600">Поточна секція:</span>
+            <span id="tr-current-section" class="bg-blue-100 text-blue-900 font-bold px-2 py-0.5 rounded text-[11px]">...</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Нова спортивна секція кафедри фізвиховання *</label>
+          <select id="tr-new-section" required class="w-full border border-slate-300 p-2 rounded bg-white font-semibold">
+            <option value="">-- Оберіть нову секцію --</option>
+            <option value="Волейбол">Волейбол</option>
+            <option value="Баскетбол">Баскетбол</option>
+            <option value="Футзал">Футзал</option>
+            <option value="Плавання">Плавання</option>
+            <option value="Настільний теніс">Настільний теніс</option>
+            <option value="Тренажерна зала">Тренажерна зала (Атлетизм)</option>
+            <option value="Аеробіка / Фітнес">Аеробіка / Фітнес</option>
+            <option value="Спеціальна медична група">Спеціальна медична група (СМГ)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Підстава для переведення *</label>
+          <select id="tr-reason" required class="w-full border border-slate-300 p-2 rounded bg-white">
+            <option value="Особиста заява студента">Особиста заява студента</option>
+            <option value="Медичні рекомендації / Зміна групи здоров'я">Медичні рекомендації / Зміна групи здоров'я</option>
+            <option value="Зарахування до збірної команди ДТЕУ">Зарахування до збірної команди ДТЕУ</option>
+            <option value="Розклад навчальних занять">Розклад навчальних занять</option>
+            <option value="За погодженням викладача кафедри">За погодженням викладача кафедри</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Номер наказу / службової записки / коментар (опційно)</label>
+          <input type="text" id="tr-comment" placeholder="напр. Заява від 02.09 або довідка ЛКК №41" class="w-full border border-slate-300 p-2 rounded bg-white">
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-300">
+          <button type="button" onclick="closeModal('modal-transfer-sports')" class="px-4 py-1.5 border border-slate-300 rounded text-slate-700 bg-slate-100 hover:bg-slate-200">
+            Скасувати
+          </button>
+          <button type="submit" class="px-5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white font-bold rounded shadow-sm">
+            <i class="fa-solid fa-check mr-1"></i> Затвердити переведення
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -389,12 +467,25 @@
 
     let currentTab = 'dashboard';
     let isHousingMenuOpen = false;
+    let isStudentsMenuOpen = false;
     let isRegistryEditing = false;
     let backupHousingData = null;
     let studentsList = [];
     let housingData = {};
+    let sportsData = {};
     let roomDefects = [];
     let searchQuery = '';
+
+    const AVAILABLE_SECTIONS = [
+      { id: 'Волейбол', label: 'Волейбол', icon: 'fa-volleyball', color: 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100' },
+      { id: 'Баскетбол', label: 'Баскетбол', icon: 'fa-basketball', color: 'bg-orange-50 text-orange-800 border-orange-300 hover:bg-orange-100' },
+      { id: 'Футзал', label: 'Футзал', icon: 'fa-futbol', color: 'bg-green-50 text-green-800 border-green-300 hover:bg-green-100' },
+      { id: 'Плавання', label: 'Плавання', icon: 'fa-person-swimming', color: 'bg-cyan-50 text-cyan-800 border-cyan-300 hover:bg-cyan-100' },
+      { id: 'Настільний теніс', label: 'Настільний теніс', icon: 'fa-table-tennis-paddle-ball', color: 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100' },
+      { id: 'Тренажерна зала', label: 'Тренажерна зала', icon: 'fa-dumbbell', color: 'bg-purple-50 text-purple-800 border-purple-300 hover:bg-purple-100' },
+      { id: 'Аеробіка / Фітнес', label: 'Аеробіка', icon: 'fa-child-reaching', color: 'bg-pink-50 text-pink-800 border-pink-300 hover:bg-pink-100' },
+      { id: 'Спеціальна медична група', label: 'СМГ', icon: 'fa-notes-medical', color: 'bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-100' }
+    ];
 
     function updateLiveClock() {
       const clockEl = document.getElementById('system-live-clock');
@@ -447,9 +538,8 @@
       const hash = window.location.hash.replace('#', '') || 'dashboard';
       currentTab = hash;
       
-      if (currentTab.startsWith('housing-')) {
-        isHousingMenuOpen = true;
-      }
+      if (currentTab.startsWith('housing-')) isHousingMenuOpen = true;
+      if (currentTab.startsWith('students')) isStudentsMenuOpen = true;
 
       fetchDataFromCloud();
       renderNavigationUI();
@@ -460,11 +550,8 @@
       const hash = window.location.hash.replace('#', '') || 'dashboard';
       if (hash !== currentTab) {
         currentTab = hash;
-        if (currentTab.startsWith('housing-')) {
-          isHousingMenuOpen = true;
-        } else {
-          isHousingMenuOpen = false;
-        }
+        if (currentTab.startsWith('housing-')) isHousingMenuOpen = true;
+        if (currentTab.startsWith('students')) isStudentsMenuOpen = true;
         renderNavigationUI();
         renderCurrentView();
       }
@@ -520,6 +607,25 @@
           if (localH) housingData = JSON.parse(localH);
         }
 
+        // Завантаження спортивних секцій
+        const { data: spData, error: spError } = await supabaseClient
+          .from('sports_sections')
+          .select('*');
+
+        if (!spError && spData) {
+          spData.forEach(r => {
+            sportsData[r.student_id] = {
+              section: r.section,
+              assigned_at: r.assigned_at,
+              history: r.history || []
+            };
+          });
+          localStorage.setItem('ekurator_sports_data', JSON.stringify(sportsData));
+        } else {
+          const localSp = localStorage.getItem('ekurator_sports_data');
+          if (localSp) sportsData = JSON.parse(localSp);
+        }
+
         const { data: defData, error: defError } = await supabaseClient
           .from('room_defects')
           .select('*')
@@ -540,6 +646,7 @@
       initHousingRecordsForStudents();
       updateCounters();
       if (currentTab === 'students') renderStudentsTable();
+      if (currentTab === 'students-sports') renderSportsView(document.getElementById('main-content'));
       if (currentTab.startsWith('housing-')) renderCurrentView();
     }
 
@@ -610,6 +717,26 @@
       localStorage.setItem('ekurator_housing_meta', JSON.stringify(housingData));
     }
 
+    async function syncSportsRecordToCloud(studentId) {
+      const data = sportsData[studentId];
+      if (!data) return;
+
+      const recordToSave = {
+        student_id: studentId,
+        section: data.section,
+        assigned_at: data.assigned_at,
+        history: data.history || [],
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        await supabaseClient.from('sports_sections').upsert(recordToSave);
+      } catch (err) {
+        console.warn("Помилка синхронізації sports_sections із Supabase:", err);
+      }
+      localStorage.setItem('ekurator_sports_data', JSON.stringify(sportsData));
+    }
+
     function updateCounters() {
       const countEl = document.getElementById('sidebar-count');
       if (countEl) countEl.innerText = studentsList.length;
@@ -618,8 +745,10 @@
     function toggleMenu(menuKey) {
       if (menuKey === 'housing') {
         isHousingMenuOpen = !isHousingMenuOpen;
-        renderNavigationUI();
+      } else if (menuKey === 'students') {
+        isStudentsMenuOpen = !isStudentsMenuOpen;
       }
+      renderNavigationUI();
     }
 
     function navigate(tabKey, updateHash = true) {
@@ -633,8 +762,9 @@
       
       if (currentTab.startsWith('housing-')) {
         isHousingMenuOpen = true;
-      } else {
-        isHousingMenuOpen = false;
+      }
+      if (currentTab.startsWith('students')) {
+        isStudentsMenuOpen = true;
       }
       
       renderNavigationUI();
@@ -730,30 +860,49 @@
     }
 
     function renderNavigationUI() {
-      const subMenu = document.getElementById('sub-housing');
-      const arrow = document.getElementById('arrow-housing');
-      const btnGroup = document.getElementById('btn-group-housing');
+      const subHousing = document.getElementById('sub-housing');
+      const arrowHousing = document.getElementById('arrow-housing');
+      const btnGroupHousing = document.getElementById('btn-group-housing');
+
+      const subStudents = document.getElementById('sub-students');
+      const arrowStudents = document.getElementById('arrow-students');
+      const btnGroupStudents = document.getElementById('btn-group-students');
 
       renderHousingSubmenu();
 
+      // Меню Поселення
       if (isHousingMenuOpen) {
-        subMenu.classList.remove('hidden');
-        arrow.className = "fa-solid fa-chevron-down text-[11px] transition-transform duration-200";
-        btnGroup.className = "w-full flex items-center justify-between px-4 py-2 text-white bg-blue-800/80 font-bold transition";
+        subHousing.classList.remove('hidden');
+        arrowHousing.className = "fa-solid fa-chevron-down text-[11px] transition-transform duration-200";
+        btnGroupHousing.className = "w-full flex items-center justify-between px-4 py-2 text-white bg-blue-800/80 font-bold transition";
       } else {
-        subMenu.classList.add('hidden');
-        arrow.className = "fa-solid fa-chevron-right text-[11px] transition-transform duration-200";
-        btnGroup.className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition";
+        subHousing.classList.add('hidden');
+        arrowHousing.className = "fa-solid fa-chevron-right text-[11px] transition-transform duration-200";
+        btnGroupHousing.className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition";
+      }
+
+      // Меню Список групи
+      if (isStudentsMenuOpen) {
+        subStudents.classList.remove('hidden');
+        arrowStudents.className = "fa-solid fa-chevron-down text-[11px] transition-transform duration-200";
+        btnGroupStudents.className = "w-full flex items-center justify-between px-4 py-2 text-white bg-blue-800/80 font-bold transition";
+      } else {
+        subStudents.classList.add('hidden');
+        arrowStudents.className = "fa-solid fa-chevron-right text-[11px] transition-transform duration-200";
+        btnGroupStudents.className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition";
       }
 
       document.getElementById('nav-dashboard').className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover";
-      document.getElementById('nav-students').className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover";
       document.querySelectorAll('.mia-submenu-item').forEach(el => el.classList.remove('active'));
 
       if (currentTab === 'dashboard') {
         document.getElementById('nav-dashboard').className = "w-full flex items-center justify-between px-4 py-2.5 bg-blue-800 font-bold border-l-4 border-amber-400 text-white";
       } else if (currentTab === 'students') {
-        document.getElementById('nav-students').className = "w-full flex items-center justify-between px-4 py-2.5 bg-blue-800 font-bold border-l-4 border-amber-400 text-white";
+        const activeSub = document.getElementById('subnav-students');
+        if (activeSub) activeSub.classList.add('active');
+      } else if (currentTab === 'students-sports') {
+        const activeSub = document.getElementById('subnav-students-sports');
+        if (activeSub) activeSub.classList.add('active');
       } else if (currentTab.startsWith('housing-')) {
         const activeSub = document.getElementById(`subnav-${currentTab}`);
         if (activeSub) activeSub.classList.add('active');
@@ -775,6 +924,8 @@
         `;
       } else if (currentTab === 'students') {
         renderStudentsView(main);
+      } else if (currentTab === 'students-sports') {
+        renderSportsView(main);
       } else if (currentTab === 'housing-registry') {
         renderHousingRegistry(main);
       } else if (currentTab === 'housing-list') {
@@ -845,7 +996,8 @@
 
     function handleSearch(val) {
       searchQuery = val.toLowerCase().trim();
-      renderStudentsTable();
+      if (currentTab === 'students') renderStudentsTable();
+      if (currentTab === 'students-sports') renderSportsTable();
     }
 
     function renderStudentsTable() {
@@ -867,7 +1019,7 @@
           <tr>
             <td colspan="8" class="p-8 text-center text-slate-400">
               <i class="fa-solid fa-folder-open text-2xl mb-1 block"></i>
-              Студентів у групі не знайдено. Додайте записи через базу даних Supabase.
+              Студентів у групі не знайдено.
             </td>
           </tr>
         `;
@@ -901,6 +1053,209 @@
       `).join('');
     }
 
+    // ================= СПОРТИВНІ СЕКЦІЇ =================
+    function renderSportsView(main) {
+      const assignedCount = studentsList.filter(s => sportsData[s.id]?.section).length;
+      
+      main.innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-xs">
+            <div>
+              <h1 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-person-running text-[#2b569a]"></i>
+                Розподіл студентів за спортивними секціями
+              </h1>
+              <div class="text-xs text-slate-500 mt-0.5">
+                Кафедра фізичної культури та спортивного вдосконалення ДТЕУ (2026/2027 н.р.)
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold bg-blue-50 text-blue-900 border border-blue-200 px-3 py-1.5 rounded">
+                Зараховано: <b>${assignedCount}</b> / ${studentsList.length}
+              </span>
+            </div>
+          </div>
+
+          <div class="bg-white border border-slate-300 p-3 rounded-sm flex items-center gap-3 text-xs">
+            <div class="relative flex-1">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400"></i>
+              <input type="text" oninput="handleSearch(this.value)" placeholder="Пошук студента для запису на секцію..." class="w-full border border-slate-300 pl-8 pr-3 py-1.5 rounded-sm focus:outline-blue-600">
+            </div>
+          </div>
+
+          <div class="bg-white border border-slate-300 rounded overflow-x-auto shadow-sm">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="table-header border-b border-slate-300 text-slate-700 font-bold">
+                  <th class="p-2.5 border-r border-slate-300 w-10 text-center">№</th>
+                  <th class="p-2.5 border-r border-slate-300 w-64">ПІБ студента</th>
+                  <th class="p-2.5 border-r border-slate-300">Поточна секція / Швидкий запис</th>
+                  <th class="p-2.5 border-r border-slate-300 w-44">Дата зарахування / Історія</th>
+                  <th class="p-2.5 text-center w-36">Переведення</th>
+                </tr>
+              </thead>
+              <tbody id="sports-table-body" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      renderSportsTable();
+    }
+
+    function renderSportsTable() {
+      const tbody = document.getElementById('sports-table-body');
+      if (!tbody) return;
+
+      const filtered = studentsList.filter(s => 
+        (s.full_name || '').toLowerCase().includes(searchQuery) ||
+        (s.student_card_id || '').toLowerCase().includes(searchQuery)
+      );
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="p-8 text-center text-slate-400">Студентів не знайдено.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((s, idx) => {
+        const sp = sportsData[s.id] || {};
+        const currentSection = sp.section;
+        const hasSection = Boolean(currentSection);
+
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-2.5 border-r border-slate-300 text-center font-mono text-slate-500">${idx + 1}</td>
+            <td class="p-2.5 border-r border-slate-300 font-bold text-slate-900">
+              ${s.full_name}
+              <div class="text-[10px] text-slate-400 font-normal font-mono">${s.student_card_id}</div>
+            </td>
+            <td class="p-2.5 border-r border-slate-300">
+              ${hasSection ? `
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-900 border border-blue-300 shadow-2xs">
+                    <i class="fa-solid fa-circle-check text-blue-600"></i> ${currentSection}
+                  </span>
+                  <button onclick="removeStudentFromSection('${s.id}')" title="Скасувати запис" class="text-slate-400 hover:text-rose-600 text-xs px-1">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              ` : `
+                <div class="flex flex-wrap gap-1.5 py-1">
+                  ${AVAILABLE_SECTIONS.map(sec => `
+                    <button onclick="assignSportsSection('${s.id}', '${sec.id}')" class="px-2 py-0.5 rounded border text-[11px] font-medium transition cursor-pointer flex items-center gap-1 ${sec.color}">
+                      <i class="fa-solid ${sec.icon} text-[10px]"></i> ${sec.label}
+                    </button>
+                  `).join('')}
+                </div>
+              `}
+            </td>
+            <td class="p-2.5 border-r border-slate-300 text-[11px] text-slate-600">
+              ${hasSection ? `
+                <div class="font-mono">${sp.assigned_at || '—'}</div>
+                ${(sp.history && sp.history.length > 0) ? `
+                  <div class="text-[10px] text-amber-700 mt-0.5 font-medium" title="${sp.history.map(h => `${h.date}: з ${h.from} на ${h.to} (${h.reason})`).join('\n')}">
+                    <i class="fa-solid fa-clock-rotate-left mr-0.5"></i> Переведень: ${sp.history.length}
+                  </div>
+                ` : ''}
+              ` : '<span class="text-slate-400 italic">Не розподілено</span>'}
+            </td>
+            <td class="p-2.5 text-center">
+              ${hasSection ? `
+                <button onclick="openTransferModal('${s.id}')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 rounded font-semibold text-[11px] flex items-center gap-1.5 mx-auto shadow-2xs">
+                  <i class="fa-solid fa-arrow-right-arrow-left text-amber-700"></i> Перевести
+                </button>
+              ` : `
+                <span class="text-slate-300 text-xs">—</span>
+              `}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function assignSportsSection(studentId, sectionName) {
+      const now = new Date();
+      const dateStr = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`;
+
+      sportsData[studentId] = {
+        section: sectionName,
+        assigned_at: dateStr,
+        history: sportsData[studentId]?.history || []
+      };
+
+      await syncSportsRecordToCloud(studentId);
+      renderSportsView(document.getElementById('main-content'));
+    }
+
+    async function removeStudentFromSection(studentId) {
+      if (confirm("Скасувати запис студента на спортивну секцію?")) {
+        delete sportsData[studentId];
+        try {
+          await supabaseClient.from('sports_sections').delete().eq('student_id', studentId);
+        } catch (e) {
+          console.warn("Помилка видалення секції з БД:", e);
+        }
+        localStorage.setItem('ekurator_sports_data', JSON.stringify(sportsData));
+        renderSportsView(document.getElementById('main-content'));
+      }
+    }
+
+    function openTransferModal(studentId) {
+      const student = studentsList.find(s => String(s.id) === String(studentId));
+      if (!student) return;
+
+      const sp = sportsData[studentId] || {};
+      document.getElementById('tr-student-id').value = studentId;
+      document.getElementById('tr-student-name').innerText = student.full_name;
+      document.getElementById('tr-current-section').innerText = sp.section || 'Не визначено';
+      document.getElementById('transfer-sports-form').reset();
+      document.getElementById('tr-student-id').value = studentId;
+
+      openModal('modal-transfer-sports');
+    }
+
+    async function executeSportsTransfer(e) {
+      e.preventDefault();
+      const studentId = document.getElementById('tr-student-id').value;
+      const newSection = document.getElementById('tr-new-section').value;
+      const reason = document.getElementById('tr-reason').value;
+      const comment = document.getElementById('tr-comment').value.trim();
+
+      const current = sportsData[studentId];
+      if (!current) return;
+
+      if (current.section === newSection) {
+        alert("Оберіть іншу секцію, що відрізняється від поточної!");
+        return;
+      }
+
+      const now = new Date();
+      const dateStr = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`;
+
+      const historyEntry = {
+        date: dateStr,
+        from: current.section,
+        to: newSection,
+        reason: reason,
+        comment: comment || null
+      };
+
+      current.history = current.history || [];
+      current.history.push(historyEntry);
+      current.section = newSection;
+      current.assigned_at = dateStr;
+
+      await syncSportsRecordToCloud(studentId);
+      closeModal('modal-transfer-sports');
+      alert(`Студента успішно переведено до секції «${newSection}»!`);
+      renderSportsView(document.getElementById('main-content'));
+    }
+
+    // ================= ПОСЕЛЕННЯ =================
     function renderHousingRegistry(main) {
       main.innerHTML = `
         <div class="space-y-4">
