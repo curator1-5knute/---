@@ -4,12 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Державний торговельно-економічний університет — ІС «єКуратор»</title>
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Tailwind CSS, FontAwesome & Supabase JS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    body, input, select, textarea, button, table, th, td, h1, h2, h3, h4, h5, h6, span, p, div, a {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .fa, .fas, .far, .fal, .fad, .fab, .fa-solid, .fa-regular, .fa-brands {
+      font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+    }
+    body {
+      background-color: #f0f2f5;
+    }
     .sute-blue { background-color: #2b569a; }
     .sute-blue-dark { background-color: #1f4277; }
     .sute-nav-hover:hover { background-color: #3b6ab5; }
@@ -48,11 +60,11 @@
     @media print {
       body * { visibility: hidden; }
       #printable-area, #printable-area * { visibility: visible; }
-      #printable-area { position: absolute; left: 0; top: 0; width: 100%; }
+      #printable-area { position: absolute; left: 0; top: 0; width: 100%; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important; }
     }
   </style>
 </head>
-<body class="bg-[#f0f2f5] text-slate-800 flex h-screen overflow-hidden text-[14px]">
+<body class="text-slate-800 flex h-screen overflow-hidden text-[14px]">
 
   <!-- Лівий сайдбар -->
   <aside class="w-64 sute-blue text-white flex flex-col h-full shrink-0 select-none border-r border-slate-300">
@@ -72,7 +84,7 @@
         <button id="btn-group-students" onclick="toggleMenu('students')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition">
           <span class="flex items-center gap-2.5 font-bold"><i class="fa-solid fa-users w-4"></i> СПИСОК ГРУПИ</span>
           <div class="flex items-center gap-2">
-            <span id="sidebar-count" class="text-[11px] bg-blue-950/60 px-1.5 py-0.5 rounded font-mono">0</span>
+            <span id="sidebar-count" class="text-[11px] bg-blue-950/60 px-1.5 py-0.5 rounded font-semibold">0</span>
             <i id="arrow-students" class="fa-solid fa-chevron-right text-[11px] transition-transform duration-200"></i>
           </div>
         </button>
@@ -96,9 +108,7 @@
           <i id="arrow-housing" class="fa-solid fa-chevron-right text-[11px] transition-transform duration-200"></i>
         </button>
 
-        <div id="sub-housing" class="mia-submenu hidden">
-          <!-- Генерується функцією renderHousingSubmenu() -->
-        </div>
+        <div id="sub-housing" class="mia-submenu hidden"></div>
       </div>
 
       <!-- Інші модулі -->
@@ -148,18 +158,18 @@
 
     <!-- Шапка (Header) -->
     <header class="h-16 bg-white border-b border-slate-300 px-6 flex items-center justify-between shrink-0">
-      <div class="text-xl font-medium text-slate-800 tracking-tight">
+      <div class="text-xl font-semibold text-slate-800 tracking-tight">
         Державний торговельно-економічний університет
       </div>
       
       <div class="flex items-center gap-6 text-xs text-slate-600">
-        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded text-slate-700 font-mono shadow-xs">
+        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded text-slate-700 font-medium shadow-sm">
           <i class="fa-regular fa-clock text-[#2b569a]"></i>
-          <span id="system-live-clock" class="font-bold">--.--.---- --:--:--</span>
+          <span id="system-live-clock" class="font-semibold">--.--.---- --:--:--</span>
         </div>
 
         <span class="text-slate-300">|</span>
-        <a href="#" class="sute-link flex items-center gap-1.5"><i class="fa-regular fa-envelope"></i> Зворотній зв'язок</a>
+        <a href="#" class="sute-link flex items-center gap-1.5"><i class="fa-regular fa-envelope"></i> Зворотний зв'язок</a>
         <span class="text-slate-300">|</span>
         <span class="text-blue-700 font-semibold cursor-pointer">Українська</span>
         <span class="text-slate-300">|</span>
@@ -182,7 +192,7 @@
       </div>
       <div id="card-content" class="p-6 overflow-y-auto flex-1 text-xs"></div>
       <div class="p-3 bg-slate-100 border-t border-slate-300 flex justify-end">
-        <button onclick="closeModal('modal-card')" class="px-4 py-1 border border-slate-400 bg-white hover:bg-slate-50 text-slate-800 rounded-sm text-xs">
+        <button onclick="closeModal('modal-card')" class="px-4 py-1 border border-slate-400 bg-white hover:bg-slate-50 text-slate-800 rounded-sm text-xs font-medium">
           Закрити картку
         </button>
       </div>
@@ -323,13 +333,13 @@
             </div>
             <div>
               <label class="block font-semibold mb-1 text-slate-700">Рекомендована кімната / блок</label>
-              <input type="text" id="h-room" placeholder="напр. 312/1" class="w-full border border-slate-300 p-2 rounded-sm bg-white font-mono">
+              <input type="text" id="h-room" placeholder="напр. 312/1" class="w-full border border-slate-300 p-2 rounded-sm bg-white font-semibold">
             </div>
           </div>
         </div>
 
         <div class="flex justify-end gap-2 pt-3 border-t border-slate-300">
-          <button type="button" onclick="closeModal('modal-housing-edit')" class="px-4 py-1.5 border border-slate-300 rounded-sm text-slate-700 bg-slate-100 hover:bg-slate-200">
+          <button type="button" onclick="closeModal('modal-housing-edit')" class="px-4 py-1.5 border border-slate-300 rounded-sm text-slate-700 bg-slate-100 hover:bg-slate-200 font-medium">
             Скасувати
           </button>
           <button type="submit" class="px-5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white font-bold rounded-sm shadow-sm">
@@ -398,7 +408,7 @@
         </div>
 
         <div class="flex justify-end gap-2 pt-3 border-t border-slate-300">
-          <button type="button" onclick="closeModal('modal-checklist-edit')" class="px-4 py-1.5 border border-slate-300 rounded text-slate-700 bg-slate-100">
+          <button type="button" onclick="closeModal('modal-checklist-edit')" class="px-4 py-1.5 border border-slate-300 rounded text-slate-700 bg-slate-100 font-medium">
             Закрити
           </button>
           <button onclick="saveStudentChecklist()" class="px-5 py-1.5 bg-[#2b569a] text-white font-bold rounded">
@@ -420,7 +430,7 @@
       <form id="step5-defect-form" onsubmit="saveDefectFromStep5(event, false)" class="p-4 space-y-3 text-xs">
         <div>
           <label class="block font-semibold mb-1 text-slate-700">Номер кімнати / блоку *</label>
-          <input type="text" id="s5-def-room" required placeholder="напр. 312/1" class="w-full border border-slate-300 p-2 rounded bg-white font-mono font-bold">
+          <input type="text" id="s5-def-room" required placeholder="напр. 312/1" class="w-full border border-slate-300 p-2 rounded bg-white font-bold">
         </div>
         <div>
           <label class="block font-semibold mb-1 text-slate-700">Тип дефекту *</label>
@@ -442,7 +452,7 @@
         </div>
 
         <div class="flex justify-between items-center pt-2 border-t border-slate-200">
-          <button type="button" onclick="closeModal('modal-defect-step5')" class="px-3 py-1.5 border border-slate-300 rounded text-slate-600 bg-slate-100">
+          <button type="button" onclick="closeModal('modal-defect-step5')" class="px-3 py-1.5 border border-slate-300 rounded text-slate-600 bg-slate-100 font-medium">
             Скасувати
           </button>
           <div class="flex gap-2">
@@ -458,7 +468,7 @@
     </div>
   </div>
 
-  <div id="printable-area" class="hidden p-8 text-black text-xs font-serif"></div>
+  <div id="printable-area" class="hidden p-8 text-black text-xs"></div>
 
   <script>
     const SUPABASE_URL = "https://uwaxgxosskcelneqoudn.supabase.co";
@@ -538,13 +548,8 @@
       const hash = window.location.hash.replace('#', '') || 'dashboard';
       currentTab = hash;
       
-      if (currentTab.startsWith('housing-')) {
-        isHousingMenuOpen = true;
-        isStudentsMenuOpen = false;
-      } else if (currentTab.startsWith('students')) {
-        isStudentsMenuOpen = true;
-        isHousingMenuOpen = false;
-      }
+      if (currentTab.startsWith('housing-')) isHousingMenuOpen = true;
+      if (currentTab.startsWith('students')) isStudentsMenuOpen = true;
 
       fetchDataFromCloud();
       renderNavigationUI();
@@ -571,6 +576,9 @@
     });
 
     async function fetchDataFromCloud() {
+      const loader = document.getElementById('page-loader');
+      if (loader) loader.classList.remove('hidden');
+
       try {
         const { data: stData, error: stError } = await supabaseClient
           .from('students')
@@ -653,6 +661,8 @@
 
       } catch (err) {
         console.warn("Працюємо в автономному режимі:", err);
+      } finally {
+        if (loader) loader.classList.add('hidden');
       }
 
       initHousingRecordsForStudents();
@@ -722,7 +732,8 @@
       };
 
       try {
-        await supabaseClient.from('housing_records').upsert(recordToSave);
+        const { error } = await supabaseClient.from('housing_records').upsert(recordToSave);
+        if (error) throw error;
       } catch (err) {
         console.warn("Помилка синхронізації housing_records із Supabase:", err);
       }
@@ -742,7 +753,8 @@
       };
 
       try {
-        await supabaseClient.from('sports_sections').upsert(recordToSave);
+        const { error } = await supabaseClient.from('sports_sections').upsert(recordToSave);
+        if (error) throw error;
       } catch (err) {
         console.warn("Помилка синхронізації sports_sections із Supabase:", err);
       }
@@ -754,7 +766,6 @@
       if (countEl) countEl.innerText = studentsList.length;
     }
 
-    // Взаємовиключне відкриття/закриття меню (Аккордеон)
     function toggleMenu(menuKey) {
       if (menuKey === 'housing') {
         isHousingMenuOpen = !isHousingMenuOpen;
@@ -791,11 +802,13 @@
       setTimeout(() => {
         if (loader) loader.classList.add('hidden');
         renderCurrentView();
-      }, 750);
+      }, 300);
     }
 
     function renderHousingSubmenu() {
       const subMenu = document.getElementById('sub-housing');
+      if (!subMenu) return;
+      
       const isAug26 = isAugust26Passed();
       const isSep1 = isSeptember1Passed();
 
@@ -817,7 +830,7 @@
         ` : `
           <div title="Відкриється 26 серпня 2026 року о 10:00 під час очної перевірки документів" class="w-full flex items-center justify-between px-3.5 py-1.5 text-slate-400 bg-slate-100/70 cursor-not-allowed select-none text-[12px] font-normal border-y border-slate-100">
             <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-[10px] text-slate-400"></i> Чек-лист документів</span>
-            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.2 rounded font-mono">26.08</span>
+            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded font-semibold">26.08</span>
           </div>
         `}
 
@@ -828,7 +841,7 @@
         ` : `
           <div title="Відкриється 26 серпня 2026 року о 10:00 під час проведення інструктажів" class="w-full flex items-center justify-between px-3.5 py-1.5 text-slate-400 bg-slate-100/70 cursor-not-allowed select-none text-[12px] font-normal border-b border-slate-100">
             <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-[10px] text-slate-400"></i> Журнал інструктажів</span>
-            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.2 rounded font-mono">26.08</span>
+            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded font-semibold">26.08</span>
           </div>
         `}
         
@@ -839,7 +852,7 @@
         ` : `
           <div title="Відкриється 26 серпня 2026 року о 10:00 згідно з регламентом ДТЕУ" class="w-full flex items-center justify-between px-3.5 py-1.5 text-slate-400 bg-slate-100/70 cursor-not-allowed select-none text-[12px] font-normal border-b border-slate-100">
             <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-[10px] text-slate-400"></i> Очний маршрут поселення</span>
-            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.2 rounded font-mono">26.08</span>
+            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded font-semibold">26.08</span>
           </div>
         `}
 
@@ -850,7 +863,7 @@
         ` : `
           <div title="Відкриється 26 серпня 2026 року о 10:00 під час очного огляду кімнат" class="w-full flex items-center justify-between px-3.5 py-1.5 text-slate-400 bg-slate-100/70 cursor-not-allowed select-none text-[12px] font-normal border-b border-slate-100">
             <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-[10px] text-slate-400"></i> Реєстр дефектів кімнат</span>
-            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.2 rounded font-mono">26.08</span>
+            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded font-semibold">26.08</span>
           </div>
         `}
 
@@ -861,7 +874,7 @@
         ` : `
           <div title="Відкриється 1 вересня 2026 року під час проведення перших зборів" class="w-full flex items-center justify-between px-3.5 py-1.5 text-slate-400 bg-slate-100/70 cursor-not-allowed select-none text-[12px] font-normal border-b border-slate-100">
             <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-[10px] text-slate-400"></i> Вручення довідників</span>
-            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.2 rounded font-mono">01.09</span>
+            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded font-semibold">01.09</span>
           </div>
         `}
 
@@ -872,7 +885,7 @@
         ` : `
           <div title="Формування фінального звіту відкриється 1 вересня після завершення заселення" class="w-full flex items-center justify-between px-3.5 py-1.5 text-slate-400 bg-slate-100/70 cursor-not-allowed select-none text-[12px] font-normal">
             <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-[10px] text-slate-400"></i> Фінальний звіт про поселення</span>
-            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.2 rounded font-mono">01.09</span>
+            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded font-semibold">01.09</span>
           </div>
         `}
       `;
@@ -938,7 +951,7 @@
               <i class="fa-solid fa-circle-check text-green-600"></i>
               <span>Привіт, Ісіков Ярослав Андрійович.</span>
             </div>
-            <button class="text-green-800 hover:opacity-75 font-bold">×</button>
+            <button class="text-green-800 hover:opacity-75 font-bold" onclick="this.parentElement.remove()">×</button>
           </div>
         `;
       } else if (currentTab === 'students') {
@@ -1047,13 +1060,13 @@
 
       tbody.innerHTML = filtered.map((s, idx) => `
         <tr class="hover:bg-blue-50/40 transition">
-          <td class="p-2.5 border-r border-slate-300 text-center font-mono text-slate-500">${idx + 1}</td>
+          <td class="p-2.5 border-r border-slate-300 text-center text-slate-500 font-semibold">${idx + 1}</td>
           <td class="p-2.5 border-r border-slate-300 font-bold text-slate-800">
             <a href="javascript:void(0)" onclick="viewStudentCard('${s.id}')" class="sute-link">${s.full_name}</a>
           </td>
-          <td class="p-2.5 border-r border-slate-300 font-mono text-blue-900">${s.student_card_id}</td>
-          <td class="p-2.5 border-r border-slate-300 font-mono text-emerald-800 font-semibold">${s.record_book_number}</td>
-          <td class="p-2.5 border-r border-slate-300 font-mono">${s.rnokpp}</td>
+          <td class="p-2.5 border-r border-slate-300 text-blue-900 font-medium">${s.student_card_id}</td>
+          <td class="p-2.5 border-r border-slate-300 text-emerald-800 font-semibold">${s.record_book_number}</td>
+          <td class="p-2.5 border-r border-slate-300 text-slate-700">${s.rnokpp}</td>
           <td class="p-2.5 border-r border-slate-300">
             <span class="px-2 py-0.5 rounded text-[11px] font-semibold ${s.payment_type === 'Бюджет' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
               ${s.payment_type}
@@ -1064,7 +1077,7 @@
             <div><i class="fa-regular fa-envelope text-[10px] text-slate-400 mr-1"></i>${s.email}</div>
           </td>
           <td class="p-2.5 text-center">
-            <button onclick="viewStudentCard('${s.id}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-slate-700 text-[11px]">
+            <button onclick="viewStudentCard('${s.id}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-slate-700 text-[11px] font-medium">
               <i class="fa-regular fa-id-card"></i> Картка
             </button>
           </td>
@@ -1078,7 +1091,7 @@
       
       main.innerHTML = `
         <div class="space-y-4">
-          <div class="bg-white border border-slate-300 p-4 rounded-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-xs">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-sm">
             <div>
               <h1 class="text-base font-bold text-slate-800 flex items-center gap-2">
                 <i class="fa-solid fa-person-running text-[#2b569a]"></i>
@@ -1147,15 +1160,15 @@
 
         return `
           <tr class="hover:bg-slate-50 transition">
-            <td class="p-2.5 border-r border-slate-300 text-center font-mono text-slate-500">${idx + 1}</td>
+            <td class="p-2.5 border-r border-slate-300 text-center text-slate-500 font-semibold">${idx + 1}</td>
             <td class="p-2.5 border-r border-slate-300 font-bold text-slate-900">
               ${s.full_name}
-              <div class="text-[10px] text-slate-400 font-normal font-mono">${s.student_card_id}</div>
+              <div class="text-[10px] text-slate-400 font-normal">${s.student_card_id}</div>
             </td>
             <td class="p-2.5 border-r border-slate-300">
               ${hasSection ? `
                 <div class="flex items-center gap-2">
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-900 border border-blue-300 shadow-2xs">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-900 border border-blue-300 shadow-sm">
                     <i class="fa-solid fa-circle-check text-blue-600"></i> ${currentSection}
                   </span>
                   <button onclick="removeStudentFromSection('${s.id}')" title="Скасувати запис" class="text-slate-400 hover:text-rose-600 text-xs px-1">
@@ -1174,7 +1187,7 @@
             </td>
             <td class="p-2.5 border-r border-slate-300 text-[11px] text-slate-600">
               ${hasSection ? `
-                <div class="font-mono">${sp.assigned_at || '—'}</div>
+                <div class="font-medium text-slate-700">${sp.assigned_at || '—'}</div>
                 ${(sp.history && sp.history.length > 0) ? `
                   <div class="text-[10px] text-amber-700 mt-0.5 font-medium" title="${sp.history.map(h => `${h.date}: з ${h.from} на ${h.to} (${h.reason})`).join('\n')}">
                     <i class="fa-solid fa-clock-rotate-left mr-0.5"></i> Переведень: ${sp.history.length}
@@ -1184,7 +1197,7 @@
             </td>
             <td class="p-2.5 text-center">
               ${hasSection ? `
-                <button onclick="openTransferModal('${s.id}')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 rounded font-semibold text-[11px] flex items-center gap-1.5 mx-auto shadow-2xs">
+                <button onclick="openTransferModal('${s.id}')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 rounded font-semibold text-[11px] flex items-center gap-1.5 mx-auto shadow-sm">
                   <i class="fa-solid fa-arrow-right-arrow-left text-amber-700"></i> Перевести
                 </button>
               ` : `
@@ -1214,7 +1227,8 @@
       if (confirm("Скасувати запис студента на спортивну секцію?")) {
         delete sportsData[studentId];
         try {
-          await supabaseClient.from('sports_sections').delete().eq('student_id', studentId);
+          const { error } = await supabaseClient.from('sports_sections').delete().eq('student_id', studentId);
+          if (error) throw error;
         } catch (e) {
           console.warn("Помилка видалення секції з БД:", e);
         }
@@ -1278,7 +1292,7 @@
     function renderHousingRegistry(main) {
       main.innerHTML = `
         <div class="space-y-4">
-          <div class="bg-white border border-slate-300 p-4 rounded-sm flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
             <div>
               <h1 class="font-bold text-slate-800 text-sm flex items-center gap-2">
                 Реєстр та облік потреби в поселенні
@@ -1291,14 +1305,14 @@
 
             <div class="flex items-center gap-2 shrink-0">
               ${!isRegistryEditing ? `
-                <button onclick="enableRegistryEditing()" class="px-3.5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white rounded text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
+                <button onclick="enableRegistryEditing()" class="px-3.5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white rounded text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
                   <i class="fa-solid fa-pen-to-square"></i> Редагувати реєстр
                 </button>
               ` : `
                 <button onclick="cancelRegistryEditing()" class="px-3.5 py-1.5 border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 rounded text-xs font-semibold flex items-center gap-1">
                   <i class="fa-solid fa-xmark"></i> Скасувати
                 </button>
-                <button onclick="confirmRegistryEditing()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
+                <button onclick="confirmRegistryEditing()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
                   <i class="fa-solid fa-check"></i> Підтвердити та зберегти
                 </button>
               `}
@@ -1334,7 +1348,7 @@
 
                   return `
                     <tr class="${isRegistryEditing ? 'hover:bg-amber-50/60 cursor-pointer' : 'hover:bg-slate-50'} transition" onclick="${isRegistryEditing ? `openHousingEditModal('${s.id}')` : ''}">
-                      <td class="p-2.5 border-r border-slate-300 text-center font-mono text-slate-500">${idx + 1}</td>
+                      <td class="p-2.5 border-r border-slate-300 text-center text-slate-500 font-semibold">${idx + 1}</td>
                       <td class="p-2.5 border-r border-slate-300 font-bold ${isRegistryEditing ? 'text-blue-900 sute-link' : 'text-slate-900'}">
                         ${s.full_name}
                       </td>
@@ -1372,7 +1386,7 @@
       setTimeout(() => {
         if (loader) loader.classList.add('hidden');
         renderHousingRegistry(document.getElementById('main-content'));
-      }, 650);
+      }, 300);
     }
 
     function cancelRegistryEditing() {
@@ -1387,7 +1401,7 @@
       setTimeout(() => {
         if (loader) loader.classList.add('hidden');
         renderHousingRegistry(document.getElementById('main-content'));
-      }, 550);
+      }, 300);
     }
 
     async function confirmRegistryEditing() {
@@ -1404,7 +1418,7 @@
       setTimeout(() => {
         if (loader) loader.classList.add('hidden');
         renderHousingRegistry(document.getElementById('main-content'));
-      }, 750);
+      }, 300);
     }
 
     function openHousingEditModal(studentId) {
@@ -1491,12 +1505,12 @@
                   const h = housingData[s.id];
                   return `
                     <tr class="hover:bg-slate-50">
-                      <td class="p-2.5 text-center text-slate-500">${idx + 1}</td>
+                      <td class="p-2.5 text-center text-slate-500 font-semibold">${idx + 1}</td>
                       <td class="p-2.5 font-bold text-slate-900">${s.full_name}</td>
                       <td class="p-2.5">${s.payment_type}</td>
                       <td class="p-2.5">${h.benefit}</td>
                       <td class="p-2.5 font-semibold text-blue-900">Гуртожиток №3</td>
-                      <td class="p-2.5 font-mono font-bold">${h.room}</td>
+                      <td class="p-2.5 font-bold">${h.room}</td>
                     </tr>
                   `;
                 }).join('')}
@@ -1521,12 +1535,12 @@
         <table style="width: 100%; border-collapse: collapse; font-size: 11px;" border="1">
           <thead>
             <tr style="background-color: #f2f2f2;">
-              <th style="padding: 4px;">№</th>
-              <th style="padding: 4px;">ПІБ Студента</th>
-              <th style="padding: 4px;">Фінансування</th>
-              <th style="padding: 4px;">Пільгова категорія</th>
-              <th style="padding: 4px;">Гуртожиток</th>
-              <th style="padding: 4px;">Кімната</th>
+              <th style="padding: 6px;">№</th>
+              <th style="padding: 6px;">ПІБ Студента</th>
+              <th style="padding: 6px;">Фінансування</th>
+              <th style="padding: 6px;">Пільгова категорія</th>
+              <th style="padding: 6px;">Гуртожиток</th>
+              <th style="padding: 6px;">Кімната</th>
             </tr>
           </thead>
           <tbody>
@@ -1534,12 +1548,12 @@
               const h = housingData[s.id];
               return `
                 <tr>
-                  <td style="padding: 4px; text-align: center;">${idx + 1}</td>
-                  <td style="padding: 4px; font-weight: bold;">${s.full_name}</td>
-                  <td style="padding: 4px;">${s.payment_type}</td>
-                  <td style="padding: 4px;">${h.benefit}</td>
-                  <td style="padding: 4px;">Гуртожиток №3</td>
-                  <td style="padding: 4px; font-weight: bold;">${h.room}</td>
+                  <td style="padding: 6px; text-align: center;">${idx + 1}</td>
+                  <td style="padding: 6px; font-weight: bold;">${s.full_name}</td>
+                  <td style="padding: 6px;">${s.payment_type}</td>
+                  <td style="padding: 6px;">${h.benefit}</td>
+                  <td style="padding: 6px;">Гуртожиток №3</td>
+                  <td style="padding: 6px; font-weight: bold;">${h.room}</td>
                 </tr>
               `;
             }).join('')}
@@ -1588,10 +1602,10 @@
                   <tr><td colspan="5" class="p-6 text-center text-slate-400">Немає студентів, які потребують поселення.</td></tr>
                 ` : needStudents.map((s, idx) => `
                   <tr class="hover:bg-slate-50">
-                    <td class="p-2.5 text-center text-slate-500">${idx + 1}</td>
+                    <td class="p-2.5 text-center text-slate-500 font-semibold">${idx + 1}</td>
                     <td class="p-2.5 font-bold text-slate-900">${s.full_name}</td>
                     <td class="p-2.5 text-blue-900 font-semibold">Гуртожиток №3</td>
-                    <td class="p-2.5 font-mono font-bold text-slate-800">
+                    <td class="p-2.5 font-bold text-slate-800">
                       <i class="fa-regular fa-clock mr-1 text-slate-400"></i> 26 серпня (10:00 - 11:00)
                     </td>
                     <td class="p-2.5 text-center">
@@ -1639,14 +1653,14 @@
                   const h = housingData[s.id];
                   return `
                     <tr class="hover:bg-blue-50/40 transition cursor-pointer" onclick="openChecklistModal('${s.id}')">
-                      <td class="p-2.5 text-center text-slate-500">${idx + 1}</td>
+                      <td class="p-2.5 text-center text-slate-500 font-semibold">${idx + 1}</td>
                       <td class="p-2.5 font-bold text-blue-900 sute-link">${s.full_name}</td>
                       <td class="p-2.5 text-center">${h.docs_passport === true ? '<span class="text-emerald-700 font-bold">✓</span>' : '<span class="text-rose-600 font-bold">✕</span>'}</td>
                       <td class="p-2.5 text-center">${h.docs_med === true ? '<span class="text-emerald-700 font-bold">✓</span>' : '<span class="text-rose-600 font-bold">✕</span>'}</td>
                       <td class="p-2.5 text-center">${h.docs_photo === true ? '<span class="text-emerald-700 font-bold">✓</span>' : '<span class="text-rose-600 font-bold">✕</span>'}</td>
                       <td class="p-2.5 text-center">${h.docs_military === true ? '<span class="text-emerald-700 font-bold">✓</span>' : '<span class="text-rose-600 font-bold">✕</span>'}</td>
                       <td class="p-2.5 text-center">${h.docs_payment === true ? '<span class="text-emerald-700 font-bold">✓</span>' : '<span class="text-rose-600 font-bold">✕</span>'}</td>
-                      <td class="p-2.5 text-center text-slate-500">${(h.custom_docs || []).length} шт.</td>
+                      <td class="p-2.5 text-center text-slate-500 font-medium">${(h.custom_docs || []).length} шт.</td>
                     </tr>
                   `;
                 }).join('')}
@@ -1747,7 +1761,7 @@
                   const h = housingData[s.id];
                   return `
                     <tr class="hover:bg-slate-50">
-                      <td class="p-2.5 text-center text-slate-500">${idx + 1}</td>
+                      <td class="p-2.5 text-center text-slate-500 font-semibold">${idx + 1}</td>
                       <td class="p-2.5 font-bold">${s.full_name}</td>
                       <td class="p-2.5">
                         ${h.briefing ? '<span class="text-emerald-700 font-bold">✓ Пройдено</span>' : '<span class="text-amber-700 font-bold">○ Очікує підтвердження</span>'}
@@ -1943,7 +1957,7 @@
             <table class="w-full text-left text-xs border-collapse">
               <thead>
                 <tr class="table-header border-b text-slate-700 font-bold">
-                  <th class="p-2.5 border-r border-slate-300 w-10 text-center">№</th>
+                  <th class="p-2.5 border-r w-10 text-center">№</th>
                   <th class="p-2.5 border-r">Кімната</th>
                   <th class="p-2.5 border-r">Тип дефекту</th>
                   <th class="p-2.5 border-r">Опис несправності</th>
@@ -1956,8 +1970,8 @@
                   <tr><td colspan="6" class="p-8 text-center text-slate-400">Дефектів кімнат не зафіксовано.</td></tr>
                 ` : roomDefects.map((d, idx) => `
                   <tr class="hover:bg-slate-50">
-                    <td class="p-2.5 text-center text-slate-500">${idx + 1}</td>
-                    <td class="p-2.5 font-bold font-mono text-blue-900">${d.room}</td>
+                    <td class="p-2.5 text-center text-slate-500 font-semibold">${idx + 1}</td>
+                    <td class="p-2.5 font-bold text-blue-900">${d.room}</td>
                     <td class="p-2.5 font-semibold">${d.type}</td>
                     <td class="p-2.5">${d.description || d.desc} ${d.photo_url || d.photo ? `<a href="${d.photo_url || d.photo}" target="_blank" class="sute-link ml-1">[Фото]</a>` : ''}</td>
                     <td class="p-2.5">
@@ -1986,7 +2000,8 @@
       if (def) {
         def.status = val;
         try {
-          await supabaseClient.from('room_defects').update({ status: val }).eq('id', defectId);
+          const { error } = await supabaseClient.from('room_defects').update({ status: val }).eq('id', defectId);
+          if (error) throw error;
         } catch (err) {
           console.warn("Помилка оновлення дефекту в Supabase:", err);
         }
@@ -1998,7 +2013,8 @@
     async function deleteDefect(defectId) {
       if (confirm("Ви дійсно бажаєте видалити цей запис дефекту з бази даних?")) {
         try {
-          await supabaseClient.from('room_defects').delete().eq('id', defectId);
+          const { error } = await supabaseClient.from('room_defects').delete().eq('id', defectId);
+          if (error) throw error;
         } catch (err) {
           console.warn("Помилка видалення дефекту з Supabase:", err);
         }
@@ -2035,13 +2051,13 @@
                   const h = housingData[s.id];
                   return `
                     <tr class="hover:bg-slate-50">
-                      <td class="p-2.5 text-center text-slate-500">${idx + 1}</td>
+                      <td class="p-2.5 text-center text-slate-500 font-semibold">${idx + 1}</td>
                       <td class="p-2.5 font-bold">${s.full_name}</td>
                       <td class="p-2.5">
                         ${h.handbook ? '<span class="text-emerald-700 font-bold">✓ Вручено</span>' : '<span class="text-slate-400">○ Не вручено</span>'}
                       </td>
                       <td class="p-2.5 text-center">
-                        <button onclick="toggleHandbook('${s.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 border rounded text-[11px]">
+                        <button onclick="toggleHandbook('${s.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 border rounded text-[11px] font-semibold">
                           ${h.handbook ? 'Скасувати' : 'Вручено'}
                         </button>
                       </td>
@@ -2123,15 +2139,15 @@
               </tr>
               <tr class="border-b border-slate-300">
                 <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Номер студентського квитка</td>
-                <td class="p-2 font-mono text-blue-900 border-r border-slate-300">${student.student_card_id}</td>
+                <td class="p-2 text-blue-900 font-semibold border-r border-slate-300">${student.student_card_id}</td>
                 <td class="p-2 font-bold bg-slate-100 border-r border-slate-300 w-48">Номер залікової книжки</td>
-                <td class="p-2 font-mono text-emerald-800 font-bold">${student.record_book_number}</td>
+                <td class="p-2 text-emerald-800 font-bold">${student.record_book_number}</td>
               </tr>
               <tr class="border-b border-slate-300">
                 <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">РНОКПП (ІПН)</td>
-                <td class="p-2 font-mono border-r border-slate-300">${student.rnokpp}</td>
+                <td class="p-2 text-slate-800 font-medium border-r border-slate-300">${student.rnokpp}</td>
                 <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Документ особи</td>
-                <td class="p-2">${student.document_type}: <span class="font-mono">${student.document_number}</span></td>
+                <td class="p-2">${student.document_type}: <span class="font-medium text-slate-800">${student.document_number}</span></td>
               </tr>
               <tr class="border-b border-slate-300">
                 <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Дата народження</td>
@@ -2165,7 +2181,7 @@
               </tr>
               <tr>
                 <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Номер телефону</td>
-                <td class="p-2 border-r border-slate-300 font-mono">${student.phone}</td>
+                <td class="p-2 border-r border-slate-300 text-slate-800 font-medium">${student.phone}</td>
                 <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Електронна пошта</td>
                 <td class="p-2">${student.email}</td>
               </tr>
