@@ -55,6 +55,20 @@
       border-left: 3px solid #2b569a;
     }
 
+    .room-management-grid { display:grid; grid-template-columns: 280px minmax(0,1fr); gap:16px; align-items:start; }
+    .room-student-card { cursor:grab; user-select:none; transition:transform .12s, box-shadow .12s, background .12s; }
+    .room-student-card:active { cursor:grabbing; transform:scale(.98); }
+    .room-student-card.dragging { opacity:.55; box-shadow:0 8px 18px rgba(15,23,42,.16); }
+    .room-bed { min-height:42px; border:1px solid #cbd5e1; border-radius:5px; padding:7px 8px; display:flex; align-items:center; justify-content:space-between; gap:8px; transition:all .12s; }
+    .room-bed.free { background:#f8fafc; color:#64748b; }
+    .room-bed.occupied { background:#e2e8f0; color:#334155; }
+    .room-bed.drop-target { background:#dbeafe; border-color:#2563eb; box-shadow:inset 0 0 0 1px #2563eb; }
+    .room-card { border:1px solid #cbd5e1; border-radius:7px; background:#fff; box-shadow:0 2px 7px rgba(15,23,42,.05); }
+    .room-card.full { border-color:#94a3b8; }
+    .room-card.empty { border-color:#86efac; }
+    .room-card.partial { border-color:#fbbf24; }
+    @media (max-width: 900px) { .room-management-grid { grid-template-columns:1fr; } }
+
     @media print {
       body * { visibility: hidden; }
       #printable-area, #printable-area * { visibility: visible; }
@@ -136,10 +150,10 @@
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-wallet w-4"></i> Фінанси</span>
         <i class="fa-solid fa-chevron-right text-[10px]"></i>
       </button>
-      <button id="nav-military" onclick="navigate('military')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition font-normal">
+      <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none font-normal">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-shield-halved w-4"></i> Військовий облік</span>
-        <i class="fa-solid fa-chevron-right text-[10px]"></i>
-      </button>
+        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
+      </div>
       <div class="w-full flex items-center justify-between px-4 py-2 text-blue-300/40 cursor-not-allowed select-none font-normal">
         <span class="flex items-center gap-2.5"><i class="fa-solid fa-hand-holding-heart w-4"></i> Соціальний захист</span>
         <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
@@ -199,7 +213,7 @@
   <div id="modal-card" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
     <div class="bg-white border border-slate-400 rounded-sm shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
       <div class="bg-slate-200 border-b border-slate-300 px-4 py-2 flex items-center justify-between text-xs font-bold text-slate-800">
-        <span>[Картка студента. Особова справа — ДТЕУ] → Військовий облік</span>
+        <span>[Картка студента. Особова справа — ДТЕУ]</span>
         <button onclick="closeModal('modal-card')" class="text-slate-600 hover:text-black text-base font-bold">✕</button>
       </div>
       <div id="card-content" class="p-6 overflow-y-auto flex-1 text-xs"></div>
@@ -712,12 +726,14 @@
     let housingData = {};
     let sportsData = {};
     let roomDefects = [];
+    let dormRooms = [];
+    let dormBeds = [];
+    let isRoomEditing = false;
+    let roomBackupState = null;
+    let roomSearchQuery = '';
     let attendanceData = {};
     let gradesData = {};
-    let militaryData = {};
-    let activeStudentCardTab = 'general';
     let searchQuery = '';
-    militaryData = JSON.parse(localStorage.getItem('ekurator_military_data') || '{}');
 
     const AVAILABLE_SECTIONS = [
       { id: 'Волейбол', label: 'Волейбол', icon: 'fa-volleyball', color: 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100' },
@@ -1015,6 +1031,33 @@
         } else {
           const localH = localStorage.getItem('ekurator_housing_meta');
           if (localH) housingData = JSON.parse(localH);
+        }
+
+        // ================= КІМНАТИ / КОЙКО-МІСЦЯ =================
+        const { data: roomDataCloud, error: roomError } = await supabaseClient
+          .from('dormitory_rooms')
+          .select('*')
+          .eq('dormitory', 'Гуртожиток №3')
+          .order('floor', { ascending: true })
+          .order('room_number', { ascending: true });
+
+        const { data: bedDataCloud, error: bedError } = await supabaseClient
+          .from('dormitory_beds')
+          .select('*');
+
+        if (!roomError && roomDataCloud) {
+          dormRooms = roomDataCloud;
+          localStorage.setItem('ekurator_dorm_rooms', JSON.stringify(dormRooms));
+        } else {
+          const localRooms = localStorage.getItem('ekurator_dorm_rooms');
+          if (localRooms) dormRooms = JSON.parse(localRooms);
+        }
+        if (!bedError && bedDataCloud) {
+          dormBeds = bedDataCloud;
+          localStorage.setItem('ekurator_dorm_beds', JSON.stringify(dormBeds));
+        } else {
+          const localBeds = localStorage.getItem('ekurator_dorm_beds');
+          if (localBeds) dormBeds = JSON.parse(localBeds);
         }
 
         const { data: spData, error: spError } = await supabaseClient
@@ -1383,6 +1426,9 @@
         <button onclick="navigate('housing-slots')" id="subnav-housing-slots" class="mia-submenu-item">
           Планувальник тайм-слотів прибуття
         </button>
+        <button onclick="navigate('housing-rooms')" id="subnav-housing-rooms" class="mia-submenu-item">
+          Керування кімнатами
+        </button>
         
         ${isAug26 ? `
           <button onclick="navigate('housing-checklist')" id="subnav-housing-checklist" class="mia-submenu-item">
@@ -1500,9 +1546,7 @@
       document.getElementById('nav-dashboard').className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover font-normal";
       document.getElementById('nav-attendance').className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition font-normal";
       const navFinance = document.getElementById('nav-finance');
-      const navMilitary = document.getElementById('nav-military');
       if (navFinance) navFinance.className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition font-normal";
-      if (navMilitary) navMilitary.className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition font-normal";
       document.querySelectorAll('.mia-submenu-item').forEach(el => el.classList.remove('active'));
 
       if (currentTab === 'dashboard') {
@@ -1523,8 +1567,6 @@
         if (activeSub) activeSub.classList.add('active');
       } else if (currentTab.startsWith('finance-')) {
         if (navFinance) navFinance.className = "w-full flex items-center justify-between px-4 py-2.5 bg-blue-800 border-l-4 border-amber-400 text-white font-normal";
-      } else if (currentTab === 'military') {
-        if (navMilitary) navMilitary.className = "w-full flex items-center justify-between px-4 py-2 bg-blue-800 border-l-4 border-amber-400 text-white font-normal";
       }
     }
 
@@ -1547,8 +1589,6 @@
         renderSportsView(main);
       } else if (currentTab === 'attendance') {
         renderAttendanceView(main);
-      } else if (currentTab === 'military') {
-        renderMilitaryView(main);
       } else if (currentTab === 'grades' || currentTab === 'grades-journal') {
         renderGradesJournalView(main);
       } else if (currentTab === 'grades-attestation') {
@@ -1561,6 +1601,8 @@
         renderHousingList(main);
       } else if (currentTab === 'housing-slots') {
         renderHousingSlots(main);
+      } else if (currentTab === 'housing-rooms') {
+        renderHousingRooms(main);
       } else if (currentTab === 'housing-checklist') {
         renderHousingChecklist(main);
       } else if (currentTab === 'housing-briefings') {
@@ -2218,6 +2260,193 @@
           </div>
         </div>
       `;
+    }
+
+    function getRoomBedById(bedId) {
+      return dormBeds.find(b => String(b.id) === String(bedId));
+    }
+
+    function getStudentById(studentId) {
+      return studentsList.find(s => String(s.id) === String(studentId));
+    }
+
+    function getUnassignedHousingStudents() {
+      const assigned = new Set(dormBeds.filter(b => b.student_id).map(b => String(b.student_id)));
+      return studentsList.filter(s => housingData[s.id]?.need === true && !assigned.has(String(s.id)))
+        .filter(s => !roomSearchQuery || String(s.full_name || '').toLowerCase().includes(roomSearchQuery.toLowerCase()));
+    }
+
+    function getRoomStats(roomId) {
+      const room = dormRooms.find(r => String(r.id) === String(roomId));
+      const beds = dormBeds.filter(b => String(b.room_id) === String(roomId));
+      const occupied = beds.filter(b => b.student_id).length;
+      return { room, beds, occupied, free: Math.max(0, beds.length - occupied) };
+    }
+
+    function roomCardClass(stats) {
+      if (stats.occupied === 0) return 'empty';
+      if (stats.occupied >= stats.beds.length) return 'full';
+      return 'partial';
+    }
+
+    function renderHousingRooms(main) {
+      const unassigned = getUnassignedHousingStudents();
+      const assignedCount = dormBeds.filter(b => b.student_id).length;
+      const totalBeds = dormBeds.length;
+      const freeBeds = totalBeds - assignedCount;
+      const floors = [...new Set(dormRooms.map(r => r.floor))].sort((a,b) => a-b);
+
+      main.innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-white border border-slate-300 p-4 rounded-sm flex flex-col xl:flex-row xl:items-center justify-between gap-3 shadow-sm">
+            <div>
+              <h1 class="font-bold text-slate-800 text-sm flex items-center gap-2"><i class="fa-solid fa-bed text-[#2b569a]"></i> Керування кімнатами</h1>
+              <div class="text-xs text-slate-500 mt-0.5">Інтерактивний розподіл койко-місць у Гуртожитку №3. Студентів можна перетягувати лише в режимі редагування.</div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-2.5 py-1 bg-slate-100 border rounded text-[11px] font-semibold">Кімнат: ${dormRooms.length}</span>
+              <span class="px-2.5 py-1 bg-slate-100 border rounded text-[11px] font-semibold">Місць: ${totalBeds}</span>
+              <span class="px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded text-[11px] font-semibold">Вільно: ${freeBeds}</span>
+              <span class="px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded text-[11px] font-semibold">Без кімнати: ${studentsList.filter(s => housingData[s.id]?.need === true && !dormBeds.some(b => String(b.student_id) === String(s.id))).length}</span>
+              ${!isRoomEditing ? `<button onclick="enableRoomEditing()" class="px-3.5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white rounded text-xs font-bold"><i class="fa-solid fa-pen-to-square mr-1"></i> Редагувати розподіл</button>` : `<button onclick="cancelRoomEditing()" class="px-3.5 py-1.5 border border-slate-300 bg-white rounded text-xs font-semibold">Скасувати</button><button onclick="saveRoomEditing()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Зберегти розподіл</button>`}
+            </div>
+          </div>
+
+          ${isRoomEditing ? `<div class="bg-blue-50 border border-blue-200 p-3 rounded text-xs text-blue-950 flex items-start gap-2"><i class="fa-solid fa-hand-pointer text-blue-700 mt-0.5"></i><div><b>Режим редагування.</b> Перетягніть студента з лівої панелі на будь-яке вільне койко-місце. Зайняті місця показуються без ПІБ. Натисніть «Звільнити» на зайнятому місці, якщо потрібно повернути студента до списку без кімнати.</div></div>` : `<div class="bg-slate-50 border border-slate-200 p-3 rounded text-xs text-slate-600"><i class="fa-solid fa-lock mr-1"></i> Лише перегляд. ПІБ мешканців у схемі кімнат не відображаються.</div>`}
+
+          <div class="room-management-grid">
+            <aside class="bg-white border border-slate-300 rounded shadow-sm overflow-hidden">
+              <div class="p-3 border-b border-slate-200 bg-slate-50">
+                <div class="font-bold text-xs text-slate-800 flex items-center justify-between"><span>Студенти без кімнати</span><span class="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded text-[10px]">${unassigned.length}</span></div>
+                <input value="${roomSearchQuery.replace(/"/g,'&quot;')}" oninput="roomSearchQuery=this.value; renderHousingRooms(document.getElementById('main-content'))" placeholder="Пошук ПІБ..." class="mt-2 w-full border border-slate-300 rounded p-2 text-xs">
+              </div>
+              <div class="p-2 max-h-[calc(100vh-250px)] overflow-y-auto space-y-1.5">
+                ${unassigned.length === 0 ? `<div class="p-5 text-center text-xs text-slate-400">Немає студентів без кімнати.</div>` : unassigned.map(s => `
+                  <div draggable="${isRoomEditing}" ondragstart="roomDragStart(event,'${s.id}')" ondragend="roomDragEnd(event)" class="room-student-card border border-slate-200 rounded bg-white p-2.5 ${isRoomEditing ? 'hover:bg-blue-50 hover:border-blue-300' : 'opacity-90'}">
+                    <div class="font-bold text-xs text-slate-800">${s.full_name}</div>
+                    <div class="text-[10px] text-slate-500 mt-0.5">${s.student_card_id || ''} • ${s.payment_type || 'Контракт'}</div>
+                    ${isRoomEditing ? `<div class="text-[10px] text-blue-700 mt-1"><i class="fa-solid fa-arrows-up-down-left-right mr-1"></i>Перетягніть у вільне місце</div>` : ''}
+                  </div>`).join('')}
+              </div>
+            </aside>
+
+            <section class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2 mb-3">
+                <span class="text-[11px] font-semibold text-slate-500">Поверхи:</span>
+                <button class="px-2.5 py-1 border rounded bg-white text-xs font-semibold" onclick="document.querySelectorAll('[data-room-floor]').forEach(x=>x.classList.remove('hidden'))">Усі</button>
+                ${floors.map(f => `<button class="px-2.5 py-1 border rounded bg-white text-xs font-semibold" onclick="filterRoomFloor(${f})">${f} поверх</button>`).join('')}
+                <span class="ml-auto text-[10px] text-slate-500"><span class="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-1"></span>вільна <span class="inline-block w-2 h-2 rounded-full bg-amber-400 ml-2 mr-1"></span>частково <span class="inline-block w-2 h-2 rounded-full bg-slate-400 ml-2 mr-1"></span>повністю зайнята</span>
+              </div>
+              <div id="rooms-board" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3">
+                ${dormRooms.map(room => {
+                  const stats = getRoomStats(room.id);
+                  return `<div data-room-floor="${room.floor}" class="room-card ${roomCardClass(stats)} p-3">
+                    <div class="flex items-center justify-between mb-2">
+                      <div><div class="font-bold text-sm text-slate-800">Кімната №${room.room_number}</div><div class="text-[10px] text-slate-500">${room.floor} поверх • ${stats.occupied}/${room.capacity} місць</div></div>
+                      <span class="text-[10px] px-1.5 py-0.5 rounded font-bold ${stats.occupied===0?'bg-emerald-100 text-emerald-800':stats.occupied>=room.capacity?'bg-slate-200 text-slate-700':'bg-amber-100 text-amber-800'}">${stats.occupied===0?'Вільна':stats.occupied>=room.capacity?'Повна':'Частково'}</span>
+                    </div>
+                    <div class="space-y-1.5">
+                      ${stats.beds.map(b => b.student_id ? `<div class="room-bed occupied"><span><i class="fa-solid fa-bed mr-1.5 text-slate-500"></i>Койко-місце ${b.bed_number}</span><span class="text-[10px] font-bold text-slate-500">ЗАЙНЯТО</span>${isRoomEditing ? `<button onclick="releaseDormBed('${b.id}')" class="text-[10px] text-rose-700 hover:underline">Звільнити</button>` : ''}</div>` : `<div class="room-bed free" ondragover="allowRoomDrop(event)" ondragleave="roomDragLeave(event)" ondrop="dropStudentOnBed(event,'${b.id}')"><span><i class="fa-regular fa-square mr-1.5"></i>Койко-місце ${b.bed_number}</span><span class="text-[10px] font-semibold">ВІЛЬНО</span></div>`).join('')}
+                    </div>
+                  </div>`;
+                }).join('')}
+              </div>
+            </section>
+          </div>
+        </div>`;
+    }
+
+    function filterRoomFloor(floor) {
+      document.querySelectorAll('[data-room-floor]').forEach(el => el.classList.toggle('hidden', Number(el.dataset.roomFloor) !== Number(floor)));
+    }
+
+    function enableRoomEditing() {
+      roomBackupState = JSON.parse(JSON.stringify(dormBeds));
+      isRoomEditing = true;
+      renderHousingRooms(document.getElementById('main-content'));
+    }
+
+    function cancelRoomEditing() {
+      if (roomBackupState) dormBeds = JSON.parse(JSON.stringify(roomBackupState));
+      isRoomEditing = false;
+      roomBackupState = null;
+      renderHousingRooms(document.getElementById('main-content'));
+    }
+
+    function roomDragStart(event, studentId) {
+      if (!isRoomEditing) { event.preventDefault(); return; }
+      event.dataTransfer.setData('text/plain', String(studentId));
+      event.dataTransfer.effectAllowed = 'move';
+      event.currentTarget.classList.add('dragging');
+    }
+
+    function roomDragEnd(event) { event.currentTarget.classList.remove('dragging'); }
+    function allowRoomDrop(event) { if (!isRoomEditing) return; event.preventDefault(); event.currentTarget.classList.add('drop-target'); }
+    function roomDragLeave(event) { event.currentTarget.classList.remove('drop-target'); }
+
+    function dropStudentOnBed(event, bedId) {
+      event.preventDefault();
+      event.currentTarget.classList.remove('drop-target');
+      if (!isRoomEditing) return;
+      const studentId = event.dataTransfer.getData('text/plain');
+      const bed = getRoomBedById(bedId);
+      if (!bed || bed.student_id) return;
+      if (!studentsList.some(s => String(s.id) === String(studentId))) return;
+      if (dormBeds.some(b => String(b.student_id) === String(studentId))) return;
+      bed.student_id = studentId;
+      bed.status = 'occupied';
+      bed.assigned_at = new Date().toISOString();
+      renderHousingRooms(document.getElementById('main-content'));
+    }
+
+    function releaseDormBed(bedId) {
+      if (!isRoomEditing) return;
+      const bed = getRoomBedById(bedId);
+      if (!bed) return;
+      const student = getStudentById(bed.student_id);
+      const name = student?.full_name || 'студента';
+      if (!confirm(`Звільнити койко-місце від ${name}? Студент повернеться до списку «без кімнати».`)) return;
+      bed.student_id = null;
+      bed.status = 'free';
+      bed.assigned_at = null;
+      renderHousingRooms(document.getElementById('main-content'));
+    }
+
+    async function saveRoomEditing() {
+      const loader = document.getElementById('page-loader');
+      if (loader) loader.classList.remove('hidden');
+      try {
+        const { error } = await supabaseClient.from('dormitory_beds').upsert(dormBeds.map(b => ({
+          id: b.id, room_id: b.room_id, bed_number: b.bed_number, student_id: b.student_id || null,
+          status: b.student_id ? 'occupied' : 'free', assigned_at: b.student_id ? (b.assigned_at || new Date().toISOString()) : null, updated_at: new Date().toISOString()
+        })), { onConflict: 'id' });
+        if (error) throw error;
+
+        const assignedByStudent = {};
+        dormBeds.forEach(b => { if (b.student_id) assignedByStudent[String(b.student_id)] = b; });
+        for (const s of studentsList) {
+          if (!housingData[s.id]) housingData[s.id] = {};
+          if (assignedByStudent[String(s.id)]) {
+            const bed = assignedByStudent[String(s.id)];
+            const room = dormRooms.find(r => String(r.id) === String(bed.room_id));
+            housingData[s.id].need = true;
+            housingData[s.id].dorm = 'Гуртожиток №3 (вул. Матеюка, 3)';
+            housingData[s.id].room = room ? String(room.room_number) : '—';
+          }
+          await syncHousingRecordToCloud(s.id);
+        }
+        localStorage.setItem('ekurator_dorm_beds', JSON.stringify(dormBeds));
+        localStorage.setItem('ekurator_housing_meta', JSON.stringify(housingData));
+        isRoomEditing = false;
+        roomBackupState = null;
+        renderHousingRooms(document.getElementById('main-content'));
+        alert('Розподіл кімнат успішно збережено у Supabase.');
+      } catch (err) {
+        console.error('Помилка збереження розподілу кімнат:', err);
+        alert(`Не вдалося зберегти розподіл кімнат у Supabase.\n${err?.message || 'Невідома помилка'}`);
+      } finally {
+        if (loader) loader.classList.add('hidden');
+      }
     }
 
     function renderHousingChecklist(main) {
@@ -3943,27 +4172,6 @@
       try {const {data,error}=await supabaseClient.from('state_grants').upsert(grant,{onConflict:'student_id,academic_year'}).select().single();if(error)throw error;stateGrants[studentId]=data||grant;const values=[{no:1,amount:Number(document.getElementById('fin-grant-i1').value||amount/2),status:document.getElementById('fin-grant-s1').value,received_at:document.getElementById('fin-grant-d1').value||null},{no:2,amount:Number(document.getElementById('fin-grant-i2').value||amount/2),status:document.getElementById('fin-grant-s2').value,received_at:document.getElementById('fin-grant-d2').value||null}];for(const v of values){const old=grantInstallments.find(i=>String(i.grant_id)===String(grant.id)&&Number(i.installment_no)===v.no);const inst={id:old?.id||`${grant.id}_${v.no}`,grant_id:grant.id,student_id:studentId,academic_year:financeSettings.academic_year,installment_no:v.no,amount:v.amount,status:v.status,due_date:v.no===1?`${new Date().getFullYear()}-12-01`:`${new Date().getFullYear()+1}-04-01`,received_at:v.received_at,note:null};const {data:iData,error:iError}=await supabaseClient.from('grant_installments').upsert(inst,{onConflict:'grant_id,installment_no'}).select().single();if(iError)throw iError;grantInstallments=grantInstallments.filter(i=>!(String(i.grant_id)===String(grant.id)&&Number(i.installment_no)===v.no));grantInstallments.push(iData||inst);}localStorage.setItem('ekurator_state_grants',JSON.stringify(stateGrants));localStorage.setItem('ekurator_grant_installments',JSON.stringify(grantInstallments));closeModal('modal-finance-grant');renderFinanceView(document.getElementById('main-content'));showFinanceMessage('success','Дані державного гранту синхронізовано з Supabase.');}catch(err){console.error(err);showFinanceMessage('error',`Не вдалося зберегти грант: ${err?.message||err}`);}
     }
 
-    function renderMilitaryView(container) {
-      container.innerHTML = `
-        <div class="space-y-4">
-          <div class="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
-            <div class="sute-blue text-white px-4 py-2.5 flex items-center gap-2 text-xs font-bold">
-              <i class="fa-solid fa-shield-halved"></i>
-              <span>Військовий облік</span>
-            </div>
-            <div class="px-5 py-8 text-center">
-              <div class="mx-auto mb-4 w-12 h-12 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center">
-                <i class="fa-solid fa-file-circle-xmark text-xl text-slate-400"></i>
-              </div>
-              <div class="text-sm font-bold text-slate-800">Військовий облік не ведеться</div>
-              <div class="mt-2 text-xs text-slate-600">Для студентів поточної академічної групи військово-облікові дані відсутні.</div>
-              <div class="mt-2 text-xs font-bold text-slate-800">Записи для відображення не знайдено.</div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
     function renderFinanceSummary(container) {
       const totalTuition=studentsList.reduce((sum,s)=>sum+Number(tuitionContracts[s.id]?.annual_amount||financeSettings.tuition_annual||0),0); const paidTuition=tuitionPayments.reduce((sum,p)=>sum+Number(p.amount||0),0); const grantTotal=Object.values(stateGrants).reduce((sum,g)=>sum+Number(g.annual_amount||0),0); const dormPeople=studentsList.filter(s=>housingData[s.id]?.need===true||housingData[s.id]?.room&&housingData[s.id]?.room!=='—'); const dormDue=dormPeople.reduce((sum,s)=>sum+Number(dormContracts[s.id]?.annual_amount||financeSettings.dorm_annual||0),0); const dormPaid=dormPayments.reduce((sum,p)=>sum+Number(p.amount||0),0);
       const cards=[['Контрактів',studentsList.length,'fa-file-invoice-dollar'],['Нараховано за навчання',financeMoney(totalTuition),'fa-coins'],['Сплачено за навчання',financeMoney(paidTuition),'fa-circle-check'],['Гранти',financeMoney(grantTotal),'fa-graduation-cap'],['Гуртожиток: студентів',dormPeople.length,'fa-hotel'],['Гуртожиток: сплачено',financeMoney(dormPaid),'fa-bed']];
@@ -3978,150 +4186,69 @@
       const student = studentsList.find(s => String(s.id) === String(studentId));
       if (!student) return;
 
-      activeStudentCardTab = 'general';
-      renderStudentCard(student);
-      openModal('modal-card');
-    }
-
-    function switchStudentCardTab(tab) {
-      const studentId = document.getElementById('card-student-id')?.value;
-      const student = studentsList.find(s => String(s.id) === String(studentId));
-      if (!student) return;
-
-      activeStudentCardTab = tab;
-      renderStudentCard(student);
-    }
-
-    function renderStudentCard(student) {
       const container = document.getElementById('card-content');
-      const military = militaryData[student.id] || {};
-
       container.innerHTML = `
-        <input type="hidden" id="card-student-id" value="${student.id}">
-
-        <div class="border-b border-slate-300 mb-4 flex items-center gap-1">
-          <button onclick="switchStudentCardTab('general')"
-            class="px-4 py-2 text-xs font-bold border-b-2 ${activeStudentCardTab === 'general' ? 'border-[#2b569a] text-[#2b569a]' : 'border-transparent text-slate-500 hover:text-slate-800'}">
-            <i class="fa-regular fa-id-card mr-1"></i> Основні дані
-          </button>
-          <button onclick="switchStudentCardTab('military')"
-            class="px-4 py-2 text-xs font-bold border-b-2 ${activeStudentCardTab === 'military' ? 'border-[#2b569a] text-[#2b569a]' : 'border-transparent text-slate-500 hover:text-slate-800'}">
-            <i class="fa-solid fa-shield-halved mr-1"></i> Військовий облік
-          </button>
+        <div class="border border-slate-400 bg-white">
+          <table class="w-full border-collapse border border-slate-400 text-xs">
+            <tbody>
+              <tr class="border-b border-slate-300">
+                <td class="p-2 font-bold bg-slate-100 w-48 border-r border-slate-300">Прізвище І.Б. / ПІБ</td>
+                <td class="p-2 font-bold text-slate-900" colspan="3">${student.full_name}</td>
+              </tr>
+              <tr class="border-b border-slate-300">
+                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Номер студентського квитка</td>
+                <td class="p-2 text-blue-900 font-semibold border-r border-slate-300">${student.student_card_id}</td>
+                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300 w-48">Номер залікової книжки</td>
+                <td class="p-2 text-emerald-800 font-bold">${student.record_book_number}</td>
+              </tr>
+              <tr class="border-b border-slate-300">
+                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">РНОКПП (ІПН)</td>
+                <td class="p-2 text-slate-800 font-medium border-r border-slate-300">${student.rnokpp}</td>
+                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Документ особи</td>
+                <td class="p-2">${student.document_type}: <span class="font-medium text-slate-800">${student.document_number}</span></td>
+              </tr>
+              <tr class="border-b border-slate-300">
+                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Дата народження</td>
+                <td class="p-2" colspan="3">${student.birth_date}</td>
+              </tr>
+              <tr class="border-b border-slate-300 bg-slate-50 font-bold text-[#2b569a]">
+                <td class="p-2" colspan="4">Академічні відомості (ДТЕУ)</td>
+              </tr>
+              <tr class="border-b border-slate-300">
+                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Факультет</td>
+                <td class="p-2 border-r border-slate-300">${student.faculty}</td>
+                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Спеціальність</td>
+                <td class="p-2">${student.specialty}</td>
+              </tr>
+              <tr class="border-b border-slate-300">
+                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Освітня програма</td>
+                <td class="p-2" colspan="3">${student.study_program}</td>
+              </tr>
+              <tr class="border-b border-slate-300">
+                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Форма навчання / Курс</td>
+                <td class="p-2 border-r border-slate-300">${student.study_form} / ${student.course} курс</td>
+                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Академічна група</td>
+                <td class="p-2 font-bold">${student.group_code}</td>
+              </tr>
+              <tr class="border-b border-slate-300">
+                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Система фінансування</td>
+                <td class="p-2 font-semibold text-blue-900" colspan="3">${student.payment_type}</td>
+              </tr>
+              <tr class="border-b border-slate-300 bg-slate-50 font-bold text-[#2b569a]">
+                <td class="p-2" colspan="4">Контактні дані</td>
+              </tr>
+              <tr>
+                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Номер телефону</td>
+                <td class="p-2 border-r border-slate-300 text-slate-800 font-medium">${student.phone}</td>
+                <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Електронна пошта</td>
+                <td class="p-2">${student.email}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-
-        ${activeStudentCardTab === 'general' ? `
-          <div class="border border-slate-400 bg-white">
-            <table class="w-full border-collapse border border-slate-400 text-xs">
-              <tbody>
-                <tr class="border-b border-slate-300">
-                  <td class="p-2 font-bold bg-slate-100 w-48 border-r border-slate-300">Прізвище І.Б. / ПІБ</td>
-                  <td class="p-2 font-bold text-slate-900" colspan="3">${student.full_name}</td>
-                </tr>
-                <tr class="border-b border-slate-300">
-                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Номер студентського квитка</td>
-                  <td class="p-2 text-blue-900 font-semibold border-r border-slate-300">${student.student_card_id}</td>
-                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300 w-48">Номер залікової книжки</td>
-                  <td class="p-2 text-emerald-800 font-bold">${student.record_book_number}</td>
-                </tr>
-                <tr class="border-b border-slate-300">
-                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">РНОКПП (ІПН)</td>
-                  <td class="p-2 text-slate-800 font-medium border-r border-slate-300">${student.rnokpp}</td>
-                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Документ особи</td>
-                  <td class="p-2">${student.document_type}: <span class="font-medium text-slate-800">${student.document_number}</span></td>
-                </tr>
-                <tr class="border-b border-slate-300">
-                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Дата народження</td>
-                  <td class="p-2" colspan="3">${student.birth_date}</td>
-                </tr>
-                <tr class="border-b border-slate-300 bg-slate-50 font-bold text-[#2b569a]">
-                  <td class="p-2" colspan="4">Академічні відомості (ДТЕУ)</td>
-                </tr>
-                <tr class="border-b border-slate-300">
-                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Факультет</td>
-                  <td class="p-2 border-r border-slate-300">${student.faculty}</td>
-                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Спеціальність</td>
-                  <td class="p-2">${student.specialty}</td>
-                </tr>
-                <tr class="border-b border-slate-300">
-                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Освітня програма</td>
-                  <td class="p-2" colspan="3">${student.study_program}</td>
-                </tr>
-                <tr class="border-b border-slate-300">
-                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Форма навчання / Курс</td>
-                  <td class="p-2 border-r border-slate-300">${student.study_form} / ${student.course} курс</td>
-                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Академічна група</td>
-                  <td class="p-2 font-bold">${student.group_code}</td>
-                </tr>
-                <tr class="border-b border-slate-300">
-                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Система фінансування</td>
-                  <td class="p-2 font-semibold text-blue-900" colspan="3">${student.payment_type}</td>
-                </tr>
-                <tr class="border-b border-slate-300 bg-slate-50 font-bold text-[#2b569a]">
-                  <td class="p-2" colspan="4">Контактні дані</td>
-                </tr>
-                <tr>
-                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Номер телефону</td>
-                  <td class="p-2 border-r border-slate-300 text-slate-800 font-medium">${student.phone}</td>
-                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-300">Електронна пошта</td>
-                  <td class="p-2">${student.email}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        ` : `
-          <div class="min-h-[360px] flex items-center justify-center p-6">
-            <div class="w-full max-w-2xl border border-slate-300 bg-white rounded-sm shadow-sm">
-              <div class="px-5 py-4 border-b border-slate-300 bg-slate-50">
-                <div class="flex items-center gap-2 text-slate-800 font-bold text-sm">
-                  <i class="fa-solid fa-shield-halved text-[#2b569a]"></i>
-                  Військовий облік не ведеться
-                </div>
-              </div>
-              <div class="px-5 py-6 text-center">
-                <div class="mx-auto mb-4 w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
-                  <i class="fa-solid fa-file-circle-xmark text-xl text-slate-400"></i>
-                </div>
-                <p class="text-sm text-slate-700 font-medium">
-                  Для студентів поточної академічної групи військово-облікові дані відсутні.
-                </p>
-                <p class="mt-2 text-sm font-bold text-slate-900">
-                  Записи для відображення не знайдено.
-                </p>
-              </div>
-            </div>
-          </div>
-        `}
       `;
-    }
 
-    function saveMilitaryRecord(studentId) {
-      militaryData[studentId] = {
-        accounting_group: document.getElementById('mil-accounting-group')?.value || '',
-        accounting_category: document.getElementById('mil-accounting-category')?.value || '',
-        composition: document.getElementById('mil-composition')?.value || '',
-        rank: document.getElementById('mil-rank')?.value || '',
-        document: document.getElementById('mil-document')?.value || '',
-        document_number: document.getElementById('mil-document-number')?.value || '',
-        document_issue_date: document.getElementById('mil-document-date')?.value || '',
-        specialty: document.getElementById('mil-specialty')?.value || '',
-        fitness: document.getElementById('mil-fitness')?.value || '',
-        office_residence: document.getElementById('mil-office-residence')?.value || '',
-        office_registration: document.getElementById('mil-office-registration')?.value || '',
-        special_number: document.getElementById('mil-special-number')?.value || '',
-        mobilization_order: document.getElementById('mil-mobilization-order')?.value || '',
-        mobilization_date: document.getElementById('mil-mobilization-date')?.value || '',
-        team_number: document.getElementById('mil-team-number')?.value || '',
-        registered: document.getElementById('mil-registered')?.value || '',
-        duty: document.getElementById('mil-duty')?.value || '',
-        removed: document.getElementById('mil-removed')?.value || '',
-        removal_reason: document.getElementById('mil-removal-reason')?.value || ''
-      };
-
-      localStorage.setItem('ekurator_military_data', JSON.stringify(militaryData));
-      alert('Військово-облікові дані збережено.');
-      const student = studentsList.find(s => String(s.id) === String(studentId));
-      if (student) renderStudentCard(student);
+      openModal('modal-card');
     }
 
     function openModal(id) {
