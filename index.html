@@ -682,10 +682,11 @@
       <form onsubmit="saveDormFinance(event)" class="p-5 space-y-4 text-xs">
         <input type="hidden" id="fin-dorm-student-id">
         <div id="fin-dorm-student" class="bg-slate-100 p-3 rounded border border-slate-300 font-bold text-slate-900 text-sm">...</div>
+        <div id="fin-dorm-benefit" class="bg-amber-50 border border-amber-200 text-amber-900 p-3 rounded font-semibold">Пільга не визначена</div>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-          <div><label class="block font-semibold mb-1">Сума за місяць, грн</label><input id="fin-dorm-monthly" type="number" min="0" step="0.01" class="w-full border border-slate-300 p-2 rounded"></div>
-          <div><label class="block font-semibold mb-1">Сума за рік, грн</label><input id="fin-dorm-annual" type="number" min="0" step="0.01" class="w-full border border-slate-300 p-2 rounded"></div>
-          <div><label class="block font-semibold mb-1">Сума за семестр, грн</label><input id="fin-dorm-semester" type="number" min="0" step="0.01" class="w-full border border-slate-300 p-2 rounded"></div>
+          <div><label class="block font-semibold mb-1">Сума за місяць, грн</label><input id="fin-dorm-monthly" type="number" min="0" step="0.01" readonly class="w-full border border-slate-300 p-2 rounded bg-slate-100"></div>
+          <div><label class="block font-semibold mb-1">Сума за рік, грн</label><input id="fin-dorm-annual" type="number" min="0" step="0.01" readonly class="w-full border border-slate-300 p-2 rounded bg-slate-100"></div>
+          <div><label class="block font-semibold mb-1">Сума за семестр, грн</label><input id="fin-dorm-semester" type="number" min="0" step="0.01" readonly class="w-full border border-slate-300 p-2 rounded bg-slate-100"></div>
           <div><label class="block font-semibold mb-1">Схема оплати</label><select id="fin-dorm-plan" class="w-full border border-slate-300 p-2 rounded"><option value="year">За весь рік</option><option value="semester">За семестрами</option></select></div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -1062,40 +1063,25 @@
 
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '') || 'dashboard';
-      if (hash !== currentTab) {
-        currentTab = hash;
-        if (currentTab.startsWith('housing-')) {
-          isHousingMenuOpen = true;
-          isStudentsMenuOpen = false;
-          isGradesMenuOpen = false;
-        } else if (currentTab.startsWith('students')) {
-          isStudentsMenuOpen = true;
-          isHousingMenuOpen = false;
-          isGradesMenuOpen = false;
-        } else if (currentTab.startsWith('grades')) {
-          isGradesMenuOpen = true;
-          isHousingMenuOpen = false;
-          isStudentsMenuOpen = false;
-        } else if (currentTab.startsWith('exam-session')) {
-          isExamSessionMenuOpen = true;
-          isHousingMenuOpen = false;
-          isStudentsMenuOpen = false;
-          isGradesMenuOpen = false;
-        } else if (currentTab.startsWith('finance-')) {
-          financeActiveTab = currentTab.replace('finance-', '') || 'tuition';
-          isHousingMenuOpen = false;
-          isStudentsMenuOpen = false;
-          isGradesMenuOpen = false;
-          isExamSessionMenuOpen = false;
-        } else {
-          isHousingMenuOpen = false;
-          isStudentsMenuOpen = false;
-          isGradesMenuOpen = false;
-          isExamSessionMenuOpen = false;
-        }
-        renderNavigationUI();
-        renderCurrentView();
+      if (hash === currentTab) return;
+
+      currentTab = hash;
+      collapseAllSidebarMenus();
+
+      if (currentTab.startsWith('housing-')) {
+        isHousingMenuOpen = true;
+      } else if (currentTab.startsWith('students')) {
+        isStudentsMenuOpen = true;
+      } else if (currentTab.startsWith('grades')) {
+        isGradesMenuOpen = true;
+      } else if (currentTab.startsWith('exam-session')) {
+        isExamSessionMenuOpen = true;
+      } else if (currentTab.startsWith('finance-')) {
+        financeActiveTab = currentTab.replace('finance-', '') || 'tuition';
       }
+
+      renderNavigationUI();
+      renderCurrentView();
     });
 
     async function fetchDataFromCloud() {
@@ -1525,6 +1511,13 @@
       renderNavigationUI();
     }
 
+    function collapseAllSidebarMenus() {
+      isHousingMenuOpen = false;
+      isStudentsMenuOpen = false;
+      isGradesMenuOpen = false;
+      isExamSessionMenuOpen = false;
+    }
+
     function navigate(tabKey, updateHash = true) {
       if (currentTab === tabKey) return;
 
@@ -1534,35 +1527,20 @@
       currentTab = tabKey;
       if (updateHash) window.location.hash = tabKey;
 
+      // Кожен перехід починається з повного згортання всіх модулів.
+      // Після цього відкриваємо тільки той модуль, до якого перейшли.
+      collapseAllSidebarMenus();
+
       if (currentTab.startsWith('housing-')) {
         isHousingMenuOpen = true;
-        isStudentsMenuOpen = false;
-        isGradesMenuOpen = false;
-        isExamSessionMenuOpen = false;
       } else if (currentTab.startsWith('students')) {
         isStudentsMenuOpen = true;
-        isHousingMenuOpen = false;
-        isGradesMenuOpen = false;
-        isExamSessionMenuOpen = false;
       } else if (currentTab.startsWith('grades')) {
         isGradesMenuOpen = true;
-        isHousingMenuOpen = false;
-        isStudentsMenuOpen = false;
-        isExamSessionMenuOpen = false;
       } else if (currentTab.startsWith('exam-session')) {
         isExamSessionMenuOpen = true;
-        isHousingMenuOpen = false;
-        isStudentsMenuOpen = false;
-        isGradesMenuOpen = false;
       } else if (currentTab.startsWith('finance-')) {
         financeActiveTab = currentTab.replace('finance-', '') || 'tuition';
-        isHousingMenuOpen = false;
-        isStudentsMenuOpen = false;
-        isGradesMenuOpen = false;
-      } else {
-        isHousingMenuOpen = false;
-        isStudentsMenuOpen = false;
-        isGradesMenuOpen = false;
       }
 
       renderNavigationUI();
@@ -1570,6 +1548,11 @@
       setTimeout(() => {
         if (loader) loader.classList.add('hidden');
         renderCurrentView();
+        // Захист від повторного розгортання старого модуля після рендеру сторінки.
+        if (!currentTab.startsWith('exam-session')) {
+          isExamSessionMenuOpen = false;
+          renderNavigationUI();
+        }
       }, 250);
     }
 
@@ -4179,8 +4162,7 @@
       const tabs = [
         ['tuition', 'Контракт', 'fa-file-invoice-dollar'],
         ['dorm', 'Гуртожиток', 'fa-hotel'],
-        ['grants', 'Державні гранти', 'fa-graduation-cap'],
-        ['summary', 'Зведення', 'fa-chart-pie']
+        ['grants', 'Державні гранти', 'fa-graduation-cap']
       ];
       return `<div class="bg-white border border-slate-300 rounded-sm shadow-sm p-1 flex flex-wrap gap-1">${tabs.map(([id, label, icon]) => `
         <button onclick="switchFinanceTab('${id}')" class="px-4 py-2 text-xs font-bold rounded-sm transition ${financeActiveTab === id ? 'bg-[#2b569a] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'}"><i class="fa-solid ${icon} mr-1.5"></i>${label}</button>
@@ -4202,7 +4184,7 @@
       if (financeActiveTab === 'tuition') renderFinanceTuition(content);
       else if (financeActiveTab === 'dorm') renderFinanceDorm(content);
       else if (financeActiveTab === 'grants') renderFinanceGrants(content);
-      else renderFinanceSummary(content);
+      else renderFinanceGrants(content);
     }
 
     function renderFinanceTuition(container) {
@@ -4230,12 +4212,8 @@
         </tr>`;
       }).join('');
       container.innerHTML = `<div class="space-y-3">
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <div class="bg-white border border-slate-300 p-3 rounded"><div class="text-[10px] text-slate-500 font-bold uppercase">Рік</div><div class="font-black text-lg">${financeSettings.academic_year}</div></div>
-          <div class="bg-white border border-slate-300 p-3 rounded"><div class="text-[10px] text-slate-500 font-bold uppercase">Контракт / рік</div><div class="font-black text-lg">${financeMoney(annual)}</div></div>
-          <div class="bg-white border border-slate-300 p-3 rounded"><div class="text-[10px] text-slate-500 font-bold uppercase">І семестр</div><div class="font-black text-lg">${financeMoney(semester)}</div></div>
-          <div class="bg-white border border-slate-300 p-3 rounded"><div class="text-[10px] text-slate-500 font-bold uppercase">Отримувачі гранту</div><div class="font-black text-lg">${Object.keys(stateGrants).length}</div></div>
-          <div class="bg-white border border-slate-300 p-3 rounded"><div class="text-[10px] text-slate-500 font-bold uppercase">Загалом оплачено</div><div class="font-black text-lg">${financeMoney(tuitionPayments.reduce((a,p)=>a+Number(p.amount||0),0))}</div></div>
+        <div class="bg-white border border-slate-300 rounded-sm p-3 flex flex-wrap items-center justify-between gap-2">
+          <div><div class="font-bold text-slate-800 text-sm">Реєстрація оплати за навчання</div><div class="text-[11px] text-slate-500 mt-0.5">Навчальний рік ${financeSettings.academic_year} · базова вартість контракту ${financeMoney(annual)} за рік · ${financeMoney(semester)} за семестр</div></div>
         </div>
         <div class="bg-white border border-slate-300 rounded overflow-x-auto shadow-sm"><table class="w-full text-left text-xs border-collapse"><thead><tr class="table-header border-b border-slate-300 font-bold text-slate-700"><th class="p-2.5 border-r">№</th><th class="p-2.5 border-r">Студент</th><th class="p-2.5 border-r text-center">Грант</th><th class="p-2.5 border-r text-right">Вартість</th><th class="p-2.5 border-r text-right">Сплачено</th><th class="p-2.5 border-r text-right">Залишок</th><th class="p-2.5 border-r text-center">Схема</th><th class="p-2.5 border-r text-center">Статус</th><th class="p-2.5 text-center">Дії</th></tr></thead><tbody class="divide-y divide-slate-200">${rows}</tbody></table></div>
       </div>`;
@@ -4295,27 +4273,104 @@
       } catch (err) { console.error(err); showFinanceMessage('error', `Не вдалося зберегти фінанси: ${err?.message || err}`); }
     }
 
+    function getDormBenefitInfo(studentId) {
+      const h = housingData[studentId] || {};
+      const raw = String(h.benefit || '').trim();
+      const benefit = raw && raw !== 'none' ? raw : 'Без пільг';
+      const normalized = benefit.toLowerCase();
+      const isDeceasedChild = normalized.includes('дитина загиблого');
+      const hasBenefit = benefit !== 'Без пільг' && benefit !== 'none';
+      const rate = isDeceasedChild ? 0 : (hasBenefit ? 0.5 : 1);
+      const label = isDeceasedChild ? '100% пільга — безкоштовно' : (hasBenefit ? '50% пільга — сплата половини' : 'Без пільги — повна вартість');
+      return { benefit, status: h.benefit_status || 'Не подано', rate, label, isDeceasedChild, hasBenefit };
+    }
+
+    function getDormAmounts(studentId) {
+      const b = getDormBenefitInfo(studentId);
+      const monthly = Math.round(Number(financeSettings.dorm_monthly || 2772) * b.rate * 100) / 100;
+      return { ...b, monthly, semester: Math.round(monthly * 6 * 100) / 100, annual: Math.round(monthly * 12 * 100) / 100 };
+    }
+
     function renderFinanceDorm(container) {
-      const dormStudents = studentsList.filter(s => housingData[s.id]?.need === true || housingData[s.id]?.room && housingData[s.id]?.room !== '—');
+      const dormStudents = studentsList.filter(s => housingData[s.id]?.need === true || (housingData[s.id]?.room && housingData[s.id]?.room !== '—'));
       const rows = dormStudents.map((s, idx) => {
         const h = housingData[s.id] || {};
         const c = dormContracts[s.id] || {};
-        const due = Number(c.annual_amount || financeSettings.dorm_annual || 0);
-        const paid = financeDormPaid(s.id); const remaining = Math.max(0,due-paid); const status = financePaymentStatus(due,paid);
-        return `<tr class="hover:bg-slate-50"><td class="p-2.5 border-r text-center">${idx+1}</td><td class="p-2.5 border-r font-bold">${s.full_name}</td><td class="p-2.5 border-r">${h.dorm || '—'}</td><td class="p-2.5 border-r text-center font-bold">${h.room || '—'}</td><td class="p-2.5 border-r text-center">${h.step5 ? '<span class="text-emerald-700 font-bold">Проживає</span>' : (h.need ? 'Потребує' : '—')}</td><td class="p-2.5 border-r text-right">${financeMoney(due)}</td><td class="p-2.5 border-r text-right font-bold">${financeMoney(paid)}</td><td class="p-2.5 border-r text-right font-bold ${remaining>0?'text-rose-700':'text-emerald-700'}">${financeMoney(remaining)}</td><td class="p-2.5 border-r text-center">${financeStatusBadge(status)}</td><td class="p-2.5 text-center"><button onclick="openDormFinanceModal('${s.id}')" class="px-2.5 py-1 bg-[#2b569a] text-white rounded text-[10px] font-bold"><i class="fa-solid fa-pen mr-1"></i>Оплата</button></td></tr>`;
+        const amounts = getDormAmounts(s.id);
+        const due = Number(c.annual_amount ?? amounts.annual);
+        const paid = financeDormPaid(s.id);
+        const remaining = Math.max(0, due - paid);
+        const status = financePaymentStatus(due, paid);
+        const benefitClass = amounts.isDeceasedChild ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : (amounts.hasBenefit ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-slate-50 text-slate-700 border-slate-200');
+        return `<tr class="hover:bg-slate-50">
+          <td class="p-2.5 border-r text-center">${idx+1}</td>
+          <td class="p-2.5 border-r font-bold">${s.full_name}</td>
+          <td class="p-2.5 border-r">${h.dorm || '—'}</td>
+          <td class="p-2.5 border-r text-center font-bold">${h.room || '—'}</td>
+          <td class="p-2.5 border-r text-center"><span class="px-2 py-0.5 rounded border text-[10px] font-bold ${benefitClass}">${amounts.benefit}</span><div class="text-[10px] text-slate-500 mt-1">${amounts.label}</div></td>
+          <td class="p-2.5 border-r text-right">${financeMoney(due)}</td>
+          <td class="p-2.5 border-r text-right font-bold">${financeMoney(paid)}</td>
+          <td class="p-2.5 border-r text-right font-bold ${remaining>0?'text-rose-700':'text-emerald-700'}">${financeMoney(remaining)}</td>
+          <td class="p-2.5 border-r text-center">${financeStatusBadge(status)}</td>
+          <td class="p-2.5 text-center"><button onclick="openDormFinanceModal('${s.id}')" class="px-2.5 py-1 bg-[#2b569a] text-white rounded text-[10px] font-bold"><i class="fa-solid fa-pen mr-1"></i>Оплата</button></td>
+        </tr>`;
       }).join('');
-      container.innerHTML = `<div class="space-y-3"><div class="bg-blue-50 border border-blue-200 p-3 rounded text-xs text-blue-900"><b>Джерело списку:</b> модуль «Поселення» — відображаються студенти, які потребують гуртожитку або мають призначену кімнату.</div><div class="bg-white border border-slate-300 rounded overflow-x-auto shadow-sm"><table class="w-full text-xs border-collapse"><thead><tr class="table-header border-b font-bold"><th class="p-2.5 border-r">№</th><th class="p-2.5 border-r">Студент</th><th class="p-2.5 border-r">Гуртожиток</th><th class="p-2.5 border-r">Кімната</th><th class="p-2.5 border-r">Статус проживання</th><th class="p-2.5 border-r text-right">Нараховано</th><th class="p-2.5 border-r text-right">Сплачено</th><th class="p-2.5 border-r text-right">Залишок</th><th class="p-2.5 border-r text-center">Статус</th><th class="p-2.5 text-center">Дії</th></tr></thead><tbody class="divide-y divide-slate-200">${rows || '<tr><td colspan="10" class="p-8 text-center text-slate-400">Студентів із потребою в гуртожитку не знайдено.</td></tr>'}</tbody></table></div></div>`;
+      container.innerHTML = `<div class="space-y-3">
+        <div class="bg-white border border-slate-300 rounded-sm p-3">
+          <div class="font-bold text-slate-800 text-sm">Реєстрація оплати за гуртожиток</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">Базовий тариф: ${financeMoney(financeSettings.dorm_monthly)} на місяць. Пільга визначається автоматично з модуля «Поселення → Реєстр та облік потреби».</div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded overflow-x-auto shadow-sm"><table class="w-full text-xs border-collapse"><thead><tr class="table-header border-b font-bold">
+          <th class="p-2.5 border-r">№</th><th class="p-2.5 border-r">Студент</th><th class="p-2.5 border-r">Гуртожиток</th><th class="p-2.5 border-r">Кімната</th><th class="p-2.5 border-r">Пільга</th><th class="p-2.5 border-r text-right">До сплати за рік</th><th class="p-2.5 border-r text-right">Сплачено</th><th class="p-2.5 border-r text-right">Залишок</th><th class="p-2.5 border-r text-center">Статус</th><th class="p-2.5 text-center">Дії</th>
+        </tr></thead><tbody class="divide-y divide-slate-200">${rows || '<tr><td colspan="10" class="p-8 text-center text-slate-400">Студентів із потребою в гуртожитку не знайдено.</td></tr>'}</tbody></table></div>
+      </div>`;
     }
 
     function openDormFinanceModal(studentId) {
-      const s = financeStudent(studentId); if (!s) return; const c=dormContracts[studentId]||{};
-      document.getElementById('fin-dorm-student-id').value=studentId; document.getElementById('fin-dorm-student').innerText=s.full_name;
-      document.getElementById('fin-dorm-monthly').value=c.monthly_amount ?? financeSettings.dorm_monthly; document.getElementById('fin-dorm-annual').value=c.annual_amount ?? financeSettings.dorm_annual; document.getElementById('fin-dorm-semester').value=c.semester_amount ?? financeSettings.dorm_semester; document.getElementById('fin-dorm-plan').value=c.payment_plan||'semester'; document.getElementById('fin-dorm-payment').value=''; document.getElementById('fin-dorm-paid-at').value=new Date().toISOString().slice(0,10); document.getElementById('fin-dorm-note').value=''; openModal('modal-finance-dorm');
+      const s = financeStudent(studentId);
+      if (!s) return;
+      const c = dormContracts[studentId] || {};
+      const amounts = getDormAmounts(studentId);
+      document.getElementById('fin-dorm-student-id').value = studentId;
+      document.getElementById('fin-dorm-student').innerHTML = `${s.full_name}<div class="text-[10px] text-slate-500 font-normal">${amounts.benefit} · ${amounts.label}</div>`;
+      document.getElementById('fin-dorm-benefit').innerText = `${amounts.benefit} — ${amounts.label}`;
+      document.getElementById('fin-dorm-monthly').value = amounts.monthly;
+      document.getElementById('fin-dorm-annual').value = amounts.annual;
+      document.getElementById('fin-dorm-semester').value = amounts.semester;
+      document.getElementById('fin-dorm-plan').value = c.payment_plan || 'semester';
+      document.getElementById('fin-dorm-payment').value = '';
+      document.getElementById('fin-dorm-paid-at').value = new Date().toISOString().slice(0,10);
+      document.getElementById('fin-dorm-note').value = '';
+      openModal('modal-finance-dorm');
     }
 
     async function saveDormFinance(e) {
-      e.preventDefault(); const studentId=document.getElementById('fin-dorm-student-id').value; const monthly=Number(document.getElementById('fin-dorm-monthly').value||financeSettings.dorm_monthly||0); const annual=Number(document.getElementById('fin-dorm-annual').value||monthly*12); const semester=Number(document.getElementById('fin-dorm-semester').value||monthly*6); const plan=document.getElementById('fin-dorm-plan').value; const paymentAmount=Number(document.getElementById('fin-dorm-payment').value||0); const contract={id:dormContracts[studentId]?.id||`${financeSettings.academic_year}_${studentId}`,student_id:studentId,academic_year:financeSettings.academic_year,dorm:housingData[studentId]?.dorm||null,room:housingData[studentId]?.room||null,monthly_amount:monthly,annual_amount:annual,semester_amount:semester,payment_plan:plan,notes:document.getElementById('fin-dorm-note').value.trim()||null,updated_at:new Date().toISOString()};
-      try { const {data,error}=await supabaseClient.from('dormitory_contracts').upsert(contract,{onConflict:'student_id,academic_year'}).select().single(); if(error)throw error; dormContracts[studentId]=data||contract; if(paymentAmount>0){const payment={student_id:studentId,academic_year:financeSettings.academic_year,amount:paymentAmount,period:document.getElementById('fin-dorm-period').value,paid_at:document.getElementById('fin-dorm-paid-at').value||new Date().toISOString().slice(0,10),method:'Не вказано',note:document.getElementById('fin-dorm-note').value.trim()||null};const {data:pData,error:pError}=await supabaseClient.from('dormitory_payments').insert(payment).select().single();if(pError)throw pError;dormPayments.unshift(pData||payment);} localStorage.setItem('ekurator_dorm_contracts',JSON.stringify(dormContracts));localStorage.setItem('ekurator_dorm_payments',JSON.stringify(dormPayments));closeModal('modal-finance-dorm');renderFinanceView(document.getElementById('main-content'));showFinanceMessage('success','Оплату гуртожитку синхронізовано з Supabase.'); } catch(err){console.error(err);showFinanceMessage('error',`Не вдалося зберегти оплату гуртожитку: ${err?.message||err}`);}
+      e.preventDefault();
+      const studentId = document.getElementById('fin-dorm-student-id').value;
+      const amounts = getDormAmounts(studentId);
+      const plan = document.getElementById('fin-dorm-plan').value;
+      const paymentAmount = Number(document.getElementById('fin-dorm-payment').value || 0);
+      if (paymentAmount <= 0) { alert('Вкажіть суму фактично отриманої оплати.'); return; }
+      const contract = {
+        id: dormContracts[studentId]?.id || `${financeSettings.academic_year}_${studentId}`,
+        student_id: studentId, academic_year: financeSettings.academic_year,
+        dorm: housingData[studentId]?.dorm || null, room: housingData[studentId]?.room || null,
+        monthly_amount: amounts.monthly, annual_amount: amounts.annual, semester_amount: amounts.semester,
+        payment_plan: plan, notes: document.getElementById('fin-dorm-note').value.trim() || null, updated_at: new Date().toISOString()
+      };
+      try {
+        const {data,error} = await supabaseClient.from('dormitory_contracts').upsert(contract,{onConflict:'student_id,academic_year'}).select().single();
+        if(error) throw error;
+        dormContracts[studentId] = data || contract;
+        const payment = { student_id: studentId, academic_year: financeSettings.academic_year, amount: paymentAmount, period: document.getElementById('fin-dorm-period').value, paid_at: document.getElementById('fin-dorm-paid-at').value || new Date().toISOString().slice(0,10), method:'Не вказано', note: document.getElementById('fin-dorm-note').value.trim() || null };
+        const {data:pData,error:pError} = await supabaseClient.from('dormitory_payments').insert(payment).select().single();
+        if(pError) throw pError;
+        dormPayments.unshift(pData || payment);
+        localStorage.setItem('ekurator_dorm_contracts',JSON.stringify(dormContracts));
+        localStorage.setItem('ekurator_dorm_payments',JSON.stringify(dormPayments));
+        closeModal('modal-finance-dorm'); renderFinanceView(document.getElementById('main-content'));
+        showFinanceMessage('success','Оплату гуртожитку зареєстровано та синхронізовано з Supabase.');
+      } catch(err) { console.error(err); showFinanceMessage('error',`Не вдалося зберегти оплату гуртожитку: ${err?.message||err}`); }
     }
 
     function renderFinanceGrants(container) {
@@ -4323,7 +4378,7 @@
       const total = recipients.reduce((sum,s)=>sum+Number(stateGrants[s.id]?.annual_amount||0),0);
       const received = grantInstallments.filter(i=>['Отримано','Враховано в оплаті'].includes(i.status)).reduce((sum,i)=>sum+Number(i.amount||0),0);
       const rows = recipients.map((s,idx)=>{const g=stateGrants[s.id];const inst=financeGrantInstallments(s.id);const i1=inst.find(i=>Number(i.installment_no)===1);const i2=inst.find(i=>Number(i.installment_no)===2);return `<tr class="hover:bg-slate-50"><td class="p-2.5 border-r text-center">${idx+1}</td><td class="p-2.5 border-r font-bold">${s.full_name}</td><td class="p-2.5 border-r text-center">${g.level || 'II'}</td><td class="p-2.5 border-r text-right font-bold">${financeMoney(g.annual_amount)}</td><td class="p-2.5 border-r text-right">${financeMoney(i1?.amount||0)}</td><td class="p-2.5 border-r text-center">${financeStatusBadge(i1?.status||'Очікується')}</td><td class="p-2.5 border-r text-right">${financeMoney(i2?.amount||0)}</td><td class="p-2.5 border-r text-center">${financeStatusBadge(i2?.status||'Очікується')}</td><td class="p-2.5 border-r text-center">${g.certificate_status||'Очікується'}</td><td class="p-2.5 text-center"><button onclick="openGrantFinanceModal('${s.id}')" class="px-2.5 py-1 bg-[#2b569a] text-white rounded text-[10px] font-bold"><i class="fa-solid fa-pen mr-1"></i>Грант</button></td></tr>`;}).join('');
-      container.innerHTML=`<div class="space-y-3"><div class="grid grid-cols-1 md:grid-cols-3 gap-3"><div class="bg-white border p-3 rounded"><div class="text-[10px] text-slate-500 font-bold uppercase">Отримувачів</div><div class="text-2xl font-black">${recipients.length}</div></div><div class="bg-white border p-3 rounded"><div class="text-[10px] text-slate-500 font-bold uppercase">Сума грантів</div><div class="text-2xl font-black">${financeMoney(total)}</div></div><div class="bg-white border p-3 rounded"><div class="text-[10px] text-slate-500 font-bold uppercase">Отримано траншами</div><div class="text-2xl font-black">${financeMoney(received)}</div></div></div><div class="bg-white border rounded overflow-x-auto shadow-sm"><table class="w-full text-xs border-collapse"><thead><tr class="table-header border-b font-bold"><th class="p-2.5 border-r">№</th><th class="p-2.5 border-r">Студент</th><th class="p-2.5 border-r">Рівень</th><th class="p-2.5 border-r text-right">Грант / рік</th><th class="p-2.5 border-r text-right">І транш</th><th class="p-2.5 border-r">Статус</th><th class="p-2.5 border-r text-right">ІІ транш</th><th class="p-2.5 border-r">Статус</th><th class="p-2.5 border-r">Сертифікат</th><th class="p-2.5">Дії</th></tr></thead><tbody class="divide-y">${rows||'<tr><td colspan="10" class="p-8 text-center text-slate-400">Поки немає отримувачів гранту. Додайте грант через вкладку «Контракт» або тут.</td></tr>'}</tbody></table></div><div class="text-right"><button onclick="openGrantFinanceModal('')" class="px-3 py-1.5 bg-[#2b569a] text-white rounded text-xs font-bold"><i class="fa-solid fa-plus mr-1"></i>Додати грант студенту</button></div></div>`;
+      container.innerHTML=`<div class="space-y-3"><div class="bg-white border border-slate-300 rounded-sm p-3"><div class="font-bold text-slate-800 text-sm">Реєстрація даних державних грантів</div><div class="text-[11px] text-slate-500 mt-0.5">Перелік отримувачів, суми та статуси траншів без зведеної фінансової статистики.</div></div><div class="bg-white border rounded overflow-x-auto shadow-sm"><table class="w-full text-xs border-collapse"><thead><tr class="table-header border-b font-bold"><th class="p-2.5 border-r">№</th><th class="p-2.5 border-r">Студент</th><th class="p-2.5 border-r">Рівень</th><th class="p-2.5 border-r text-right">Грант / рік</th><th class="p-2.5 border-r text-right">І транш</th><th class="p-2.5 border-r">Статус</th><th class="p-2.5 border-r text-right">ІІ транш</th><th class="p-2.5 border-r">Статус</th><th class="p-2.5 border-r">Сертифікат</th><th class="p-2.5">Дії</th></tr></thead><tbody class="divide-y">${rows||'<tr><td colspan="10" class="p-8 text-center text-slate-400">Поки немає отримувачів гранту. Додайте грант через вкладку «Контракт» або тут.</td></tr>'}</tbody></table></div><div class="text-right"><button onclick="openGrantFinanceModal('')" class="px-3 py-1.5 bg-[#2b569a] text-white rounded text-xs font-bold"><i class="fa-solid fa-plus mr-1"></i>Додати грант студенту</button></div></div>`;
     }
 
     async function ensureGrantRecord(studentId, amount) {
@@ -4358,11 +4413,7 @@
       try {const {data,error}=await supabaseClient.from('state_grants').upsert(grant,{onConflict:'student_id,academic_year'}).select().single();if(error)throw error;stateGrants[studentId]=data||grant;const values=[{no:1,amount:Number(document.getElementById('fin-grant-i1').value||amount/2),status:document.getElementById('fin-grant-s1').value,received_at:document.getElementById('fin-grant-d1').value||null},{no:2,amount:Number(document.getElementById('fin-grant-i2').value||amount/2),status:document.getElementById('fin-grant-s2').value,received_at:document.getElementById('fin-grant-d2').value||null}];for(const v of values){const old=grantInstallments.find(i=>String(i.grant_id)===String(grant.id)&&Number(i.installment_no)===v.no);const inst={id:old?.id||`${grant.id}_${v.no}`,grant_id:grant.id,student_id:studentId,academic_year:financeSettings.academic_year,installment_no:v.no,amount:v.amount,status:v.status,due_date:v.no===1?`${new Date().getFullYear()}-12-01`:`${new Date().getFullYear()+1}-04-01`,received_at:v.received_at,note:null};const {data:iData,error:iError}=await supabaseClient.from('grant_installments').upsert(inst,{onConflict:'grant_id,installment_no'}).select().single();if(iError)throw iError;grantInstallments=grantInstallments.filter(i=>!(String(i.grant_id)===String(grant.id)&&Number(i.installment_no)===v.no));grantInstallments.push(iData||inst);}localStorage.setItem('ekurator_state_grants',JSON.stringify(stateGrants));localStorage.setItem('ekurator_grant_installments',JSON.stringify(grantInstallments));closeModal('modal-finance-grant');renderFinanceView(document.getElementById('main-content'));showFinanceMessage('success','Дані державного гранту синхронізовано з Supabase.');}catch(err){console.error(err);showFinanceMessage('error',`Не вдалося зберегти грант: ${err?.message||err}`);}
     }
 
-    function renderFinanceSummary(container) {
-      const totalTuition=studentsList.reduce((sum,s)=>sum+Number(tuitionContracts[s.id]?.annual_amount||financeSettings.tuition_annual||0),0); const paidTuition=tuitionPayments.reduce((sum,p)=>sum+Number(p.amount||0),0); const grantTotal=Object.values(stateGrants).reduce((sum,g)=>sum+Number(g.annual_amount||0),0); const dormPeople=studentsList.filter(s=>housingData[s.id]?.need===true||housingData[s.id]?.room&&housingData[s.id]?.room!=='—'); const dormDue=dormPeople.reduce((sum,s)=>sum+Number(dormContracts[s.id]?.annual_amount||financeSettings.dorm_annual||0),0); const dormPaid=dormPayments.reduce((sum,p)=>sum+Number(p.amount||0),0);
-      const cards=[['Контрактів',studentsList.length,'fa-file-invoice-dollar'],['Нараховано за навчання',financeMoney(totalTuition),'fa-coins'],['Сплачено за навчання',financeMoney(paidTuition),'fa-circle-check'],['Гранти',financeMoney(grantTotal),'fa-graduation-cap'],['Гуртожиток: студентів',dormPeople.length,'fa-hotel'],['Гуртожиток: сплачено',financeMoney(dormPaid),'fa-bed']];
-      container.innerHTML=`<div class="space-y-4"><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">${cards.map(c=>`<div class="bg-white border border-slate-300 p-4 rounded shadow-sm flex items-center justify-between"><div><div class="text-[10px] text-slate-500 font-bold uppercase">${c[0]}</div><div class="text-2xl font-black text-[#2b569a] mt-1">${c[1]}</div></div><div class="w-10 h-10 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-800"><i class="fa-solid ${c[2]}"></i></div></div>`).join('')}</div><div class="bg-white border border-slate-300 rounded p-4 text-xs"><div class="font-bold text-slate-800 mb-2">Фінансові налаштування ${financeSettings.academic_year}</div><div class="grid grid-cols-1 md:grid-cols-3 gap-3"><div class="p-3 bg-slate-50 border rounded">Навчання за рік: <b>${financeMoney(financeSettings.tuition_annual)}</b></div><div class="p-3 bg-slate-50 border rounded">Навчання за семестр: <b>${financeMoney(financeSettings.tuition_semester)}</b></div><div class="p-3 bg-slate-50 border rounded">Грант за замовчуванням: <b>${financeMoney(financeSettings.grant_default)}</b></div><div class="p-3 bg-slate-50 border rounded">Гуртожиток за місяць: <b>${financeMoney(financeSettings.dorm_monthly)}</b></div></div><div class="mt-3 text-slate-500">Гуртожиток: 2 772 грн/місяць; за 6 місяців — 16 632 грн; за 12 місяців — 33 264 грн.</div></div></div>`;
-    }
+    function renderFinanceSummary(container) { if (container) container.innerHTML = ''; }
 
     function showFinanceMessage(type, message) {
       let el=document.getElementById('finance-message'); if(!el){el=document.createElement('div');el.id='finance-message';el.className='fixed right-5 bottom-5 z-[100] max-w-md rounded shadow-2xl px-4 py-3 text-xs font-semibold border';document.body.appendChild(el);} el.className=`fixed right-5 bottom-5 z-[100] max-w-md rounded shadow-2xl px-4 py-3 text-xs font-semibold border ${type==='success'?'bg-emerald-50 text-emerald-800 border-emerald-300':'bg-rose-50 text-rose-800 border-rose-300'}`;el.textContent=message;clearTimeout(window.__financeMsgTimer);window.__financeMsgTimer=setTimeout(()=>el.remove(),5000);
