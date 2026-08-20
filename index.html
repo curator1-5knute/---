@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -5,11 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Державний торговельно-економічний університет — ІС «єКуратор»</title>
   <!-- Google Font: Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700\&display=swap" rel="stylesheet">
   <!-- Tailwind CSS, FontAwesome & Supabase JS -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com/"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
@@ -26,7 +27,7 @@
     .sute-link { color: #1e5bb8; text-decoration: underline; }
     .sute-link:hover { color: #0d3875; }
     .table-header { background-color: #e9ecef; }
-    
+
     .mia-submenu {
       background-color: #ffffff;
       border-radius: 4px;
@@ -68,6 +69,14 @@
     .room-card.empty { border-color:#86efac; }
     .room-card.partial { border-color:#fbbf24; }
     @media (max-width: 900px) { .room-management-grid { grid-template-columns:1fr; } }
+    .exam-session-status { display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:999px; font-size:10px; font-weight:700; border:1px solid; }
+    .exam-session-status.project { background:#f1f5f9; color:#475569; border-color:#cbd5e1; }
+    .exam-session-status.started { background:#dcfce7; color:#166534; border-color:#86efac; }
+    .exam-session-status.closed { background:#e2e8f0; color:#334155; border-color:#94a3b8; }
+    .exam-session-row:hover { background:#f8fafc; }
+    .exam-schedule-card { border:1px solid #cbd5e1; border-radius:6px; background:#fff; }
+    .exam-warning { background:#fffbeb; border:1px solid #fcd34d; color:#92400e; }
+    .exam-ok { background:#ecfdf5; border:1px solid #86efac; color:#166534; }
 
     @media print {
       body * { visibility: hidden; }
@@ -112,7 +121,7 @@
       </div>
 
       <div class="px-4 pt-3 pb-1 text-[11px] text-blue-200/70 uppercase">Сервіси супроводу</div>
-      
+
       <!-- Модуль ПОСЕЛЕННЯ -->
       <div>
         <button id="btn-group-housing" onclick="toggleMenu('housing')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition font-normal">
@@ -142,6 +151,23 @@
           <button onclick="navigate('grades-attestation')" id="subnav-grades-attestation" class="mia-submenu-item">
             Атестаційний зріз
           </button>
+        </div>
+      </div>
+
+      <!-- МОДУЛЬ ЕКЗАМЕНАЦІЙНА СЕСІЯ -->
+      <div>
+        <button id="btn-group-exam-session" onclick="toggleMenu('exam-session')" class="w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition font-normal">
+          <span class="flex items-center gap-2.5"><i class="fa-solid fa-calendar-days w-4"></i> Екзаменаційна сесія</span>
+          <i id="arrow-exam-session" class="fa-solid fa-chevron-right text-[11px] transition-transform duration-200"></i>
+        </button>
+        <div id="sub-exam-session" class="mia-submenu hidden">
+          <button onclick="navigate('exam-session-registry')" id="subnav-exam-session-registry" class="mia-submenu-item">
+            Реєстр екзаменаційних сесій
+          </button>
+          <div class="w-full flex items-center justify-between px-3.5 py-1.5 text-slate-400 bg-slate-100/70 cursor-not-allowed select-none text-[12px] font-normal border-t border-slate-100">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-[10px] text-slate-400"></i> Екзаменаційні відомості</span>
+            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded">далі</span>
+          </div>
         </div>
       </div>
 
@@ -176,7 +202,7 @@
 
   <!-- Головний контент -->
   <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-    
+
     <!-- Лоадер -->
     <div id="page-loader" class="absolute inset-0 bg-slate-50/60 z-40 flex items-center justify-center hidden">
       <div class="w-8 h-8 rounded-full border-2 border-slate-300 border-t-[#2b569a] animate-spin"></div>
@@ -187,7 +213,7 @@
       <div class="text-xl font-semibold text-slate-800 tracking-tight">
         Державний торговельно-економічний університет
       </div>
-      
+
       <div class="flex items-center gap-6 text-xs text-slate-600">
         <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded text-slate-700 font-medium shadow-sm">
           <i class="fa-regular fa-clock text-[#2b569a]"></i>
@@ -195,7 +221,7 @@
         </div>
 
         <span class="text-slate-300">|</span>
-        <a href="#" class="sute-link flex items-center gap-1.5"><i class="fa-regular fa-envelope"></i> Зворотний зв'язок</a>
+        <a href="https://curator1-5knute.github.io/---/#" class="sute-link flex items-center gap-1.5"><i class="fa-regular fa-envelope"></i> Зворотний зв'язок</a>
         <span class="text-slate-300">|</span>
         <span class="text-blue-700 font-semibold cursor-pointer">Українська</span>
         <span class="text-slate-300">|</span>
@@ -394,7 +420,7 @@
 
         <div class="space-y-2">
           <div class="font-bold text-slate-800 border-b pb-1">Обов'язкові документи (відмітьте наявні):</div>
-          
+
           <label class="flex items-center gap-2 p-1.5 hover:bg-slate-50 rounded cursor-pointer">
             <input type="checkbox" id="cl-doc-passport" class="w-4 h-4 text-blue-600 rounded">
             <span>Паспорт громадянина України (ID-картка) + 2 копії</span>
@@ -699,7 +725,73 @@
     </div>
   </div>
 
-  <div id="printable-area" class="hidden p-8 text-black text-xs"></div>
+  
+  <!-- МОДАЛКА: Створення / редагування екзаменаційної сесії -->
+  <div id="modal-exam-session" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white border border-slate-400 rounded-sm shadow-2xl w-full max-w-3xl flex flex-col max-h-[90vh]">
+      <div class="sute-blue text-white px-4 py-2.5 flex items-center justify-between font-bold text-xs">
+        <span><i class="fa-solid fa-calendar-days mr-2"></i><span id="exam-session-modal-title">Нова екзаменаційна сесія</span></span>
+        <button onclick="closeModal('modal-exam-session')" class="text-white hover:text-red-200 text-base">✕</button>
+      </div>
+      <form onsubmit="saveExamSession(event)" class="p-5 overflow-y-auto space-y-4 text-xs">
+        <input type="hidden" id="exam-session-id">
+        <div class="bg-slate-50 border border-slate-200 p-3 rounded">
+          <div class="text-[11px] font-bold text-slate-500 uppercase mb-2">Академічний контекст групи — визначений системою</div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div><label class="block font-semibold mb-1 text-slate-500">Навчальний рік</label><input id="exam-academic-year" disabled class="w-full border border-slate-300 p-2 rounded bg-slate-200 text-slate-600 font-semibold"></div>
+            <div><label class="block font-semibold mb-1 text-slate-500">Форма навчання</label><input id="exam-form" disabled class="w-full border border-slate-300 p-2 rounded bg-slate-200 text-slate-600 font-semibold"></div>
+            <div><label class="block font-semibold mb-1 text-slate-500">Група</label><input id="exam-group" disabled class="w-full border border-slate-300 p-2 rounded bg-slate-200 text-slate-600 font-semibold"></div>
+            <div><label class="block font-semibold mb-1 text-slate-500">Факультет</label><input id="exam-faculty" disabled class="w-full border border-slate-300 p-2 rounded bg-slate-200 text-slate-600 font-semibold"></div>
+            <div><label class="block font-semibold mb-1 text-slate-500">Спеціальність</label><input id="exam-specialty" disabled class="w-full border border-slate-300 p-2 rounded bg-slate-200 text-slate-600 font-semibold"></div>
+            <div><label class="block font-semibold mb-1 text-slate-500">Курс</label><input id="exam-course" disabled class="w-full border border-slate-300 p-2 rounded bg-slate-200 text-slate-600 font-semibold"></div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="md:col-span-2"><label class="block font-semibold mb-1 text-slate-700">Найменування сесії *</label><input id="exam-session-name" required maxlength="150" placeholder="Напр. Зимова екзаменаційна сесія" class="w-full border border-slate-300 p-2 rounded bg-white font-semibold"></div>
+          <div><label class="block font-semibold mb-1 text-slate-700">Початок *</label><input id="exam-start-date" type="date" required class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+          <div><label class="block font-semibold mb-1 text-slate-700">Закінчення *</label><input id="exam-end-date" type="date" required class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 p-3 rounded text-[11px] text-blue-950"><i class="fa-solid fa-circle-info mr-1"></i> Після створення сесії її графік формується окремо: додаються консультації, заліки та іспити, а також екзаменатори, асистенти та інші організаційні дані.</div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-300">
+          <button type="button" onclick="closeModal('modal-exam-session')" class="px-4 py-1.5 border border-slate-300 rounded text-slate-700 bg-slate-100">Скасувати</button>
+          <button type="submit" class="px-5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white font-bold rounded"><i class="fa-solid fa-check mr-1"></i>Зберегти сесію</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА: Елемент графіка екзаменаційної сесії -->
+  <div id="modal-exam-item" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white border border-slate-400 rounded-sm shadow-2xl w-full max-w-3xl flex flex-col max-h-[92vh]">
+      <div class="sute-blue text-white px-4 py-2.5 flex items-center justify-between font-bold text-xs">
+        <span><i class="fa-solid fa-list-check mr-2"></i><span id="exam-item-modal-title">Додати елемент графіка</span></span>
+        <button onclick="closeModal('modal-exam-item')" class="text-white hover:text-red-200 text-base">✕</button>
+      </div>
+      <form onsubmit="saveExamScheduleItem(event)" class="p-5 overflow-y-auto space-y-4 text-xs">
+        <input type="hidden" id="exam-item-id">
+        <input type="hidden" id="exam-item-session-id">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="md:col-span-2"><label class="block font-semibold mb-1 text-slate-700">Дисципліна *</label><input id="exam-item-discipline" required maxlength="200" placeholder="Назва дисципліни" class="w-full border border-slate-300 p-2 rounded bg-white font-semibold"></div>
+          <div><label class="block font-semibold mb-1 text-slate-700">Вид навчальної діяльності *</label><select id="exam-item-type" required class="w-full border border-slate-300 p-2 rounded bg-white"><option value="Іспит">Іспит</option><option value="Залік">Залік</option><option value="Консультація">Консультація</option><option value="Диференційований залік">Диференційований залік</option></select></div>
+          <div><label class="block font-semibold mb-1 text-slate-700">Дата *</label><input id="exam-item-date" type="date" required class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+          <div><label class="block font-semibold mb-1 text-slate-700">Початок *</label><input id="exam-item-start" type="time" required class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+          <div><label class="block font-semibold mb-1 text-slate-700">Закінчення *</label><input id="exam-item-end" type="time" required class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+          <div><label class="block font-semibold mb-1 text-slate-700">Екзаменатор</label><input id="exam-item-examiner" maxlength="150" placeholder="ПІБ викладача" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+          <div><label class="block font-semibold mb-1 text-slate-700">Асистент</label><input id="exam-item-assistant" maxlength="150" placeholder="ПІБ асистента" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+          <div><label class="block font-semibold mb-1 text-slate-700">Аудиторія / місце</label><input id="exam-item-room" maxlength="100" placeholder="Напр. 312" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+          <div><label class="block font-semibold mb-1 text-slate-700">№ у графіку</label><input id="exam-item-order" type="number" min="1" step="1" value="1" class="w-full border border-slate-300 p-2 rounded bg-white"></div>
+        </div>
+        <label class="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded cursor-pointer"><input type="checkbox" id="exam-item-consultation-required" class="w-4 h-4"><span><b>Для іспиту потрібна консультація перед проведенням</b><span class="block text-[10px] text-slate-500 mt-0.5">Система покаже попередження у графіку, якщо консультацію ще не внесено.</span></span></label>
+        <div><label class="block font-semibold mb-1 text-slate-700">Примітка</label><textarea id="exam-item-notes" rows="3" maxlength="500" placeholder="Додаткові організаційні відомості" class="w-full border border-slate-300 p-2 rounded bg-white resize-y"></textarea></div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-300">
+          <button type="button" onclick="closeModal('modal-exam-item')" class="px-4 py-1.5 border border-slate-300 rounded text-slate-700 bg-slate-100">Скасувати</button>
+          <button type="submit" class="px-5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white font-bold rounded"><i class="fa-solid fa-check mr-1"></i>Зберегти елемент</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+<div id="printable-area" class="hidden p-8 text-black text-xs"></div>
 
   <script>
     const SUPABASE_URL = "https://uwaxgxosskcelneqoudn.supabase.co";
@@ -710,7 +802,24 @@
     let isHousingMenuOpen = false;
     let isStudentsMenuOpen = false;
     let isGradesMenuOpen = false;
+    let isExamSessionMenuOpen = false;
     let isRegistryEditing = false;
+
+    // Екзаменаційна сесія
+    let examSessions = [];
+    let examSessionItems = [];
+    let examSessionActiveId = null;
+    let examSessionEditId = null;
+    let examScheduleEditId = null;
+
+    const CURATOR_ACADEMIC_CONTEXT = {
+      academic_year: '2026/2027',
+      form_of_study: 'Денна',
+      faculty: 'Факультет торгівлі та маркетингу',
+      specialty: 'Журналістика',
+      course: '1',
+      group: 'ФТМ 1-5'
+    };
 
     // Фінанси
     let financeActiveTab = 'tuition';
@@ -932,10 +1041,11 @@
 
       const hash = window.location.hash.replace('#', '') || 'dashboard';
       currentTab = hash;
-      
+
       if (currentTab.startsWith('housing-')) isHousingMenuOpen = true;
       if (currentTab.startsWith('students')) isStudentsMenuOpen = true;
       if (currentTab.startsWith('grades')) isGradesMenuOpen = true;
+      if (currentTab.startsWith('exam-session')) isExamSessionMenuOpen = true;
       if (currentTab.startsWith('finance-')) {
         financeActiveTab = currentTab.replace('finance-', '') || 'tuition';
       }
@@ -1161,6 +1271,35 @@
           if (localEcts) generatedEctsData = JSON.parse(localEcts);
         }
 
+        // ================= ЕКЗАМЕНАЦІЙНА СЕСІЯ =================
+        const { data: esData, error: esError } = await supabaseClient
+          .from('exam_sessions')
+          .select('*')
+          .eq('group_name', CURATOR_ACADEMIC_CONTEXT.group)
+          .order('start_date', { ascending: false })
+          .order('created_at', { ascending: false });
+        if (!esError && esData) {
+          examSessions = esData;
+          localStorage.setItem('ekurator_exam_sessions', JSON.stringify(examSessions));
+        } else {
+          const localEs = localStorage.getItem('ekurator_exam_sessions');
+          if (localEs) examSessions = JSON.parse(localEs);
+        }
+
+        const { data: esiData, error: esiError } = await supabaseClient
+          .from('exam_session_items')
+          .select('*')
+          .order('exam_date', { ascending: true })
+          .order('start_time', { ascending: true })
+          .order('sort_order', { ascending: true });
+        if (!esiError && esiData) {
+          examSessionItems = esiData;
+          localStorage.setItem('ekurator_exam_session_items', JSON.stringify(examSessionItems));
+        } else {
+          const localEsi = localStorage.getItem('ekurator_exam_session_items');
+          if (localEsi) examSessionItems = JSON.parse(localEsi);
+        }
+
         // ================= ФІНАНСИ =================
         const { data: fsData, error: fsError } = await supabaseClient
           .from('finance_settings')
@@ -1251,6 +1390,7 @@
       if (currentTab === 'attendance') renderAttendanceView(document.getElementById('main-content'));
       if (currentTab === 'grades' || currentTab === 'grades-journal') renderGradesJournalView(document.getElementById('main-content'));
       if (currentTab === 'grades-attestation') renderGradesAttestationView(document.getElementById('main-content'));
+      if (currentTab === 'exam-session-registry') renderExamSessionView(document.getElementById('main-content'));
       if (currentTab.startsWith('finance-')) renderFinanceView(document.getElementById('main-content'));
       if (currentTab.startsWith('housing-')) renderCurrentView();
     }
@@ -1364,6 +1504,14 @@
         if (isGradesMenuOpen) {
           isHousingMenuOpen = false;
           isStudentsMenuOpen = false;
+          isExamSessionMenuOpen = false;
+        }
+      } else if (menuKey === 'exam-session') {
+        isExamSessionMenuOpen = !isExamSessionMenuOpen;
+        if (isExamSessionMenuOpen) {
+          isHousingMenuOpen = false;
+          isStudentsMenuOpen = false;
+          isGradesMenuOpen = false;
         }
       }
       renderNavigationUI();
@@ -1377,7 +1525,7 @@
 
       currentTab = tabKey;
       if (updateHash) window.location.hash = tabKey;
-      
+
       if (currentTab.startsWith('housing-')) {
         isHousingMenuOpen = true;
         isStudentsMenuOpen = false;
@@ -1390,6 +1538,12 @@
         isGradesMenuOpen = true;
         isHousingMenuOpen = false;
         isStudentsMenuOpen = false;
+        isExamSessionMenuOpen = false;
+      } else if (currentTab.startsWith('exam-session')) {
+        isExamSessionMenuOpen = true;
+        isHousingMenuOpen = false;
+        isStudentsMenuOpen = false;
+        isGradesMenuOpen = false;
       } else if (currentTab.startsWith('finance-')) {
         financeActiveTab = currentTab.replace('finance-', '') || 'tuition';
         isHousingMenuOpen = false;
@@ -1400,7 +1554,7 @@
         isStudentsMenuOpen = false;
         isGradesMenuOpen = false;
       }
-      
+
       renderNavigationUI();
 
       setTimeout(() => {
@@ -1412,7 +1566,7 @@
     function renderHousingSubmenu() {
       const subMenu = document.getElementById('sub-housing');
       if (!subMenu) return;
-      
+
       const isAug26 = isAugust26Passed();
       const isSep1 = isSeptember1Passed();
 
@@ -1429,7 +1583,7 @@
         <button onclick="navigate('housing-rooms')" id="subnav-housing-rooms" class="mia-submenu-item">
           Керування кімнатами
         </button>
-        
+
         ${isAug26 ? `
           <button onclick="navigate('housing-checklist')" id="subnav-housing-checklist" class="mia-submenu-item">
             Чек-лист обов'язкових документів
@@ -1451,7 +1605,7 @@
             <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded">26.08</span>
           </div>
         `}
-        
+
         ${isAug26 ? `
           <button onclick="navigate('housing-route')" id="subnav-housing-route" class="mia-submenu-item">
             Очний маршрут поселення
@@ -1511,6 +1665,10 @@
       const arrowGrades = document.getElementById('arrow-grades');
       const btnGroupGrades = document.getElementById('btn-group-grades');
 
+      const subExamSession = document.getElementById('sub-exam-session');
+      const arrowExamSession = document.getElementById('arrow-exam-session');
+      const btnGroupExamSession = document.getElementById('btn-group-exam-session');
+
       renderHousingSubmenu();
 
       if (isHousingMenuOpen) {
@@ -1543,6 +1701,16 @@
         btnGroupGrades.className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition font-normal";
       }
 
+      if (isExamSessionMenuOpen) {
+        subExamSession.classList.remove('hidden');
+        arrowExamSession.className = "fa-solid fa-chevron-down text-[11px] transition-transform duration-200";
+        btnGroupExamSession.className = "w-full flex items-center justify-between px-4 py-2 text-white bg-blue-800/80 font-normal transition";
+      } else {
+        subExamSession.classList.add('hidden');
+        arrowExamSession.className = "fa-solid fa-chevron-right text-[11px] transition-transform duration-200";
+        btnGroupExamSession.className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition font-normal";
+      }
+
       document.getElementById('nav-dashboard').className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover font-normal";
       document.getElementById('nav-attendance').className = "w-full flex items-center justify-between px-4 py-2 text-blue-100 sute-nav-hover transition font-normal";
       const navFinance = document.getElementById('nav-finance');
@@ -1556,6 +1724,10 @@
       } else if (currentTab.startsWith('grades-')) {
         const activeSub = document.getElementById(`subnav-${currentTab}`);
         if (activeSub) activeSub.classList.add('active');
+      } else if (currentTab.startsWith('exam-session-')) {
+        const activeSub = document.getElementById(`subnav-${currentTab}`);
+        if (activeSub) activeSub.classList.add('active');
+        if (btnGroupExamSession) btnGroupExamSession.className = "w-full flex items-center justify-between px-4 py-2.5 bg-blue-800 border-l-4 border-amber-400 text-white font-normal";
       } else if (currentTab === 'students') {
         const activeSub = document.getElementById('subnav-students');
         if (activeSub) activeSub.classList.add('active');
@@ -1572,7 +1744,7 @@
 
     function renderCurrentView() {
       const main = document.getElementById('main-content');
-      
+
       if (currentTab === 'dashboard') {
         main.innerHTML = `
           <div class="bg-[#d4edda] border border-[#c3e6cb] text-[#155724] px-4 py-3 rounded flex items-center justify-between text-sm shadow-sm">
@@ -1593,6 +1765,10 @@
         renderGradesJournalView(main);
       } else if (currentTab === 'grades-attestation') {
         renderGradesAttestationView(main);
+      } else if (currentTab === 'exam-session-registry') {
+        renderExamSessionView(main);
+      } else if (currentTab === 'exam-session-documents') {
+        renderExamSessionDocumentsPlaceholder(main);
       } else if (currentTab.startsWith('finance-')) {
         renderFinanceView(main);
       } else if (currentTab === 'housing-registry') {
@@ -1678,7 +1854,7 @@
       const tbody = document.getElementById('students-table-body');
       if (!tbody) return;
 
-      const filtered = studentsList.filter(s => 
+      const filtered = studentsList.filter(s =>
         (s.full_name || '').toLowerCase().includes(searchQuery) ||
         (s.rnokpp || '').includes(searchQuery) ||
         (s.student_card_id || '').toLowerCase().includes(searchQuery) ||
@@ -1730,7 +1906,7 @@
     // ================= СПОРТИВНІ СЕКЦІЇ =================
     function renderSportsView(main) {
       const assignedCount = studentsList.filter(s => sportsData[s.id]?.section).length;
-      
+
       main.innerHTML = `
         <div class="space-y-4">
           <div class="bg-white border border-slate-300 p-4 rounded-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-sm">
@@ -1781,7 +1957,7 @@
       const tbody = document.getElementById('sports-table-body');
       if (!tbody) return;
 
-      const filtered = studentsList.filter(s => 
+      const filtered = studentsList.filter(s =>
         (s.full_name || '').toLowerCase().includes(searchQuery) ||
         (s.student_card_id || '').toLowerCase().includes(searchQuery)
       );
@@ -1978,7 +2154,7 @@
                   <tr><td colspan="6" class="p-8 text-center text-slate-400">Студентів у групі не знайдено.</td></tr>
                 ` : studentsList.map((s, idx) => {
                   const h = housingData[s.id] || {};
-                  
+
                   let needBadge = '<span class="text-amber-600 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">⚠ Потрібно внести дані</span>';
                   if (h.need === true) needBadge = '<span class="text-emerald-700 font-bold">✓ Потребує</span>';
                   if (h.need === false) needBadge = `<span class="text-rose-700 font-bold">✕ Відмова</span> <span class="text-[11px] text-slate-500 font-normal">(${h.refusal_reason || 'Власне житло'})</span>`;
@@ -2072,7 +2248,7 @@
       document.getElementById('h-student-id').value = studentId;
       document.getElementById('h-student-name').innerText = student.full_name;
       document.getElementById('h-student-meta').innerText = `${student.student_card_id} • ${student.payment_type}`;
-      
+
       document.getElementById('h-need').value = h.need === null ? 'none' : (h.need ? 'true' : 'false');
       document.getElementById('h-refusal-reason').value = h.refusal_reason || 'Проживає вдома (Київ/область)';
       document.getElementById('h-benefit').value = h.benefit || 'none';
@@ -2656,7 +2832,7 @@
                   </div>
 
                   <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 text-xs">
-                    
+
                     <button onclick="toggleStep('${s.id}', 'step1')" class="p-2.5 rounded border text-left transition ${h.step1 ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'}">
                       <div class="font-bold">Крок 1. Штаб / Ордер</div>
                       <div class="text-[10px] text-slate-500 mt-0.5">Звірка з наказом та візування ордера</div>
@@ -2689,7 +2865,7 @@
                           ${h.step5 ? '✓ Заселено' : '○ Підписати акт'}
                         </button>
                       </div>
-                      
+
                       <button onclick="openDefectStep5Modal('${h.room}')" class="mt-2 text-[10px] bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded font-bold">
                         <i class="fa-solid fa-screwdriver-wrench mr-1"></i> Фіксація дефекту
                       </button>
@@ -2962,7 +3138,7 @@
       main.innerHTML = `
         <div class="space-y-4">
           <div class="bg-white border border-slate-300 p-4 rounded-sm shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            
+
             <div class="flex items-center gap-4 text-xs font-semibold text-slate-700 bg-slate-50 p-2 rounded border border-slate-200">
               <label class="flex items-center gap-1.5 cursor-pointer">
                 <input type="radio" name="att_lesson_type" value="lectures" ${selectedLessonType === 'lectures' ? 'checked' : ''} onchange="changeAttendanceLessonType('lectures')" class="w-4 h-4 text-blue-600 focus:ring-0">
@@ -3003,18 +3179,18 @@
                   <tr class="table-header border-b border-slate-300 text-slate-700 font-bold">
                     <th class="p-2.5 border-r border-slate-300 w-10 text-center">№</th>
                     <th class="p-2.5 border-r border-slate-300 w-56 sticky left-0 bg-[#e9ecef] z-10">Студент</th>
-                    
+
                     ${lessons.length === 0 ? `
                       <th class="p-4 text-center text-slate-400 font-normal">Для обраного типу немає пар за навчальним планом.</th>
                     ` : lessons.map(l => {
                       const isFuture = l.date > todayStr;
                       const isToday = l.date === todayStr;
-                      
+
                       return `
                         <th class="p-2 border-r border-slate-300 text-center min-w-[95px] max-w-[110px] ${isFuture ? 'bg-slate-100 text-slate-400' : 'bg-blue-50/50 text-blue-950'}">
                           <div class="text-[11px] font-bold">№${l.num} ${l.display}</div>
                           <div class="text-[10px] truncate text-slate-500 font-medium" title="${discipline.title}">${discipline.title}</div>
-                          
+
                           <div class="mt-1 flex items-center justify-center gap-1.5 text-xs">
                             ${isFuture ? `
                               <span title="Пара ще не відбулася (блокування за розкладом)" class="text-slate-300 cursor-not-allowed">
@@ -3038,7 +3214,7 @@
                     <tr class="hover:bg-slate-50 transition">
                       <td class="p-2 border-r border-slate-300 text-center text-slate-500 font-semibold">${sIdx + 1}</td>
                       <td class="p-2 border-r border-slate-300 font-bold text-slate-900 sticky left-0 bg-white z-10">${s.full_name}</td>
-                      
+
                       ${lessons.map(l => {
                         const key = `${discipline.id}_${selectedLessonType}_${l.num}_${s.id}`;
                         const record = attendanceData[key];
@@ -3453,11 +3629,11 @@
                 <tr class="table-header border-b border-slate-300 text-slate-700 font-bold">
                   <th class="p-2.5 border-r border-slate-300 w-10 text-center">№</th>
                   <th class="p-2.5 border-r border-slate-300 w-64">ПІБ студента</th>
-                  <th class="p-2.5 border-r border-slate-300 text-center w-24">Робота<br>(40)</th>
-                  <th class="p-2.5 border-r border-slate-300 text-center w-24">Атестація 1<br>(30)</th>
-                  <th class="p-2.5 border-r border-slate-300 text-center w-24">Атестація 2 / Екз<br>(30)</th>
-                  <th class="p-2.5 border-r border-slate-300 text-center w-24 bg-blue-50/50 text-blue-900">Разом<br>(100)</th>
-                  <th class="p-2.5 border-r border-slate-300 text-center w-44">ECTS / національна<br><span class="font-normal">за запитом</span></th>
+                  <th class="p-2.5 border-r border-slate-300 text-center w-24">Робота(40)</th>
+                  <th class="p-2.5 border-r border-slate-300 text-center w-24">Атестація 1(30)</th>
+                  <th class="p-2.5 border-r border-slate-300 text-center w-24">Атестація 2 / Екз(30)</th>
+                  <th class="p-2.5 border-r border-slate-300 text-center w-24 bg-blue-50/50 text-blue-900">Разом(100)</th>
+                  <th class="p-2.5 border-r border-slate-300 text-center w-44">ECTS / національна<span class="font-normal">за запитом</span></th>
                   <th class="p-2.5 border-r border-slate-300">Примітка</th>
                   <th class="p-2.5 text-center w-28">Дії</th>
                 </tr>
@@ -4250,6 +4426,427 @@
 
       openModal('modal-card');
     }
+
+    // ================= ЕКЗАМЕНАЦІЙНА СЕСІЯ =================
+    function examEscapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+    }
+
+    function examStatusBadge(status) {
+      const cls = status === 'Розпочата' ? 'started' : status === 'Закрита' ? 'closed' : 'project';
+      const icon = status === 'Розпочата' ? 'fa-play' : status === 'Закрита' ? 'fa-lock' : 'fa-file-lines';
+      return `<span class="exam-session-status ${cls}"><i class="fa-solid ${icon}"></i>${examEscapeHtml(status)}</span>`;
+    }
+
+    function examSessionById(id) {
+      return examSessions.find(s => String(s.id) === String(id));
+    }
+
+    function examItemsForSession(sessionId) {
+      return examSessionItems.filter(i => String(i.session_id) === String(sessionId)).sort((a,b) => {
+        const d = String(a.exam_date || '').localeCompare(String(b.exam_date || ''));
+        if (d !== 0) return d;
+        const tm = String(a.start_time || '').localeCompare(String(b.start_time || ''));
+        if (tm !== 0) return tm;
+        return Number(a.sort_order || 0) - Number(b.sort_order || 0);
+      });
+    }
+
+    function examFormatDate(value) {
+      if (!value) return '—';
+      const parts = String(value).split('-');
+      return parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : value;
+    }
+
+    function examSessionCreate() {
+      examSessionEditId = null;
+      document.getElementById('exam-session-modal-title').textContent = 'Нова екзаменаційна сесія';
+      document.getElementById('exam-session-id').value = '';
+      document.getElementById('exam-academic-year').value = CURATOR_ACADEMIC_CONTEXT.academic_year;
+      document.getElementById('exam-form').value = CURATOR_ACADEMIC_CONTEXT.form_of_study;
+      document.getElementById('exam-group').value = CURATOR_ACADEMIC_CONTEXT.group;
+      document.getElementById('exam-faculty').value = CURATOR_ACADEMIC_CONTEXT.faculty;
+      document.getElementById('exam-specialty').value = CURATOR_ACADEMIC_CONTEXT.specialty;
+      document.getElementById('exam-course').value = CURATOR_ACADEMIC_CONTEXT.course;
+      document.getElementById('exam-session-name').value = '';
+      document.getElementById('exam-start-date').value = '';
+      document.getElementById('exam-end-date').value = '';
+      openModal('modal-exam-session');
+    }
+
+    function examSessionEdit(id) {
+      const s = examSessionById(id);
+      if (!s || s.status !== 'Проєкт') return;
+      examSessionEditId = id;
+      document.getElementById('exam-session-modal-title').textContent = 'Редагування екзаменаційної сесії';
+      document.getElementById('exam-session-id').value = s.id;
+      document.getElementById('exam-academic-year').value = s.academic_year;
+      document.getElementById('exam-form').value = s.form_of_study;
+      document.getElementById('exam-group').value = s.group_name;
+      document.getElementById('exam-faculty').value = s.faculty;
+      document.getElementById('exam-specialty').value = s.specialty;
+      document.getElementById('exam-course').value = s.course;
+      document.getElementById('exam-session-name').value = s.name || '';
+      document.getElementById('exam-start-date').value = s.start_date || '';
+      document.getElementById('exam-end-date').value = s.end_date || '';
+      openModal('modal-exam-session');
+    }
+
+    async function saveExamSession(event) {
+      event.preventDefault();
+      const id = document.getElementById('exam-session-id').value.trim();
+      const name = document.getElementById('exam-session-name').value.trim();
+      const startDate = document.getElementById('exam-start-date').value;
+      const endDate = document.getElementById('exam-end-date').value;
+      if (!name || !startDate || !endDate) return;
+      if (endDate < startDate) { alert('Дата закінчення не може бути раніше дати початку.'); return; }
+
+      const payload = {
+        academic_year: CURATOR_ACADEMIC_CONTEXT.academic_year,
+        form_of_study: CURATOR_ACADEMIC_CONTEXT.form_of_study,
+        faculty: CURATOR_ACADEMIC_CONTEXT.faculty,
+        specialty: CURATOR_ACADEMIC_CONTEXT.specialty,
+        course: CURATOR_ACADEMIC_CONTEXT.course,
+        group_name: CURATOR_ACADEMIC_CONTEXT.group,
+        name,
+        start_date: startDate,
+        end_date: endDate,
+        status: 'Проєкт',
+        updated_at: new Date().toISOString()
+      };
+      const loader = document.getElementById('page-loader');
+      if (loader) loader.classList.remove('hidden');
+      try {
+        if (id) {
+          const existing = examSessionById(id);
+          const { data, error } = await supabaseClient.from('exam_sessions').update(payload).eq('id', id).select().single();
+          if (error) throw error;
+          examSessions = examSessions.map(s => String(s.id) === String(id) ? (data || {...existing, ...payload}) : s);
+        } else {
+          const { data, error } = await supabaseClient.from('exam_sessions').insert(payload).select().single();
+          if (error) throw error;
+          examSessions.unshift(data);
+          examSessionActiveId = data.id;
+        }
+        localStorage.setItem('ekurator_exam_sessions', JSON.stringify(examSessions));
+        closeModal('modal-exam-session');
+        examSessionEditId = null;
+        renderExamSessionView(document.getElementById('main-content'));
+      } catch (err) {
+        console.error(err);
+        alert(`Не вдалося зберегти сесію в Supabase.\n${err?.message || 'Невідома помилка'}`);
+      } finally {
+        if (loader) loader.classList.add('hidden');
+      }
+    }
+
+    async function deleteExamSession(id) {
+      const s = examSessionById(id);
+      if (!s || s.status !== 'Проєкт') return;
+      if (!confirm(`Видалити сесію «${s.name}» разом із її графіком?`)) return;
+      const loader = document.getElementById('page-loader');
+      if (loader) loader.classList.remove('hidden');
+      try {
+        const { error } = await supabaseClient.from('exam_sessions').delete().eq('id', id);
+        if (error) throw error;
+        examSessions = examSessions.filter(x => String(x.id) !== String(id));
+        examSessionItems = examSessionItems.filter(x => String(x.session_id) !== String(id));
+        if (String(examSessionActiveId) === String(id)) examSessionActiveId = examSessions[0]?.id || null;
+        localStorage.setItem('ekurator_exam_sessions', JSON.stringify(examSessions));
+        localStorage.setItem('ekurator_exam_session_items', JSON.stringify(examSessionItems));
+        renderExamSessionView(document.getElementById('main-content'));
+      } catch (err) {
+        console.error(err);
+        alert(`Не вдалося видалити сесію.\n${err?.message || 'Невідома помилка'}`);
+      } finally { if (loader) loader.classList.add('hidden'); }
+    }
+
+    function openExamSession(id) {
+      examSessionActiveId = id;
+      renderExamSessionView(document.getElementById('main-content'));
+    }
+
+    function examSessionActionButtons(s) {
+      const itemsCount = examItemsForSession(s.id).length;
+      if (s.status === 'Проєкт') {
+        return `<div class="flex flex-wrap gap-1.5 justify-end">
+          <button onclick="openExamSession('${s.id}')" class="px-2.5 py-1 bg-[#2b569a] text-white rounded text-[10px] font-bold"><i class="fa-solid fa-list mr-1"></i>Графік</button>
+          <button onclick="examSessionEdit('${s.id}')" class="px-2.5 py-1 border border-slate-300 bg-white rounded text-[10px] font-semibold">Редагувати</button>
+          <button onclick="startExamSession('${s.id}')" class="px-2.5 py-1 bg-emerald-600 text-white rounded text-[10px] font-bold">Почати</button>
+          <button onclick="deleteExamSession('${s.id}')" class="px-2.5 py-1 border border-rose-200 bg-rose-50 text-rose-700 rounded text-[10px] font-semibold">Видалити</button>
+        </div>`;
+      }
+      if (s.status === 'Розпочата') {
+        return `<div class="flex flex-wrap gap-1.5 justify-end">
+          <button onclick="openExamSession('${s.id}')" class="px-2.5 py-1 bg-[#2b569a] text-white rounded text-[10px] font-bold">Графік</button>
+          <button onclick="cancelExamSessionStart('${s.id}')" class="px-2.5 py-1 border border-amber-300 bg-amber-50 text-amber-800 rounded text-[10px] font-semibold">Скасувати початок</button>
+          <button onclick="finishExamSession('${s.id}')" class="px-2.5 py-1 bg-slate-700 text-white rounded text-[10px] font-bold">Завершити</button>
+        </div>`;
+      }
+      return `<div class="flex flex-wrap gap-1.5 justify-end">
+        <button onclick="openExamSession('${s.id}')" class="px-2.5 py-1 bg-[#2b569a] text-white rounded text-[10px] font-bold">Переглянути</button>
+        <button onclick="cancelExamSessionFinish('${s.id}')" class="px-2.5 py-1 border border-amber-300 bg-amber-50 text-amber-800 rounded text-[10px] font-semibold">Скасувати завершення</button>
+      </div>`;
+    }
+
+    function examScheduleValidation(sessionId) {
+      const s = examSessionById(sessionId);
+      const items = examItemsForSession(sessionId);
+      const warnings = [];
+      if (!s) return warnings;
+      items.forEach((item, idx) => {
+        if (item.exam_date < s.start_date || item.exam_date > s.end_date) warnings.push(`«${item.discipline_name}» має дату поза межами сесії.`);
+        if (item.start_time && item.end_time && item.end_time <= item.start_time) warnings.push(`«${item.discipline_name}» має некоректний час.`);
+        for (let j = idx + 1; j < items.length; j++) {
+          const other = items[j];
+          if (item.exam_date === other.exam_date && item.start_time && item.end_time && other.start_time && other.end_time) {
+            if (item.start_time < other.end_time && other.start_time < item.end_time) warnings.push(`Перетин часу: «${item.discipline_name}» та «${other.discipline_name}» ${examFormatDate(item.exam_date)}.`);
+          }
+        }
+        if (item.activity_type === 'Іспит' && item.consultation_required) {
+          const consultation = items.some(x => x.activity_type === 'Консультація' && x.discipline_name.trim().toLowerCase() === item.discipline_name.trim().toLowerCase() && x.exam_date < item.exam_date);
+          if (!consultation) warnings.push(`Для іспиту «${item.discipline_name}» позначено потребу в консультації, але консультацію перед іспитом не внесено.`);
+        }
+      });
+      const exams = items.filter(x => x.activity_type === 'Іспит').sort((a,b) => String(a.exam_date).localeCompare(String(b.exam_date)));
+      for (let i=1;i<exams.length;i++) {
+        const prev = new Date(`${exams[i-1].exam_date}T00:00:00`);
+        const cur = new Date(`${exams[i].exam_date}T00:00:00`);
+        const days = Math.round((cur-prev)/86400000);
+        if (days < 1) warnings.push(`Іспити «${exams[i-1].discipline_name}» та «${exams[i].discipline_name}» заплановані на один день. Перевірте проміжок між іспитами.`);
+      }
+      return [...new Set(warnings)];
+    }
+
+    function renderExamSessionDocumentsPlaceholder(main) {
+      if (!main) return;
+      main.innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-white border border-slate-300 p-5 rounded-sm shadow-sm">
+            <div class="flex items-start gap-3">
+              <div class="w-9 h-9 rounded bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-500">
+                <i class="fa-solid fa-file-lines"></i>
+              </div>
+              <div>
+                <h1 class="text-base font-bold text-slate-800">Екзаменаційні відомості</h1>
+                <p class="text-xs text-slate-500 mt-1">Підсистема буде додана на наступному етапі відповідно до функціоналу, який буде визначено для куратора.</p>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function renderExamSessionView(main) {
+      if (!main) return;
+      if (!examSessionActiveId || !examSessionById(examSessionActiveId)) examSessionActiveId = examSessions[0]?.id || null;
+      const active = examSessionById(examSessionActiveId);
+      const total = examSessions.length;
+      const project = examSessions.filter(s=>s.status==='Проєкт').length;
+      const started = examSessions.filter(s=>s.status==='Розпочата').length;
+      const closed = examSessions.filter(s=>s.status==='Закрита').length;
+
+      main.innerHTML = `<div class="space-y-4">
+        <div class="bg-white border border-slate-300 p-4 rounded-sm shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+          <div><h1 class="text-base font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-calendar-days text-[#2b569a]"></i> Екзаменаційна сесія</h1><div class="text-xs text-slate-500 mt-0.5">Реєстрація та формування графіка екзаменаційної сесії для академічної групи ФТМ 1-5.</div></div>
+          <div class="flex flex-wrap gap-2 items-center"><span class="px-2.5 py-1 bg-slate-100 border rounded text-[11px] font-semibold">Усього: ${total}</span><span class="px-2.5 py-1 bg-slate-100 border rounded text-[11px] font-semibold">Проєкт: ${project}</span><span class="px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded text-[11px] font-semibold">Розпочата: ${started}</span><button onclick="examSessionCreate()" class="px-3.5 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white rounded text-xs font-bold"><i class="fa-solid fa-plus mr-1"></i>Створити</button></div>
+        </div>
+
+        <div class="bg-white border border-slate-300 rounded shadow-sm overflow-x-auto">
+          <div class="px-4 py-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between"><div class="font-bold text-xs text-slate-800">Реєстр екзаменаційних сесій</div><div class="text-[10px] text-slate-500">Insert — створити нову сесію</div></div>
+          <table class="w-full text-left text-xs border-collapse min-w-[1000px]"><thead><tr class="table-header border-b border-slate-300 text-slate-700 font-bold"><th class="p-2.5 border-r w-10 text-center">№</th><th class="p-2.5 border-r">Найменування</th><th class="p-2.5 border-r">Навчальний період</th><th class="p-2.5 border-r">Група</th><th class="p-2.5 border-r text-center">Елементи графіка</th><th class="p-2.5 border-r text-center">Статус</th><th class="p-2.5 text-right">Дії</th></tr></thead><tbody class="divide-y divide-slate-200">
+          ${examSessions.length ? examSessions.map((s,i)=>`<tr class="exam-session-row"><td class="p-2.5 border-r text-center text-slate-500">${i+1}</td><td class="p-2.5 border-r"><button onclick="openExamSession('${s.id}')" class="text-[#1e5bb8] font-bold hover:underline text-left">${examEscapeHtml(s.name)}</button><div class="text-[10px] text-slate-400 mt-0.5">${examEscapeHtml(s.specialty)} • ${examEscapeHtml(s.course)} курс • ${examEscapeHtml(s.form_of_study)}</div></td><td class="p-2.5 border-r font-semibold">${examFormatDate(s.start_date)} — ${examFormatDate(s.end_date)}</td><td class="p-2.5 border-r">${examEscapeHtml(s.group_name)}</td><td class="p-2.5 border-r text-center font-bold">${examItemsForSession(s.id).length}</td><td class="p-2.5 border-r text-center">${examStatusBadge(s.status)}</td><td class="p-2.5">${examSessionActionButtons(s)}</td></tr>`).join('') : `<tr><td colspan="7" class="p-8 text-center text-slate-400">Екзаменаційних сесій ще не створено.</td></tr>`}
+          </tbody></table>
+        </div>
+
+        ${active ? renderExamSessionDetail(active) : `<div class="bg-white border border-dashed border-slate-300 p-10 rounded text-center text-slate-400">Оберіть сесію або створіть нову.</div>`}
+      </div>`;
+    }
+
+    function renderExamSessionDetail(session) {
+      const items = examItemsForSession(session.id);
+      const warnings = examScheduleValidation(session.id);
+      const editable = session.status === 'Проєкт';
+      return `<div class="space-y-3">
+        <div class="bg-white border border-slate-300 p-4 rounded-sm shadow-sm">
+          <div class="flex flex-col xl:flex-row xl:items-start justify-between gap-3">
+            <div><div class="text-[10px] text-slate-500 uppercase font-bold">Обрана сесія</div><h2 class="text-base font-bold text-slate-800 mt-0.5">${examEscapeHtml(session.name)}</h2><div class="text-xs text-slate-500 mt-1">${examEscapeHtml(session.faculty)} • ${examEscapeHtml(session.specialty)} • ${examEscapeHtml(session.course)} курс • ${examEscapeHtml(session.group_name)}</div></div>
+            <div class="flex flex-wrap gap-2 items-center">${examStatusBadge(session.status)}${editable ? `<button onclick="examSessionEdit('${session.id}')" class="px-3 py-1.5 border border-slate-300 bg-white rounded text-xs font-semibold">Редагувати параметри</button><button onclick="openExamScheduleModal('${session.id}')" class="px-3 py-1.5 bg-[#2b569a] text-white rounded text-xs font-bold"><i class="fa-solid fa-plus mr-1"></i>Додати до графіка</button>` : ''}</div>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mt-4"><div class="bg-slate-50 border p-2 rounded"><div class="text-[10px] text-slate-500">Навчальний рік</div><div class="font-bold">${examEscapeHtml(session.academic_year)}</div></div><div class="bg-slate-50 border p-2 rounded"><div class="text-[10px] text-slate-500">Початок</div><div class="font-bold">${examFormatDate(session.start_date)}</div></div><div class="bg-slate-50 border p-2 rounded"><div class="text-[10px] text-slate-500">Закінчення</div><div class="font-bold">${examFormatDate(session.end_date)}</div></div><div class="bg-slate-50 border p-2 rounded"><div class="text-[10px] text-slate-500">Форма</div><div class="font-bold">${examEscapeHtml(session.form_of_study)}</div></div><div class="bg-slate-50 border p-2 rounded"><div class="text-[10px] text-slate-500">Група</div><div class="font-bold">${examEscapeHtml(session.group_name)}</div></div></div>
+        </div>
+
+        ${warnings.length ? `<div class="exam-warning p-3 rounded text-xs"><div class="font-bold mb-1"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Потрібна перевірка графіка</div><ul class="list-disc pl-5 space-y-0.5">${warnings.map(w=>`<li>${examEscapeHtml(w)}</li>`).join('')}</ul></div>` : `<div class="exam-ok p-3 rounded text-xs"><i class="fa-solid fa-circle-check mr-1"></i>За введеними даними критичних перетинів графіка не виявлено.</div>`}
+
+        <div class="bg-white border border-slate-300 rounded shadow-sm overflow-x-auto"><div class="px-4 py-3 border-b bg-slate-50 flex items-center justify-between"><div><div class="font-bold text-xs">Графік екзаменаційної сесії</div><div class="text-[10px] text-slate-500">Консультації, заліки та іспити для групи ${examEscapeHtml(session.group_name)}</div></div><div class="text-[11px] font-bold text-slate-600">${items.length} записів</div></div>
+          <table class="w-full text-left text-xs border-collapse min-w-[1250px]"><thead><tr class="table-header border-b border-slate-300 font-bold"><th class="p-2.5 border-r w-10 text-center">№</th><th class="p-2.5 border-r">Дата / час</th><th class="p-2.5 border-r">Дисципліна</th><th class="p-2.5 border-r">Вид</th><th class="p-2.5 border-r">Екзаменатор</th><th class="p-2.5 border-r">Асистент</th><th class="p-2.5 border-r">Аудиторія</th><th class="p-2.5 border-r">Примітка</th><th class="p-2.5 text-right">Дії</th></tr></thead><tbody class="divide-y divide-slate-200">
+          ${items.length ? items.map((item,idx)=>`<tr><td class="p-2.5 border-r text-center font-bold text-slate-500">${idx+1}</td><td class="p-2.5 border-r font-semibold">${examFormatDate(item.exam_date)}<div class="text-[10px] text-slate-500">${examEscapeHtml(item.start_time || '—')} — ${examEscapeHtml(item.end_time || '—')}</div></td><td class="p-2.5 border-r font-bold">${examEscapeHtml(item.discipline_name)}${item.consultation_required ? `<div class="text-[10px] text-amber-700 mt-0.5"><i class="fa-solid fa-circle-info mr-1"></i>Потрібна консультація</div>`:''}</td><td class="p-2.5 border-r"><span class="px-2 py-0.5 rounded bg-slate-100 border text-[10px] font-bold">${examEscapeHtml(item.activity_type)}</span></td><td class="p-2.5 border-r">${examEscapeHtml(item.examiner || '—')}</td><td class="p-2.5 border-r">${examEscapeHtml(item.assistant || '—')}</td><td class="p-2.5 border-r">${examEscapeHtml(item.room || '—')}</td><td class="p-2.5 border-r max-w-[220px]">${examEscapeHtml(item.notes || '—')}</td><td class="p-2.5">${editable ? `<div class="flex gap-1.5 justify-end"><button onclick="editExamScheduleItem('${item.id}')" class="px-2.5 py-1 border rounded bg-white text-[10px] font-semibold">Редагувати</button><button onclick="deleteExamScheduleItem('${item.id}')" class="px-2.5 py-1 bg-rose-50 text-rose-700 border border-rose-200 rounded text-[10px] font-semibold">Видалити</button></div>` : '<span class="text-[10px] text-slate-400">Тільки перегляд</span>'}</td></tr>`).join('') : `<tr><td colspan="9" class="p-8 text-center text-slate-400">Графік ще не сформовано. Додайте першу дисципліну.</td></tr>`}
+          </tbody></table></div>
+
+        <div class="bg-white border border-slate-300 rounded p-3 shadow-sm flex flex-wrap gap-2 items-center justify-between"><div class="text-[11px] text-slate-500"><i class="fa-solid fa-keyboard mr-1"></i>Клавіші: <b>Insert</b> — створити сесію; <b>Alt+P</b> — почати; <b>Alt+R</b> — скасувати початок; <b>Alt+F5</b> — завершити; <b>Ctrl+F5</b> — скасувати завершення.</div><div class="flex flex-wrap gap-2">${session.status==='Проєкт'?`<button onclick="startExamSession('${session.id}')" class="px-3 py-1.5 bg-emerald-600 text-white rounded text-xs font-bold">Почати сесію</button>`:''}${session.status==='Розпочата'?`<button onclick="cancelExamSessionStart('${session.id}')" class="px-3 py-1.5 border border-amber-300 bg-amber-50 text-amber-800 rounded text-xs font-semibold">Скасувати початок</button><button onclick="finishExamSession('${session.id}')" class="px-3 py-1.5 bg-slate-700 text-white rounded text-xs font-bold">Завершити сесію</button>`:''}${session.status==='Закрита'?`<button onclick="cancelExamSessionFinish('${session.id}')" class="px-3 py-1.5 border border-amber-300 bg-amber-50 text-amber-800 rounded text-xs font-semibold">Скасувати завершення</button>`:''}</div></div>
+      </div>`;
+    }
+
+    function openExamScheduleModal(sessionId) {
+      const s = examSessionById(sessionId);
+      if (!s || s.status !== 'Проєкт') return;
+      examScheduleEditId = null;
+      document.getElementById('exam-item-modal-title').textContent = 'Додати елемент графіка';
+      document.getElementById('exam-item-id').value = '';
+      document.getElementById('exam-item-session-id').value = s.id;
+      document.getElementById('exam-item-discipline').value = '';
+      document.getElementById('exam-item-type').value = 'Іспит';
+      document.getElementById('exam-item-date').value = s.start_date || '';
+      document.getElementById('exam-item-date').min = s.start_date || '';
+      document.getElementById('exam-item-date').max = s.end_date || '';
+      document.getElementById('exam-item-start').value = '';
+      document.getElementById('exam-item-end').value = '';
+      document.getElementById('exam-item-examiner').value = '';
+      document.getElementById('exam-item-assistant').value = '';
+      document.getElementById('exam-item-room').value = '';
+      document.getElementById('exam-item-order').value = examItemsForSession(sessionId).length + 1;
+      document.getElementById('exam-item-consultation-required').checked = false;
+      document.getElementById('exam-item-notes').value = '';
+      openModal('modal-exam-item');
+    }
+
+    function editExamScheduleItem(id) {
+      const item = examSessionItems.find(x => String(x.id) === String(id));
+      const s = item ? examSessionById(item.session_id) : null;
+      if (!item || !s || s.status !== 'Проєкт') return;
+      examScheduleEditId = id;
+      document.getElementById('exam-item-modal-title').textContent = 'Редагування елемента графіка';
+      document.getElementById('exam-item-id').value = item.id;
+      document.getElementById('exam-item-session-id').value = item.session_id;
+      document.getElementById('exam-item-discipline').value = item.discipline_name || '';
+      document.getElementById('exam-item-type').value = item.activity_type || 'Іспит';
+      document.getElementById('exam-item-date').value = item.exam_date || '';
+      document.getElementById('exam-item-date').min = s.start_date || '';
+      document.getElementById('exam-item-date').max = s.end_date || '';
+      document.getElementById('exam-item-start').value = item.start_time || '';
+      document.getElementById('exam-item-end').value = item.end_time || '';
+      document.getElementById('exam-item-examiner').value = item.examiner || '';
+      document.getElementById('exam-item-assistant').value = item.assistant || '';
+      document.getElementById('exam-item-room').value = item.room || '';
+      document.getElementById('exam-item-order').value = item.sort_order || 1;
+      document.getElementById('exam-item-consultation-required').checked = !!item.consultation_required;
+      document.getElementById('exam-item-notes').value = item.notes || '';
+      openModal('modal-exam-item');
+    }
+
+    async function saveExamScheduleItem(event) {
+      event.preventDefault();
+      const id = document.getElementById('exam-item-id').value.trim();
+      const sessionId = document.getElementById('exam-item-session-id').value;
+      const session = examSessionById(sessionId);
+      const discipline = document.getElementById('exam-item-discipline').value.trim();
+      const activity = document.getElementById('exam-item-type').value;
+      const date = document.getElementById('exam-item-date').value;
+      const start = document.getElementById('exam-item-start').value;
+      const end = document.getElementById('exam-item-end').value;
+      if (!session || session.status !== 'Проєкт') return;
+      if (!discipline || !date || !start || !end) { alert('Заповніть усі обов’язкові поля.'); return; }
+      if (date < session.start_date || date > session.end_date) { alert('Дата елемента має бути в межах сесії.'); return; }
+      if (end <= start) { alert('Час закінчення має бути пізніше часу початку.'); return; }
+      const payload = {
+        session_id: sessionId,
+        group_name: session.group_name,
+        discipline_name: discipline,
+        activity_type: activity,
+        exam_date: date,
+        start_time: start,
+        end_time: end,
+        examiner: document.getElementById('exam-item-examiner').value.trim(),
+        assistant: document.getElementById('exam-item-assistant').value.trim(),
+        room: document.getElementById('exam-item-room').value.trim(),
+        sort_order: Number(document.getElementById('exam-item-order').value || 1),
+        consultation_required: document.getElementById('exam-item-consultation-required').checked,
+        notes: document.getElementById('exam-item-notes').value.trim(),
+        updated_at: new Date().toISOString()
+      };
+      const loader = document.getElementById('page-loader');
+      if (loader) loader.classList.remove('hidden');
+      try {
+        if (id) {
+          const { data, error } = await supabaseClient.from('exam_session_items').update(payload).eq('id', id).select().single();
+          if (error) throw error;
+          examSessionItems = examSessionItems.map(x => String(x.id) === String(id) ? data : x);
+        } else {
+          const { data, error } = await supabaseClient.from('exam_session_items').insert(payload).select().single();
+          if (error) throw error;
+          examSessionItems.push(data);
+        }
+        localStorage.setItem('ekurator_exam_session_items', JSON.stringify(examSessionItems));
+        closeModal('modal-exam-item');
+        examScheduleEditId = null;
+        renderExamSessionView(document.getElementById('main-content'));
+      } catch (err) {
+        console.error(err);
+        alert(`Не вдалося зберегти елемент графіка в Supabase.\n${err?.message || 'Невідома помилка'}`);
+      } finally { if (loader) loader.classList.add('hidden'); }
+    }
+
+    async function deleteExamScheduleItem(id) {
+      const item = examSessionItems.find(x => String(x.id) === String(id));
+      const s = item ? examSessionById(item.session_id) : null;
+      if (!item || !s || s.status !== 'Проєкт') return;
+      if (!confirm(`Видалити «${item.activity_type}: ${item.discipline_name}» з графіка?`)) return;
+      try {
+        const { error } = await supabaseClient.from('exam_session_items').delete().eq('id', id);
+        if (error) throw error;
+        examSessionItems = examSessionItems.filter(x => String(x.id) !== String(id));
+        localStorage.setItem('ekurator_exam_session_items', JSON.stringify(examSessionItems));
+        renderExamSessionView(document.getElementById('main-content'));
+      } catch (err) { alert(`Не вдалося видалити запис.\n${err?.message || 'Невідома помилка'}`); }
+    }
+
+    async function updateExamSessionStatus(id, status) {
+      const s = examSessionById(id);
+      if (!s) return;
+      const { data, error } = await supabaseClient.from('exam_sessions').update({ status, updated_at: new Date().toISOString() }).eq('id', id).select().single();
+      if (error) throw error;
+      examSessions = examSessions.map(x => String(x.id) === String(id) ? data : x);
+      localStorage.setItem('ekurator_exam_sessions', JSON.stringify(examSessions));
+    }
+
+    async function startExamSession(id) {
+      const s = examSessionById(id); if (!s || s.status !== 'Проєкт') return;
+      const items = examItemsForSession(id);
+      if (!items.length) { alert('Неможливо почати сесію: спочатку додайте хоча б один запис до графіка.'); return; }
+      const warnings = examScheduleValidation(id);
+      if (warnings.length && !confirm(`У графіку є ${warnings.length} попереджень. Розпочати сесію все одно?`)) return;
+      if (!confirm(`Почати екзаменаційну сесію «${s.name}»? Після початку графік буде доступний лише для перегляду.`)) return;
+      try { await updateExamSessionStatus(id,'Розпочата'); renderExamSessionView(document.getElementById('main-content')); } catch(err) { alert(`Не вдалося почати сесію.\n${err?.message || 'Невідома помилка'}`); }
+    }
+
+    async function cancelExamSessionStart(id) {
+      const s = examSessionById(id); if (!s || s.status !== 'Розпочата') return;
+      if (!confirm('Скасувати початок сесії та повернути її у статус «Проєкт»?')) return;
+      try { await updateExamSessionStatus(id,'Проєкт'); renderExamSessionView(document.getElementById('main-content')); } catch(err) { alert(`Не вдалося скасувати початок.\n${err?.message || 'Невідома помилка'}`); }
+    }
+
+    async function finishExamSession(id) {
+      const s = examSessionById(id); if (!s || s.status !== 'Розпочата') return;
+      if (!confirm(`Завершити екзаменаційну сесію «${s.name}»? Після завершення графік буде доступний лише для перегляду.`)) return;
+      try { await updateExamSessionStatus(id,'Закрита'); renderExamSessionView(document.getElementById('main-content')); } catch(err) { alert(`Не вдалося завершити сесію.\n${err?.message || 'Невідома помилка'}`); }
+    }
+
+    async function cancelExamSessionFinish(id) {
+      const s = examSessionById(id); if (!s || s.status !== 'Закрита') return;
+      if (!confirm('Скасувати завершення сесії та повернути її у статус «Розпочата»?')) return;
+      try { await updateExamSessionStatus(id,'Розпочата'); renderExamSessionView(document.getElementById('main-content')); } catch(err) { alert(`Не вдалося скасувати завершення.\n${err?.message || 'Невідома помилка'}`); }
+    }
+
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Insert' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName) && currentTab === 'exam-session-registry') {
+        event.preventDefault(); examSessionCreate();
+      }
+      if (currentTab !== 'exam-session-registry') return;
+      const active = examSessionById(examSessionActiveId);
+      if (event.altKey && event.key.toLowerCase() === 'p' && active) { event.preventDefault(); startExamSession(active.id); }
+      if (event.altKey && event.key.toLowerCase() === 'r' && active) { event.preventDefault(); cancelExamSessionStart(active.id); }
+      if (event.altKey && event.key === 'F5' && active) { event.preventDefault(); finishExamSession(active.id); }
+      if (event.ctrlKey && event.key === 'F5' && active) { event.preventDefault(); cancelExamSessionFinish(active.id); }
+    });
 
     function openModal(id) {
       document.getElementById(id).classList.remove('hidden');
