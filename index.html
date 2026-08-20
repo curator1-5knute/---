@@ -4908,6 +4908,38 @@ async function loadExamSheetGrades(sheetId) {
  }
 }
 
+function getExamScale(value) {
+ const n = Number(value);
+ if (!Number.isFinite(n)) return { ects:'—', national:'—' };
+ if (n >= 90) return { ects:'A', national:'Відмінно' };
+ if (n >= 82) return { ects:'B', national:'Добре' };
+ if (n >= 74) return { ects:'C', national:'Добре' };
+ if (n >= 64) return { ects:'D', national:'Задовільно' };
+ if (n >= 60) return { ects:'E', national:'Задовільно' };
+ if (n >= 35) return { ects:'FX', national:'Незадовільно' };
+ return { ects:'F', national:'Незадовільно' };
+}
+
+function formatExamEditDate(value) {
+ if (!value) return '—';
+ const d = new Date(value);
+ if (Number.isNaN(d.getTime())) return '—';
+ return d.toLocaleString('uk-UA', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
+}
+
+function examStatusLabel(status) {
+ const map = {
+   'Не проведена': 'Очікує оцінювання',
+   'Проведена': 'Проведена',
+   'не допущений': 'Не допущений',
+   'н/д': 'Не допущений',
+   'не з’явився': 'Не з’явився',
+   'не з\'явився': 'Не з\'явився',
+   'курсову не здано': 'Курсова не здана'
+ };
+ return map[status] || status || '—';
+}
+
 function renderExamSheetGradeTable(sheetId) {
  const sheet = examSheets.find(s => String(s.id) === String(sheetId));
  const loading = document.getElementById('exam-sheet-loading');
@@ -4917,71 +4949,73 @@ function renderExamSheetGradeTable(sheetId) {
 
  const students = Array.isArray(studentsList) ? studentsList : [];
  const readonly = sheet.status === 'Проведена';
-
  if (loading) loading.classList.add('hidden');
  wrap.classList.remove('hidden');
+
+ const sheetNumber = sheet.sheet_number || ('EV-' + String(sheet.id).slice(0,8).toUpperCase());
+ const registeredAt = sheet.registered_at || sheet.created_at;
+ const credits = sheet.credits ?? '—';
 
  if (!students.length) {
    wrap.innerHTML = `<div class="p-8 text-center text-slate-400">Студентів академічної групи не знайдено.</div>`;
  } else {
    wrap.innerHTML = `
+     <div class="p-4 bg-white border-b border-slate-200">
+       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-[11px]">
+         <div><div class="text-slate-400 uppercase font-bold">Номер відомості</div><div class="font-semibold text-slate-800 mt-0.5">${escExam(sheetNumber)}</div></div>
+         <div><div class="text-slate-400 uppercase font-bold">Години / кредити ECTS</div><div class="font-semibold text-slate-800 mt-0.5">${escExam(credits)}</div></div>
+         <div><div class="text-slate-400 uppercase font-bold">Дата реєстрації</div><div class="font-semibold text-slate-800 mt-0.5">${escExam(formatExamEditDate(registeredAt))}</div></div>
+         <div><div class="text-slate-400 uppercase font-bold">Дата складання</div><div class="font-semibold text-slate-800 mt-0.5">${escExam(sheet.exam_date || '—')}</div></div>
+       </div>
+     </div>
      <div class="px-4 py-3 bg-white border-b border-slate-200 flex items-center justify-between">
        <div class="text-xs font-bold text-slate-800">Відомість екзамену</div>
        <div class="text-[11px] text-slate-500">Студентів: <b>${students.length}</b></div>
      </div>
      <div class="overflow-x-auto">
-       <table class="w-full text-xs min-w-[760px]">
+       <table class="w-full text-xs min-w-[1120px]">
          <thead class="bg-slate-100 border-b border-slate-300">
            <tr>
-             <th class="p-2.5 w-12 text-center">№</th>
-             <th class="p-2.5 text-left">Студент</th>
-             <th class="p-2.5 text-center w-36">100-ная</th>
-             <th class="p-2.5 text-center w-32">Звільнений</th>
-             <th class="p-2.5 text-center w-40">Кількість перездач</th>
+             <th class="p-2.5 w-10 text-center">№</th>
+             <th class="p-2.5 text-left min-w-[250px]">Студент</th>
+             <th class="p-2.5 text-center w-28">100-бал</th>
+             <th class="p-2.5 text-center w-20">ECTS</th>
+             <th class="p-2.5 text-center w-36">Оцінка</th>
+             <th class="p-2.5 text-center w-40">Дата редагування</th>
+             <th class="p-2.5 text-center w-64">Звітування / статус</th>
            </tr>
          </thead>
          <tbody class="divide-y divide-slate-200">
            ${students.map((student, index) => {
              const grade = examSheetGrades[String(student.id)] || {};
-             const value = grade.grade_value || '';
-             const exempt = value === 'Звільнений';
+             const value = grade.grade_value && !['Звільнений','н/д','Не допущений','не з\'явився','не з’явився','курсову не здано'].includes(grade.grade_value) ? grade.grade_value : '';
+             const status = grade.result_status || (['н/д','Не допущений','не з\'явився','не з\'явився','курсову не здано'].includes(grade.grade_value) ? grade.grade_value : '');
+             const exempt = grade.grade_value === 'Звільнений';
+             const scale = value === '' ? {ects:'—', national: exempt ? 'Звільнений' : '—'} : getExamScale(value);
+             const currentEcts = grade.ects_grade || scale.ects;
+             const currentNational = grade.national_grade || scale.national;
              return `
-               <tr class="hover:bg-slate-50">
+               <tr class="hover:bg-slate-50" data-exam-row="${escExam(student.id)}">
                  <td class="p-2.5 text-center text-slate-500">${index + 1}</td>
-                 <td class="p-2.5 font-semibold text-slate-800">${escExam(student.full_name || student.name || '—')}</td>
-                 <td class="p-2.5 text-center">
-                   <input
-                     id="exam-grade-${escExam(student.id)}"
-                     data-student-id="${escExam(student.id)}"
-                     type="number" min="0" max="100" step="1"
-                     value="${exempt ? '' : escExam(value)}"
-                     ${readonly || exempt ? 'disabled' : ''}
-                     class="exam-grade-input w-24 border border-slate-300 rounded px-2 py-1.5 text-center font-bold focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-slate-100 disabled:text-slate-500"
-                     placeholder="0–100"
-                   >
+                 <td class="p-2.5">
+                   <div class="font-semibold text-slate-800">${escExam(student.full_name || student.name || '—')}</div>
+                   <div class="text-[10px] text-slate-400">${escExam(student.id)}</div>
                  </td>
                  <td class="p-2.5 text-center">
-                   <label class="inline-flex items-center gap-2 ${readonly ? 'cursor-default' : 'cursor-pointer'}">
-                     <input
-                       id="exam-exempt-${escExam(student.id)}"
-                       data-student-id="${escExam(student.id)}"
-                       type="checkbox"
-                       ${exempt ? 'checked' : ''}
-                       ${readonly ? 'disabled' : ''}
-                       class="exam-exempt-input w-4 h-4 rounded"
-                     >
-                     <span class="text-[11px] font-semibold text-slate-600">Так</span>
-                   </label>
+                   <input id="exam-grade-${escExam(student.id)}" data-student-id="${escExam(student.id)}" type="number" min="0" max="100" step="1" value="${escExam(value)}" ${readonly || exempt || status ? 'disabled' : ''}
+                     oninput="updateExamScale('${escExam(student.id)}')"
+                     class="exam-grade-input w-20 border border-slate-300 rounded px-2 py-1.5 text-center font-bold focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-slate-100 disabled:text-slate-500" placeholder="0–100">
                  </td>
-                 <td class="p-2.5 text-center">
-                   <input
-                     id="exam-retake-${escExam(student.id)}"
-                     data-student-id="${escExam(student.id)}"
-                     type="number" min="0" max="99" step="1"
-                     value="${Number(grade.retake_count || 0)}"
-                     ${readonly ? 'disabled' : ''}
-                     class="exam-retake-input w-20 border border-slate-300 rounded px-2 py-1.5 text-center disabled:bg-slate-100 disabled:text-slate-500"
-                   >
+                 <td class="p-2.5 text-center"><span id="exam-ects-${escExam(student.id)}" class="font-extrabold text-[#2b569a]">${escExam(currentEcts)}</span></td>
+                 <td class="p-2.5 text-center"><span id="exam-national-${escExam(student.id)}" class="font-semibold">${escExam(currentNational)}</span></td>
+                 <td class="p-2.5 text-center text-[10px] text-slate-500"><span id="exam-edited-${escExam(student.id)}">${escExam(formatExamEditDate(grade.updated_at))}</span></td>
+                 <td class="p-2.5">
+                   <div class="flex flex-wrap justify-center gap-1.5">
+                     <button type="button" onclick="setExamStudentStatus('${escExam(student.id)}','н/д')" ${readonly ? 'disabled' : ''} class="px-2 py-1 rounded border text-[10px] font-bold ${status === 'н/д' ? 'bg-rose-100 border-rose-300 text-rose-700' : 'bg-white border-slate-300 text-slate-600 hover:bg-rose-50'} disabled:opacity-50">н/д</button>
+                     <button type="button" onclick="setExamStudentStatus('${escExam(student.id)}','не з’явився')" ${readonly ? 'disabled' : ''} class="px-2 py-1 rounded border text-[10px] font-bold ${status === 'не з’явився' ? 'bg-amber-100 border-amber-300 text-amber-700' : 'bg-white border-slate-300 text-slate-600 hover:bg-amber-50'} disabled:opacity-50">Не з'явився</button>
+                     <button type="button" onclick="setExamStudentStatus('${escExam(student.id)}','курсову не здано')" ${readonly ? 'disabled' : ''} class="px-2 py-1 rounded border text-[10px] font-bold ${status === 'курсову не здано' ? 'bg-orange-100 border-orange-300 text-orange-700' : 'bg-white border-slate-300 text-slate-600 hover:bg-orange-50'} disabled:opacity-50">Курсова не здана</button>
+                     <button type="button" onclick="setExamStudentStatus('${escExam(student.id)}','')" ${readonly ? 'disabled' : ''} class="px-2 py-1 rounded border text-[10px] font-bold bg-white border-slate-300 text-slate-600 hover:bg-emerald-50 disabled:opacity-50">Очистити статус</button>
+                   </div>
                  </td>
                </tr>`;
            }).join('')}
@@ -4989,62 +5023,73 @@ function renderExamSheetGradeTable(sheetId) {
        </table>
      </div>
    `;
-
-   wrap.querySelectorAll('.exam-exempt-input').forEach(cb => {
-     cb.addEventListener('change', () => {
-       const id = cb.dataset.studentId;
-       const input = document.getElementById(`exam-grade-${id}`);
-       if (input) {
-         input.disabled = cb.checked || sheet.status === 'Проведена';
-         if (cb.checked) input.value = '';
-       }
-     });
-   });
  }
 
  if (actions) {
    actions.classList.remove('hidden');
    actions.innerHTML = readonly
-     ? `<div class="mr-auto text-[11px] text-slate-500 flex items-center gap-1.5">
-          <i class="fa-solid fa-lock text-slate-400"></i> Відомість закрита. Оцінки доступні лише для перегляду.
-        </div>`
-     : `
-       <div class="mr-auto text-[11px] text-slate-500 self-center">
-         Оцінка: від 0 до 100. Для студента без оцінки можна встановити «Звільнений».
-       </div>
-       <button onclick="saveExamSheetGrades('${escExam(sheet.id)}')" class="px-4 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white rounded text-xs font-bold">
-         <i class="fa-solid fa-floppy-disk mr-1"></i> Зберегти оцінки
-       </button>
-       <button onclick="closeExamSheet('${escExam(sheet.id)}')" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold">
-         <i class="fa-solid fa-lock mr-1"></i> Закрити відомість
-       </button>`;
+     ? `<div class="mr-auto text-[11px] text-slate-500 flex items-center gap-1.5"><i class="fa-solid fa-lock text-slate-400"></i> Відомість закрита. Дані доступні лише для перегляду.</div>`
+     : `<div class="mr-auto text-[11px] text-slate-500 self-center">100-бальна оцінка автоматично перераховується у шкалу ECTS та національну оцінку.</div>
+        <button onclick="saveExamSheetGrades('${escExam(sheet.id)}')" class="px-4 py-1.5 bg-[#2b569a] hover:bg-[#1f4277] text-white rounded text-xs font-bold"><i class="fa-solid fa-floppy-disk mr-1"></i> Зберегти оцінки</button>
+        <button onclick="closeExamSheet('${escExam(sheet.id)}')" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold"><i class="fa-solid fa-lock mr-1"></i> Закрити відомість</button>`;
  }
+}
+
+function updateExamScale(studentId) {
+ const input = document.getElementById(`exam-grade-${studentId}`);
+ const ects = document.getElementById(`exam-ects-${studentId}`);
+ const national = document.getElementById(`exam-national-${studentId}`);
+ if (!input || !ects || !national) return;
+ const value = input.value.trim();
+ if (value === '') { ects.textContent='—'; national.textContent='—'; return; }
+ const scale = getExamScale(value);
+ ects.textContent = scale.ects;
+ national.textContent = scale.national;
+}
+
+function setExamStudentStatus(studentId, status) {
+ const sheet = examSheets.find(s => String(s.id) === String(selectedExamSheetId));
+ if (!sheet || sheet.status === 'Проведена') return;
+ const input = document.getElementById(`exam-grade-${studentId}`);
+ const ects = document.getElementById(`exam-ects-${studentId}`);
+ const national = document.getElementById(`exam-national-${studentId}`);
+ if (!input) return;
+ if (status) {
+   input.value = '';
+   input.disabled = true;
+   if (ects) ects.textContent = '—';
+   if (national) national.textContent = status === 'н/д' ? 'Не допущений' : status === 'не з’явився' ? 'Не з’явився' : 'Не допущений';
+ } else {
+   input.disabled = false;
+   if (national) national.textContent = '—';
+ }
+ const grade = examSheetGrades[String(studentId)] || {};
+ grade.grade_value = status || '';
+ grade.result_status = status || null;
+ grade.ects_grade = status ? null : grade.ects_grade || null;
+ grade.national_grade = status ? (status === 'н/д' ? 'Не допущений' : status === 'не з’явився' ? 'Не з’явився' : 'Не допущений') : null;
+ examSheetGrades[String(studentId)] = grade;
+ renderExamSheetGradeTable(sheet.id);
 }
 
 async function saveExamSheetGrades(sheetId) {
  const sheet = examSheets.find(s => String(s.id) === String(sheetId));
  if (!sheet || sheet.status === 'Проведена') return false;
-
  const students = Array.isArray(studentsList) ? studentsList : [];
  const records = [];
-
  for (const student of students) {
    const id = String(student.id);
    const gradeInput = document.getElementById(`exam-grade-${id}`);
-   const exemptInput = document.getElementById(`exam-exempt-${id}`);
-   const retakeInput = document.getElementById(`exam-retake-${id}`);
-
-   const exempt = !!exemptInput?.checked;
+   const existing = examSheetGrades[id] || {};
    const rawGrade = (gradeInput?.value ?? '').trim();
-   const retakes = Math.max(0, Number(retakeInput?.value || 0));
-
-   if (!exempt && rawGrade === '') {
-     alert(`Не заповнена оцінка: ${student.full_name}. Вкажіть бал або встановіть «Звільнений».`);
+   const status = existing.result_status || '';
+   const retakes = Math.max(0, Number(existing.retake_count || 0));
+   if (!status && rawGrade === '') {
+     alert(`Не заповнена оцінка: ${student.full_name}. Вкажіть бал або встановіть статус.`);
      gradeInput?.focus();
      return false;
    }
-
-   if (!exempt) {
+   if (!status) {
      const grade = Number(rawGrade);
      if (!Number.isFinite(grade) || grade < 0 || grade > 100) {
        alert(`Некоректна оцінка для ${student.full_name}. Допустимий діапазон: 0–100.`);
@@ -5052,52 +5097,23 @@ async function saveExamSheetGrades(sheetId) {
        return false;
      }
    }
-
-   records.push({
-     student_id: student.id,
-     grade_value: exempt ? 'Звільнений' : String(Number(rawGrade)),
-     retake_count: retakes
-   });
+   const scale = status ? {ects:null, national: status === 'н/д' || status === 'курсову не здано' ? 'Не допущений' : 'Не з’явився'} : getExamScale(rawGrade);
+   records.push({student_id: student.id, grade_value: status || String(Number(rawGrade)), result_status: status || null, ects_grade: scale.ects, national_grade: scale.national, retake_count: retakes, updated_at: new Date().toISOString()});
  }
-
  const loader = document.getElementById('page-loader');
  if (loader) loader.classList.remove('hidden');
-
  try {
    for (const record of records) {
-     const { data: existing, error: findError } = await supabaseClient
-       .from('exam_sheet_grades')
-       .select('id')
-       .eq('sheet_id', sheetId)
-       .eq('student_id', record.student_id)
-       .maybeSingle();
-
+     const { data: existing, error: findError } = await supabaseClient.from('exam_sheet_grades').select('id').eq('sheet_id', sheetId).eq('student_id', record.student_id).maybeSingle();
      if (findError) throw findError;
-
      if (existing?.id) {
-       const { error } = await supabaseClient
-         .from('exam_sheet_grades')
-         .update({
-           grade_value: record.grade_value,
-           retake_count: record.retake_count,
-           updated_at: new Date().toISOString()
-         })
-         .eq('id', existing.id);
+       const { error } = await supabaseClient.from('exam_sheet_grades').update(record).eq('id', existing.id);
        if (error) throw error;
      } else {
-       const { error } = await supabaseClient
-         .from('exam_sheet_grades')
-         .insert({
-           sheet_id: sheetId,
-           student_id: record.student_id,
-           grade_value: record.grade_value,
-           retake_count: record.retake_count,
-           updated_at: new Date().toISOString()
-         });
+       const { error } = await supabaseClient.from('exam_sheet_grades').insert({sheet_id: sheetId, ...record});
        if (error) throw error;
      }
    }
-
    await loadExamSheetGrades(sheetId);
    alert('Оцінки успішно збережено.');
    return true;
@@ -5105,9 +5121,7 @@ async function saveExamSheetGrades(sheetId) {
    console.error(err);
    alert(`Не вдалося зберегти оцінки у Supabase.\n${err?.message || 'Невідома помилка'}`);
    return false;
- } finally {
-   if (loader) loader.classList.add('hidden');
- }
+ } finally { if (loader) loader.classList.add('hidden'); }
 }
 
 async function closeExamSheet(sheetId) {
@@ -5155,49 +5169,16 @@ async function closeExamSheet(sheetId) {
 function printExamSheet(sheetId) {
  const sheet = examSheets.find(s => String(s.id) === String(sheetId));
  if (!sheet) return;
-
  const students = Array.isArray(studentsList) ? studentsList : [];
  const rows = students.map((student, index) => {
    const grade = examSheetGrades[String(student.id)] || {};
-   return `
-     <tr>
-       <td>${index + 1}</td>
-       <td style="text-align:left">${escExam(student.full_name || '—')}</td>
-       <td>${escExam(grade.grade_value || '')}</td>
-       <td>${Number(grade.retake_count || 0)}</td>
-     </tr>`;
+   const scale = grade.ects_grade || (grade.grade_value ? getExamScale(grade.grade_value).ects : '—');
+   const result = grade.result_status || grade.national_grade || (grade.grade_value ? getExamScale(grade.grade_value).national : '—');
+   return `<tr><td>${index+1}</td><td style="text-align:left">${escExam(student.full_name || '—')}</td><td>${escExam(grade.grade_value || '')}</td><td>${escExam(scale)}</td><td>${escExam(result)}</td><td>${escExam(formatExamEditDate(grade.updated_at))}</td></tr>`;
  }).join('');
-
- let area = document.getElementById('printable-area');
- if (!area) {
-   area = document.createElement('div');
-   area.id = 'printable-area';
-   document.body.appendChild(area);
- }
-
- area.innerHTML = `
-   <div style="padding:24px;font-family:Arial,sans-serif;color:#111">
-     <div style="text-align:center;font-weight:700;font-size:18px">ДЕРЖАВНИЙ ТОРГОВЕЛЬНО-ЕКОНОМІЧНИЙ УНІВЕРСИТЕТ</div>
-     <div style="text-align:center;font-size:15px;font-weight:700;margin-top:16px">ЕКЗАМЕНАЦІЙНА ВІДОМІСТЬ</div>
-     <table style="width:100%;margin-top:18px;font-size:13px">
-       <tr><td><b>Дисципліна:</b> ${escExam(sheet.discipline_name)}</td><td><b>Група:</b> ${escExam(sheet.group_name || CURATOR_ACADEMIC_CONTEXT.group)}</td></tr>
-       <tr><td><b>Вид контролю:</b> ${escExam(examTypeLabel(sheet.exam_type))}</td><td><b>Дата:</b> ${escExam(sheet.exam_date || '—')}</td></tr>
-       <tr><td><b>Екзаменатор:</b> ${escExam(sheet.examiner || '—')}</td><td><b>Місце:</b> ${escExam(sheet.room || sheet.place || '—')}</td></tr>
-     </table>
-     <table style="width:100%;border-collapse:collapse;margin-top:18px;font-size:12px">
-       <thead><tr>
-         <th style="border:1px solid #555;padding:6px;width:40px">№</th>
-         <th style="border:1px solid #555;padding:6px">ПІБ студента</th>
-         <th style="border:1px solid #555;padding:6px;width:100px">100-ная</th>
-         <th style="border:1px solid #555;padding:6px;width:100px">Перездачі</th>
-       </tr></thead>
-       <tbody>${rows.replace(/<td>/g,'<td style="border:1px solid #555;padding:6px;text-align:center">')}</tbody>
-     </table>
-     <div style="margin-top:36px;display:flex;justify-content:space-between;font-size:12px">
-       <span>Екзаменатор ____________________</span>
-       <span>Куратор ____________________</span>
-     </div>
-   </div>`;
+ let area=document.getElementById('printable-area');
+ if(!area){area=document.createElement('div');area.id='printable-area';document.body.appendChild(area);}
+ area.innerHTML=`<div style="padding:24px;font-family:Arial,sans-serif;color:#111"><div style="text-align:center;font-weight:700;font-size:18px">ДЕРЖАВНИЙ ТОРГОВЕЛЬНО-ЕКОНОМІЧНИЙ УНІВЕРСИТЕТ</div><div style="text-align:center;font-size:15px;font-weight:700;margin-top:16px">ЕКЗАМЕНАЦІЙНА ВІДОМІСТЬ</div><table style="width:100%;margin-top:18px;font-size:13px"><tr><td><b>Номер:</b> ${escExam(sheet.sheet_number || ('EV-'+String(sheet.id).slice(0,8).toUpperCase()))}</td><td><b>Група:</b> ${escExam(sheet.group_name || CURATOR_ACADEMIC_CONTEXT.group)}</td></tr><tr><td><b>Дисципліна:</b> ${escExam(sheet.discipline_name)}</td><td><b>Дата складання:</b> ${escExam(sheet.exam_date || '—')}</td></tr><tr><td><b>Вид контролю:</b> ${escExam(examTypeLabel(sheet.exam_type))}</td><td><b>Екзаменатор:</b> ${escExam(sheet.examiner || '—')}</td></tr></table><table style="width:100%;border-collapse:collapse;margin-top:18px;font-size:11px"><thead><tr><th style="border:1px solid #555;padding:6px">№</th><th style="border:1px solid #555;padding:6px">ПІБ студента</th><th style="border:1px solid #555;padding:6px">100-бал</th><th style="border:1px solid #555;padding:6px">ECTS</th><th style="border:1px solid #555;padding:6px">Оцінка / статус</th><th style="border:1px solid #555;padding:6px">Дата редагування</th></tr></thead><tbody>${rows.replace(/<td>/g,'<td style="border:1px solid #555;padding:6px;text-align:center">')}</tbody></table><div style="margin-top:36px;display:flex;justify-content:space-between;font-size:12px"><span>Екзаменатор ____________________</span><span>Куратор ____________________</span></div></div>`;
  window.print();
 }
 
@@ -5225,6 +5206,7 @@ function getStartedExamSession() {
       const examiner = prompt('Екзаменатор (необов’язково):', '');
       const assistant = prompt('Асистент (необов’язково):', '');
       const place = prompt('Місце проведення (необов’язково):', '');
+      const credits = prompt('Кількість кредитів ECTS (необов’язково):', '');
 
       const payload = {
         session_id: session.id,
@@ -5241,6 +5223,9 @@ function getStartedExamSession() {
         start_time: startTime,
         end_time: endTime,
         place: place?.trim() || null,
+        credits: credits?.trim() || null,
+        sheet_number: 'EV-' + Date.now().toString().slice(-8),
+        registered_at: new Date().toISOString(),
         status: 'Не проведена',
         updated_at: new Date().toISOString()
       };
