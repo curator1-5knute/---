@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -8,12 +7,12 @@
   <!-- Google Font: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com/">
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700\&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700\\&display=swap" rel="stylesheet">
   <!-- Tailwind CSS, FontAwesome & Supabase JS -->
   <script src="https://cdn.tailwindcss.com/"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <style>
+  \<style>
     body, input, select, textarea, button, table, th, td, h1, h2, h3, h4, h5, h6, span, p, div, a {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
@@ -23,9 +22,9 @@
     body { background-color: #f0f2f5; }
     .sute-blue { background-color: #2b569a; }
     .sute-blue-dark { background-color: #1f4277; }
-    .sute-nav-hover:hover { background-color: #3b6ab5; }
+    .sute-nav-hover\:hover { background-color: #3b6ab5; }
     .sute-link { color: #1e5bb8; text-decoration: underline; }
-    .sute-link:hover { color: #0d3875; }
+    .sute-link\:hover { color: #0d3875; }
     .table-header { background-color: #e9ecef; }
 
     .mia-submenu {
@@ -45,7 +44,7 @@
       font-weight: 400;
       transition: all 0.15s;
     }
-    .mia-submenu-item:hover {
+    .mia-submenu-item\:hover {
       background-color: #f1f5f9;
       color: #1e5bb8;
     }
@@ -56,34 +55,34 @@
       border-left: 3px solid #2b569a;
     }
 
-    .room-management-grid { display:grid; grid-template-columns: 280px minmax(0,1fr); gap:16px; align-items:start; }
-    .room-student-card { cursor:grab; user-select:none; transition:transform .12s, box-shadow .12s, background .12s; }
-    .room-student-card:active { cursor:grabbing; transform:scale(.98); }
+    .room-management-grid { display\:grid; grid-template-columns: 280px minmax(0,1fr); gap:16px; align-items\:start; }
+    .room-student-card { cursor\:grab; user-select\:none; transition\:transform .12s, box-shadow .12s, background .12s; }
+    .room-student-card\:active { cursor\:grabbing; transform\:scale(.98); }
     .room-student-card.dragging { opacity:.55; box-shadow:0 8px 18px rgba(15,23,42,.16); }
-    .room-bed { min-height:42px; border:1px solid #cbd5e1; border-radius:5px; padding:7px 8px; display:flex; align-items:center; justify-content:space-between; gap:8px; transition:all .12s; }
+    .room-bed { min-height:42px; border:1px solid #cbd5e1; border-radius:5px; padding:7px 8px; display\:flex; align-items\:center; justify-content\:space-between; gap:8px; transition\:all .12s; }
     .room-bed.free { background:#f8fafc; color:#64748b; }
     .room-bed.occupied { background:#e2e8f0; color:#334155; }
-    .room-bed.drop-target { background:#dbeafe; border-color:#2563eb; box-shadow:inset 0 0 0 1px #2563eb; }
+    .room-bed.drop-target { background:#dbeafe; border-color:#2563eb; box-shadow\:inset 0 0 0 1px #2563eb; }
     .room-card { border:1px solid #cbd5e1; border-radius:7px; background:#fff; box-shadow:0 2px 7px rgba(15,23,42,.05); }
     .room-card.full { border-color:#94a3b8; }
     .room-card.empty { border-color:#86efac; }
     .room-card.partial { border-color:#fbbf24; }
     @media (max-width: 900px) { .room-management-grid { grid-template-columns:1fr; } }
-    .exam-session-status { display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:999px; font-size:10px; font-weight:700; border:1px solid; }
+    .exam-session-status { display\:inline-flex; align-items\:center; gap:6px; padding:3px 8px; border-radius:999px; font-size:10px; font-weight:700; border:1px solid; }
     .exam-session-status.project { background:#f1f5f9; color:#475569; border-color:#cbd5e1; }
     .exam-session-status.started { background:#dcfce7; color:#166534; border-color:#86efac; }
     .exam-session-status.closed { background:#e2e8f0; color:#334155; border-color:#94a3b8; }
-    .exam-session-row:hover { background:#f8fafc; }
+    .exam-session-row\:hover { background:#f8fafc; }
     .exam-schedule-card { border:1px solid #cbd5e1; border-radius:6px; background:#fff; }
     .exam-warning { background:#fffbeb; border:1px solid #fcd34d; color:#92400e; }
     .exam-ok { background:#ecfdf5; border:1px solid #86efac; color:#166534; }
 
     @media print {
-      body * { visibility: hidden; }
-      #printable-area, #printable-area * { visibility: visible; }
+      body \* { visibility: hidden; }
+      #printable-area, #printable-area \* { visibility: visible; }
       #printable-area { position: absolute; left: 0; top: 0; width: 100%; font-family: 'Inter', sans-serif !important; }
     }
-  </style>
+  \</style>
 </head>
 <body class="text-slate-800 flex h-screen overflow-hidden text-[14px]">
 
@@ -164,10 +163,9 @@
           <button onclick="navigate('exam-session-registry')" id="subnav-exam-session-registry" class="mia-submenu-item">
             Реєстр екзаменаційних сесій
           </button>
-          <div class="w-full flex items-center justify-between px-3.5 py-1.5 text-slate-400 bg-slate-100/70 cursor-not-allowed select-none text-[12px] font-normal border-t border-slate-100">
-            <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-[10px] text-slate-400"></i> Екзаменаційні відомості</span>
-            <span class="text-[10px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded">далі</span>
-          </div>
+          <button onclick="navigate('exam-session-documents')" id="subnav-exam-session-documents" class="mia-submenu-item">
+            Екзаменаційні відомості
+          </button>
         </div>
       </div>
 
@@ -726,7 +724,7 @@
     </div>
   </div>
 
-  
+
   <!-- МОДАЛКА: Створення / редагування екзаменаційної сесії -->
   <div id="modal-exam-session" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
     <div class="bg-white border border-slate-400 rounded-sm shadow-2xl w-full max-w-3xl flex flex-col max-h-[90vh]">
@@ -813,6 +811,9 @@
     let examSessionDetailOpen = false;
     let examSessionEditId = null;
     let examScheduleEditId = null;
+    // Екзаменаційні відомості
+    let examSheets = [];
+    let selectedExamSheetId = null;
 
     const CURATOR_ACADEMIC_CONTEXT = {
       academic_year: '2026/2027',
@@ -1761,7 +1762,7 @@
       } else if (currentTab === 'exam-session-registry') {
         renderExamSessionView(main);
       } else if (currentTab === 'exam-session-documents') {
-        renderExamSessionDocumentsPlaceholder(main);
+        renderExamSessionDocuments(main);
       } else if (currentTab.startsWith('finance-')) {
         renderFinanceView(main);
       } else if (currentTab === 'housing-registry') {
@@ -4687,23 +4688,249 @@
       return [...new Set(warnings)];
     }
 
-    function renderExamSessionDocumentsPlaceholder(main) {
+    function renderExamSessionDocuments(main) {
       if (!main) return;
       main.innerHTML = `
         <div class="space-y-4">
-          <div class="bg-white border border-slate-300 p-5 rounded-sm shadow-sm">
-            <div class="flex items-start gap-3">
-              <div class="w-9 h-9 rounded bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-500">
-                <i class="fa-solid fa-file-lines"></i>
-              </div>
-              <div>
-                <h1 class="text-base font-bold text-slate-800">Екзаменаційні відомості</h1>
-                <p class="text-xs text-slate-500 mt-1">Підсистема буде додана на наступному етапі відповідно до функціоналу, який буде визначено для куратора.</p>
-              </div>
+          <div class="bg-white p-4 border border-slate-300 shadow-sm flex justify-between items-center">
+            <div>
+              <h1 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-file-lines text-[#2b569a]"></i> Екзаменаційні відомості
+              </h1>
+              <p class="text-xs text-slate-500 mt-1">Реєстр документів контролю успішності академічної групи ФТМ 1-5.</p>
             </div>
+            <button onclick="createExamSheet()" class="bg-[#2b569a] hover:bg-[#1f4277] text-white px-3 py-1.5 rounded text-xs font-bold">
+              <i class="fa-solid fa-plus mr-1"></i> Створити відомість
+            </button>
           </div>
-        </div>`;
+
+          <div id="exam-sheets-message"></div>
+
+          <div class="bg-white border border-slate-300 rounded shadow-sm overflow-x-auto">
+            <table class="w-full text-xs min-w-[900px]">
+              <thead class="bg-slate-100 border-b border-slate-300">
+                <tr>
+                  <th class="p-2.5 text-center w-12">№</th>
+                  <th class="p-2.5 text-left">Дисципліна</th>
+                  <th class="p-2.5 text-left">Вид</th>
+                  <th class="p-2.5 text-left">Дата</th>
+                  <th class="p-2.5 text-left">Група</th>
+                  <th class="p-2.5 text-center">Статус</th>
+                  <th class="p-2.5 text-right">Дії</th>
+                </tr>
+              </thead>
+              <tbody id="sheets-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      loadSheets();
     }
+
+    function escExam(value) {
+      return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
+    }
+
+    function examTypeLabel(type) {
+      const map = {
+        'Залік': 'Залік',
+        'Диференційований залік': 'Диференційований залік',
+        'Іспит': 'Іспит',
+        'Практика': 'Практика'
+      };
+      return map[type] || type || '—';
+    }
+
+    async function loadSheets() {
+      const tbody = document.getElementById('sheets-tbody');
+      const message = document.getElementById('exam-sheets-message');
+      if (!tbody) return;
+      tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">Завантаження відомостей...</td></tr>`;
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('exam_sheets')
+          .select('*')
+          .eq('group_name', CURATOR_ACADEMIC_CONTEXT.group)
+          .order('exam_date', { ascending: true })
+          .order('start_time', { ascending: true });
+        if (error) throw error;
+
+        examSheets = data || [];
+        const local = JSON.stringify(examSheets);
+        localStorage.setItem('ekurator_exam_sheets', local);
+        renderExamSheetsTable();
+      } catch (err) {
+        console.error(err);
+        const local = localStorage.getItem('ekurator_exam_sheets');
+        examSheets = local ? JSON.parse(local) : [];
+        renderExamSheetsTable();
+        if (message) {
+          message.innerHTML = `<div class="bg-amber-50 border border-amber-300 text-amber-800 px-3 py-2 text-xs rounded">Не вдалося завантажити відомості з Supabase: ${escExam(err?.message || 'Невідома помилка')}</div>`;
+        }
+      }
+    }
+
+    function renderExamSheetsTable() {
+      const tbody = document.getElementById('sheets-tbody');
+      if (!tbody) return;
+      if (!examSheets.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-slate-400">Екзаменаційних відомостей ще немає.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = examSheets.map((s, i) => {
+        const conducted = s.status === 'Проведена';
+        const selected = String(selectedExamSheetId) === String(s.id);
+        const statusClass = conducted
+          ? 'bg-slate-100 text-slate-700 border-slate-300'
+          : 'bg-emerald-50 text-emerald-700 border-emerald-300';
+        return `
+          <tr onclick="selectExamSheet('${escExam(s.id)}')" class="border-b border-slate-200 cursor-pointer ${selected ? 'bg-blue-50' : 'hover:bg-slate-50'} ${conducted ? 'text-slate-900' : 'text-emerald-800'}">
+            <td class="p-2.5 text-center">${i + 1}</td>
+            <td class="p-2.5 font-semibold">${escExam(s.discipline_name)}</td>
+            <td class="p-2.5">${escExam(examTypeLabel(s.exam_type))}</td>
+            <td class="p-2.5">${escExam(s.exam_date || '—')}${s.start_time ? ` <span class="text-slate-400">${escExam(String(s.start_time).slice(0,5))}</span>` : ''}</td>
+            <td class="p-2.5">${escExam(s.group_name || CURATOR_ACADEMIC_CONTEXT.group)}</td>
+            <td class="p-2.5 text-center"><span class="inline-flex px-2 py-1 rounded-full border text-[10px] font-bold ${statusClass}">${escExam(s.status || 'Не проведена')}</span></td>
+            <td class="p-2.5 text-right whitespace-nowrap" onclick="event.stopPropagation()">
+              <button onclick="editSheet('${escExam(s.id)}')" class="text-blue-600 hover:underline mr-3">Редагувати</button>
+              ${conducted
+                ? `<button onclick="toggleSheetStatus('${escExam(s.id)}', 'Не проведена')" class="text-amber-600 hover:underline">Відкликати (Alt+R)</button>`
+                : `<button onclick="toggleSheetStatus('${escExam(s.id)}', 'Проведена')" class="text-emerald-600 hover:underline">Провести (Alt+P)</button>`}
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    function selectExamSheet(id) {
+      selectedExamSheetId = id;
+      renderExamSheetsTable();
+    }
+
+    function getStartedExamSession() {
+      return examSessions.find(s => s.status === 'Розпочата') || null;
+    }
+
+    async function createExamSheet() {
+      const session = getStartedExamSession();
+      if (!session) {
+        alert('Створити екзаменаційну відомість можна лише після початку екзаменаційної сесії.');
+        return;
+      }
+
+      const discipline = prompt('Назва дисципліни:');
+      if (!discipline || !discipline.trim()) return;
+      const examType = prompt('Вид контролю: Залік / Диференційований залік / Іспит / Практика', 'Іспит');
+      if (!examType || !examType.trim()) return;
+      const examDate = prompt('Дата проведення (YYYY-MM-DD):', session.start_date || '');
+      if (!examDate) return;
+      const startTime = prompt('Початок (HH:MM):', '09:00');
+      if (!startTime) return;
+      const endTime = prompt('Закінчення (HH:MM):', '10:30');
+      if (!endTime) return;
+      const examiner = prompt('Екзаменатор (необов’язково):', '');
+      const assistant = prompt('Асистент (необов’язково):', '');
+      const place = prompt('Місце проведення (необов’язково):', '');
+
+      const payload = {
+        session_id: session.id,
+        academic_year: CURATOR_ACADEMIC_CONTEXT.academic_year,
+        specialty: CURATOR_ACADEMIC_CONTEXT.specialty,
+        form_of_study: CURATOR_ACADEMIC_CONTEXT.form_of_study,
+        course: CURATOR_ACADEMIC_CONTEXT.course,
+        group_name: CURATOR_ACADEMIC_CONTEXT.group,
+        discipline_name: discipline.trim(),
+        exam_type: examType.trim(),
+        examiner: examiner?.trim() || null,
+        assistant: assistant?.trim() || null,
+        exam_date: examDate,
+        start_time: startTime,
+        end_time: endTime,
+        place: place?.trim() || null,
+        status: 'Не проведена',
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        const { error } = await supabaseClient.from('exam_sheets').insert(payload);
+        if (error) throw error;
+        await loadSheets();
+      } catch (err) {
+        console.error(err);
+        alert(`Не вдалося створити відомість у Supabase.\n${err?.message || 'Невідома помилка'}`);
+      }
+    }
+
+    async function editSheet(id) {
+      const sheet = examSheets.find(s => String(s.id) === String(id));
+      if (!sheet) return;
+      if (sheet.status === 'Проведена') {
+        alert('Проведену відомість спочатку потрібно відкликати.');
+        return;
+      }
+
+      const discipline = prompt('Дисципліна:', sheet.discipline_name || '');
+      if (!discipline) return;
+      const examType = prompt('Вид контролю:', sheet.exam_type || 'Іспит');
+      if (!examType) return;
+      const examDate = prompt('Дата (YYYY-MM-DD):', sheet.exam_date || '');
+      if (!examDate) return;
+      const startTime = prompt('Початок (HH:MM):', String(sheet.start_time || '').slice(0,5));
+      if (!startTime) return;
+      const endTime = prompt('Закінчення (HH:MM):', String(sheet.end_time || '').slice(0,5));
+      if (!endTime) return;
+
+      try {
+        const { error } = await supabaseClient.from('exam_sheets').update({
+          discipline_name: discipline.trim(),
+          exam_type: examType.trim(),
+          exam_date: examDate,
+          start_time: startTime,
+          end_time: endTime,
+          updated_at: new Date().toISOString()
+        }).eq('id', id);
+        if (error) throw error;
+        await loadSheets();
+      } catch (err) {
+        console.error(err);
+        alert(`Не вдалося змінити відомість.\n${err?.message || 'Невідома помилка'}`);
+      }
+    }
+
+    async function toggleSheetStatus(id, newStatus) {
+      const sheet = examSheets.find(s => String(s.id) === String(id));
+      if (!sheet) return;
+      const question = newStatus === 'Проведена'
+        ? 'Провести екзаменаційну відомість? Після проведення редагування буде заблоковано.'
+        : 'Відкликати проведення відомості та повернути її до статусу «Не проведена»?';
+      if (!confirm(question)) return;
+
+      try {
+        const { error } = await supabaseClient.from('exam_sheets').update({
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        }).eq('id', id);
+        if (error) throw error;
+        selectedExamSheetId = id;
+        await loadSheets();
+      } catch (err) {
+        console.error(err);
+        alert(`Не вдалося змінити статус відомості.\n${err?.message || 'Невідома помилка'}`);
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (!currentTab || currentTab !== 'exam-session-documents') return;
+      if (e.altKey && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        if (selectedExamSheetId) toggleSheetStatus(selectedExamSheetId, 'Проведена');
+      }
+      if (e.altKey && e.key.toLowerCase() === 'r') {
+        e.preventDefault();
+        if (selectedExamSheetId) toggleSheetStatus(selectedExamSheetId, 'Не проведена');
+      }
+    });
 
     function renderExamSessionView(main) {
       if (!main) return;
