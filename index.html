@@ -1,6 +1,4 @@
-
 <!DOCTYPE html>
-
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
@@ -5047,28 +5045,49 @@ function updateExamScale(studentId) {
  national.textContent = scale.national;
 }
 
+function snapshotExamSheetInputs() {
+ const students = Array.isArray(studentsList) ? studentsList : [];
+ for (const student of students) {
+   const id = String(student.id);
+   const input = document.getElementById(`exam-grade-${id}`);
+   if (!input) continue;
+
+   const current = examSheetGrades[id] || {};
+   const raw = input.value.trim();
+   // Важливо: не затираємо дані, які вже завантажені з БД.
+   // Тут лише фіксуємо поточний стан DOM перед перемальовуванням таблиці.
+   if (raw !== '') {
+     current.grade_value = raw;
+     const scale = getExamScale(raw);
+     current.ects_grade = scale.ects;
+     current.national_grade = scale.national;
+   } else if (!current.result_status) {
+     current.grade_value = '';
+   }
+   examSheetGrades[id] = current;
+ }
+}
+
 function setExamStudentStatus(studentId, status) {
  const sheet = examSheets.find(s => String(s.id) === String(selectedExamSheetId));
  if (!sheet || sheet.status === 'Проведена') return;
- const input = document.getElementById(`exam-grade-${studentId}`);
- const ects = document.getElementById(`exam-ects-${studentId}`);
- const national = document.getElementById(`exam-national-${studentId}`);
- if (!input) return;
- if (status) {
-   input.value = '';
-   input.disabled = true;
-   if (ects) ects.textContent = '—';
-   if (national) national.textContent = status === 'н/д' ? 'Не допущений' : status === 'не з’явився' ? 'Не з’явився' : 'Не допущений';
- } else {
-   input.disabled = false;
-   if (national) national.textContent = '—';
- }
- const grade = examSheetGrades[String(studentId)] || {};
- grade.grade_value = status || '';
+
+ // Головний фікс: перед renderExamSheetGradeTable() зчитуємо ВСІ
+ // введені оцінки з DOM. Інакше перемальовування таблиці скидало
+ // незбережені оцінки інших студентів.
+ snapshotExamSheetInputs();
+
+ const id = String(studentId);
+ const grade = examSheetGrades[id] || {};
+ grade.grade_value = '';
  grade.result_status = status || null;
- grade.ects_grade = status ? null : grade.ects_grade || null;
- grade.national_grade = status ? (status === 'н/д' ? 'Не допущений' : status === 'не з’явився' ? 'Не з’явився' : 'Не допущений') : null;
- examSheetGrades[String(studentId)] = grade;
+ grade.ects_grade = null;
+ grade.national_grade = status
+   ? (status === 'н/д' || status === 'курсову не здано' ? 'Не допущений' : 'Не з’явився')
+   : null;
+ grade.updated_at = new Date().toISOString();
+ examSheetGrades[id] = grade;
+
  renderExamSheetGradeTable(sheet.id);
 }
 
@@ -5193,42 +5212,77 @@ function getStartedExamSession() {
         return;
       }
 
-      const discipline = prompt('Назва дисципліни:');
-      if (!discipline || !discipline.trim()) return;
-      const examType = prompt('Вид контролю: Залік / Диференційований залік / Іспит / Практика', 'Іспит');
-      if (!examType || !examType.trim()) return;
-      const examDate = prompt('Дата проведення (YYYY-MM-DD):', session.start_date || '');
-      if (!examDate) return;
-      const startTime = prompt('Початок (HH:MM):', '09:00');
-      if (!startTime) return;
-      const endTime = prompt('Закінчення (HH:MM):', '10:30');
-      if (!endTime) return;
-      const examiner = prompt('Екзаменатор (необов’язково):', '');
-      const assistant = prompt('Асистент (необов’язково):', '');
-      const place = prompt('Місце проведення (необов’язково):', '');
-      const credits = prompt('Кількість кредитів ECTS (необов’язково):', '');
+      // Відомість завжди створюється з графіка вже розпочатої сесії.
+      // Повторно вводити дату, час, викладача, місце тощо не потрібно.
+      const items = examItemsForSession(session.id).filter(item => {
+        const activity = String(item.activity_type || item.exam_type || '').trim().toLowerCase();
+        return !item.consultation_required && activity !== 'консультація' && activity !== 'консультація до іспиту';
+      });
+
+      if (!items.length) {
+        alert('У розпочатій сесії немає записів для створення екзаменаційної відомості. Консультації не формують відомість.');
+        return;
+      }
+
+      // Не дозволяємо створити другу відомість для того самого запису графіка.
+      const available = items.filter(item =>
+        !examSheets.some(sheet => String(sheet.session_item_id || '') === String(item.id))
+      );
+
+      if (!available.length) {
+        alert('Для всіх відповідних записів графіка вже створені екзаменаційні відомості.');
+        return;
+      }
+
+      const options = available.map((item, index) => {
+        const type = examTypeLabel(item.activity_type || item.exam_type);
+        const date = item.exam_date || 'без дати';
+        const time = item.start_time ? `, ${String(item.start_time).slice(0,5)}` : '';
+        return `${index + 1}. ${item.discipline_name || 'Без назви'} — ${type} — ${date}${time}`;
+      }).join('\n');
+
+      const answer = prompt(
+        `Оберіть запис із графіка сесії, з якого створити відомість:\n\n${options}\n\nВведіть номер:`,
+        '1'
+      );
+      if (answer === null) return;
+
+      const index = Number(answer) - 1;
+      if (!Number.isInteger(index) || index < 0 || index >= available.length) {
+        alert('Невірно обрано запис графіка.');
+        return;
+      }
+
+      const item = available[index];
+      const activity = item.activity_type || item.exam_type || 'Іспит';
 
       const payload = {
         session_id: session.id,
+        session_item_id: item.id,
         academic_year: CURATOR_ACADEMIC_CONTEXT.academic_year,
         specialty: CURATOR_ACADEMIC_CONTEXT.specialty,
         form_of_study: CURATOR_ACADEMIC_CONTEXT.form_of_study,
         course: CURATOR_ACADEMIC_CONTEXT.course,
         group_name: CURATOR_ACADEMIC_CONTEXT.group,
-        discipline_name: discipline.trim(),
-        exam_type: examType.trim(),
-        examiner: examiner?.trim() || null,
-        assistant: assistant?.trim() || null,
-        exam_date: examDate,
-        start_time: startTime,
-        end_time: endTime,
-        place: place?.trim() || null,
-        credits: credits?.trim() || null,
+        discipline_name: item.discipline_name || '',
+        exam_type: activity,
+        examiner: item.examiner || null,
+        assistant: item.assistant || null,
+        exam_date: item.exam_date,
+        start_time: item.start_time || null,
+        end_time: item.end_time || null,
+        place: item.room || item.place || null,
+        credits: item.credits || null,
         sheet_number: 'EV-' + Date.now().toString().slice(-8),
         registered_at: new Date().toISOString(),
         status: 'Не проведена',
         updated_at: new Date().toISOString()
       };
+
+      if (!payload.discipline_name || !payload.exam_date) {
+        alert('У записі графіка сесії не заповнені обов’язкові дані (дисципліна або дата). Спочатку виправте графік сесії.');
+        return;
+      }
 
       try {
         const { error } = await supabaseClient.from('exam_sheets').insert(payload);
